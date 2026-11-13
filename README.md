@@ -22,9 +22,9 @@ Service buttons preselect the requested service. All three services are quoted i
 - `index.html`: services, project links, contact address and text.
 - `styles.css`: palette, layouts, mobile breakpoints and animations.
 - `app.js`: navigation, service selection, scroll reveals and email brief.
-- `assets/`: optimized project screenshots from Lucas's supplied portfolio and an SVG favicon.
+- `assets/`: optimized project screenshots from Lucas's supplied portfolio, Samantha Ramsey’s portfolio preview artwork and an SVG favicon.
 
-Change the email in both `index.html` and `app.js` if needed. Project examples are explicitly identified as training work. External portfolio links are retained for full case studies.
+Change the email in both `index.html` and `app.js` if needed. Kasa and Nina Carducci are explicitly identified as training work; Samantha Ramsey’s academic portfolio is featured separately. External portfolio links are retained for full case studies.
 
 ## Local preview
 
@@ -39,3 +39,5 @@ Includes semantic landmarks, labeled fields, native form validation, keyboard fo
 `node --check app.js`
 
 The Pages workflow checks JavaScript syntax and deploys only the static website files, excluding repository documentation and workflow configuration.
+
+Decorative and navigation icons use inline SVG (and an SVG mask for service bullets), so iOS Safari cannot substitute emoji artwork. Motion preferences are still respected.

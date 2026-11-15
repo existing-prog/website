@@ -123,7 +123,7 @@ Le thème emploie les principes généraux du verre dépoli (translucidité, bor
 
 ## Étude de cas Samantha
 
-La route `#project/samantha` affiche une vraie page intégrée et partageable, compatible avec GitHub Pages sans règle de réécriture. L’accueil et les réalisations utilisent `projectHref` dans `src/data.ts`. Kasa possède également une étude intégrée ; Nina conserve son lien externe.
+La route `#project/samantha` affiche une vraie page intégrée et partageable, compatible avec GitHub Pages sans règle de réécriture. L’accueil et les réalisations utilisent `projectHref` dans `src/data.ts`. Kasa et Nina possèdent également leur étude intégrée, via le même gestionnaire de liens.
 
 `src/SamanthaCaseStudy.tsx` et son SCSS sont chargés à la demande. Les textes viennent des deux catalogues existants. Le formulaire reste géré par `App` ; le CTA de l’étude sélectionne le service `portfolio`. Les effets GSAP sont retirés au démontage et en mode mouvement réduit. Le titre reçoit le focus à l’ouverture, et les liens de retour rejoignent les réalisations.
 
@@ -140,3 +140,13 @@ La route `#project/kasa` charge `src/KasaCaseStudy.tsx` à la demande. Kasa est 
 `src/useKasaMotion.ts` centralise les animations et leur nettoyage : entrée des appareils, titres par mots, progression et changement d’aperçu selon le chapitre visible. À partir de 1024 × 700 px, la scène reste sticky pendant les trois étapes, sans bloquer le scroll natif. Les petits écrans et le mode mouvement réduit affichent les captures dans le flux. Les boutons de la scène permettent aussi de rejoindre chaque étape. Le CTA ouvre le formulaire existant avec le service `website` sélectionné.
 
 `src/CaseWords.tsx` et `src/case-study.scss` partagent les bases accessibles des deux études ; `src/kasa-case-study.scss` définit la composition et la palette propres à Kasa. Les textes FR/ENG restent dans les deux catalogues JSON. Les tests `tests/kasa-case-study.spec.ts` couvrent les dimensions, les langues, les étapes dans les deux sens, le mouvement réduit et le parcours vers le devis.
+
+## Étude de cas Nina Carducci
+
+La route `#project/nina` charge `src/NinaCaseStudy.tsx` à la demande et présente un projet de formation consacré à l’optimisation d’un site existant. Le travail concerne les images WebP, le HTML sémantique, les textes alternatifs et les métadonnées ; la conception photographique initiale n’est pas attribuée à Lucas. Le CTA utilise le formulaire commun avec le service `care` sélectionné.
+
+`src/useNinaMotion.ts` anime le cadrage de la photo d’entrée, l’assemblage de la planche-contact, les titres, les barres décoratives d’audit et les aperçus ordinateur/mobile. Le scroll reste natif, sans pin ni écran superposé. Les amplitudes diminuent sur mobile et toutes les animations sont retirées en mode mouvement réduit. Le contexte GSAP est nettoyé au démontage et au changement de langue.
+
+Les fichiers locaux `nina-study-*.webp` proviennent de la démo https://existing-prog.github.io/projet-4/, consultée le 15 novembre 2026 (sources : https://github.com/existing-prog/projet-4). Les photographies Unsplash conservées sont celles de Ryoji Iwata (`wUZjnOv7t0g`), Aaron Paul (`wnX-fXzB6Cw`), Jakob Owens (`SiniLJkXhMc`) et Nino van Prattenburg (`-443cl1uR_8`). Les captures montrent le site réellement déployé ; aucune page cliente n’est reconstruite pour les aperçus.
+
+Les scores Lighthouse avant/après (performance 56/94, accessibilité 68/100, SEO 73/100) sont repris de l’étude publiée dans le portfolio personnel, avec un lien de source visible. Ils sont explicitement présentés comme des résultats d’audit documentés, pas comme un audit actuel ni une promesse de résultat. Les chiffres restent lisibles sans animation. Les tests `tests/nina-case-study.spec.ts` couvrent les langues et dimensions, le défilement dans les deux sens, le mouvement réduit, la navigation et la sélection du service de maintenance.

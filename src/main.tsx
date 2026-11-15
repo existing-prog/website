@@ -52,6 +52,7 @@ import HeroProjectBackdrop from "./HeroProjectBackdrop";
 
 const SamanthaCaseStudy = lazy(() => import("./SamanthaCaseStudy"));
 const KasaCaseStudy = lazy(() => import("./KasaCaseStudy"));
+const NinaCaseStudy = lazy(() => import("./NinaCaseStudy"));
 
 function Mark({ className = "" }: { className?: string }) {
   return (
@@ -82,7 +83,8 @@ function App() {
   const [route, setRoute] = useState(location.hash);
   const workspace = route === "#workspace";
   const kasaCase = route === "#project/kasa";
-  const caseStudy = route === "#project/samantha" || kasaCase;
+  const ninaCase = route === "#project/nina";
+  const caseStudy = route === "#project/samantha" || kasaCase || ninaCase;
   useScrollHeader(menu, workspace || caseStudy);
   const [drafts, setDrafts] = useState<Draft[]>(loadDrafts);
   const [editing, setEditing] = useState<Draft | null>(null);
@@ -94,7 +96,11 @@ function App() {
     const change = () => {
       setRoute(location.hash);
       setMenu(false);
-      if (["#workspace", "#project/samantha", "#project/kasa"].includes(location.hash))
+      if (
+        ["#workspace", "#project/samantha", "#project/kasa", "#project/nina"].includes(
+          location.hash,
+        )
+      )
         window.scrollTo({ top: 0, behavior: "instant" });
     };
     change();
@@ -104,30 +110,36 @@ function App() {
   useEffect(() => {
     document.title = workspace
       ? tr("Project desk — Lucas Berdy")
-      : kasaCase
-        ? tr("Kasa — Case study · Lucas Berdy")
-        : caseStudy
-          ? tr("Samantha Ramsey — Case study · Lucas Berdy")
-          : tr("Lucas Berdy — Your next chapter, online.");
+      : ninaCase
+        ? tr("Nina Carducci — Case study · Lucas Berdy")
+        : kasaCase
+          ? tr("Kasa — Case study · Lucas Berdy")
+          : caseStudy
+            ? tr("Samantha Ramsey — Case study · Lucas Berdy")
+            : tr("Lucas Berdy — Your next chapter, online.");
     document
       .querySelector('meta[property="og:title"]')
       ?.setAttribute("content", document.title);
-    const description = kasaCase
+    const description = ninaCase
       ? tr(
-          "Kasa: a responsive React rental interface built by Lucas Berdy as a frontend training project.",
+          "Nina Carducci: frontend performance, SEO and accessibility improvements by Lucas Berdy, presented as a training project.",
         )
-      : caseStudy
+      : kasaCase
         ? tr(
-            "A scientific portfolio designed and developed by Lucas Berdy: visual identity, responsive interface and orbital demonstrations.",
+            "Kasa: a responsive React rental interface built by Lucas Berdy as a frontend training project.",
           )
-        : tr("meta.description");
+        : caseStudy
+          ? tr(
+              "A scientific portfolio designed and developed by Lucas Berdy: visual identity, responsive interface and orbital demonstrations.",
+            )
+          : tr("meta.description");
     document
       .querySelector('meta[name="description"]')
       ?.setAttribute("content", description);
     document
       .querySelector('meta[property="og:description"]')
       ?.setAttribute("content", description);
-  }, [workspace, caseStudy, kasaCase, i18n.resolvedLanguage]);
+  }, [workspace, caseStudy, kasaCase, ninaCase, i18n.resolvedLanguage]);
   useEffect(() => {
     if (workspace || caseStudy || !location.hash) return;
     const anchor = location.hash;
@@ -390,7 +402,9 @@ function App() {
               </section>
             }
           >
-            {kasaCase ? (
+            {ninaCase ? (
+              <NinaCaseStudy onStart={() => start("care")} />
+            ) : kasaCase ? (
               <KasaCaseStudy onStart={() => start("website")} />
             ) : (
               <SamanthaCaseStudy onStart={() => start("portfolio")} />

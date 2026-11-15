@@ -41,6 +41,8 @@ import {
 import "./styles.scss";
 import ProjectBuilder from "./ProjectBuilder";
 import ProjectStories from "./ProjectStories";
+import { useGlassMotion } from "./useGlassMotion";
+import "./glass-theme.scss";
 import LanguageSwitch from "./LanguageSwitch";
 
 function Mark({ className = "" }: { className?: string }) {
@@ -60,8 +62,13 @@ function Mark({ className = "" }: { className?: string }) {
     </svg>
   );
 }
+/**
+ * Point d’entrée : présentation des services et bureau de brouillons local.
+ * Le hash change la vue ; les demandes restent des e-mails, pas des commandes serveur.
+ */
 function App() {
   const { i18n } = useTranslation();
+  useGlassMotion();
   const [menu, setMenu] = useState(false);
   const [workspace, setWorkspace] = useState(location.hash === "#workspace");
   const [drafts, setDrafts] = useState<Draft[]>(loadDrafts);
@@ -69,6 +76,7 @@ function App() {
   const [notice, setNotice] = useState("");
   const [preview, setPreview] = useState(0);
   const previousFocus = useRef<HTMLElement | null>(null);
+  // Conserver les ancres partageables et prendre en compte un hash chargé très tôt.
   useEffect(() => {
     const change = () => {
       setWorkspace(location.hash === "#workspace");
@@ -106,6 +114,8 @@ function App() {
     window.addEventListener("storage", update);
     return () => window.removeEventListener("storage", update);
   }, []);
+  // Révéler une seule fois les sections visibles, sans imposer de mouvement.
+  // Le nettoyage évite de conserver des observateurs après un changement de vue.
   useEffect(() => {
     if (workspace) return;
     const nodes = document.querySelectorAll<HTMLElement>(".reveal");
@@ -142,12 +152,16 @@ function App() {
     previousFocus.current = document.activeElement as HTMLElement;
     setEditing({ ...draft, extras: [...draft.extras] });
   };
+  // Attendre la fermeture du dialogue natif pour rendre le focus au déclencheur.
+  // preventScroll évite de revenir à une ancienne scène, notamment dans WebKit.
   const close = () => {
     setEditing(null);
-    requestAnimationFrame(() =>
-      previousFocus.current?.focus({ preventScroll: true }),
-    );
+    requestAnimationFrame(() => previousFocus.current?.focus({ preventScroll: true }));
   };
+  /**
+   * La mémoire React reste disponible si localStorage échoue (quota, mode privé…).
+   * Le booléen renvoyé interdit d’afficher « enregistré » si l’écriture a échoué.
+   */
   const persist = (next: Draft[]) => {
     setDrafts(next);
     try {
@@ -166,13 +180,9 @@ function App() {
       id: draft.id || crypto.randomUUID(),
       updatedAt: new Date().toISOString(),
     };
-    const next = [saved, ...drafts.filter((d) => d.id !== saved.id)].slice(
-      0,
-      50,
-    );
+    const next = [saved, ...drafts.filter((d) => d.id !== saved.id)].slice(0, 50);
     const stored = persist(next);
-    if (stored)
-      setNotice("Draft saved on this device. It has not been sent to Lucas.");
+    if (stored) setNotice("Draft saved on this device. It has not been sent to Lucas.");
     setEditing(saved);
     return { draft: saved, persisted: stored };
   };
@@ -209,14 +219,9 @@ function App() {
             <a href="#services">{tr("Services")}</a>
             <a href="#work">{tr("Selected work")}</a>
             <a href="#approach">{tr("The approach")}</a>
-            <a
-              className={workspace ? "desk-link active" : "desk-link"}
-              href="#workspace"
-            >
+            <a className={workspace ? "desk-link active" : "desk-link"} href="#workspace">
               <FolderOpen size={15} /> {tr("Project desk")}{" "}
-              {drafts.length > 0 && (
-                <span className="count">{drafts.length}</span>
-              )}
+              {drafts.length > 0 && <span className="count">{drafts.length}</span>}
             </a>
           </nav>
           <LanguageSwitch />
@@ -253,7 +258,7 @@ function App() {
                   )}
                 </p>
               </div>
-              <button className="button lime" onClick={() => start()}>
+              <button className="button primary" onClick={() => start()}>
                 {tr("New project")} <Plus size={18} />
               </button>
             </div>
@@ -291,19 +296,17 @@ function App() {
                   <br />
                   {tr("and build a brief at your own pace.")}
                 </p>
-                <button className="button lime" onClick={() => start()}>
+                <button className="button primary" onClick={() => start()}>
                   {tr("Plan my first project")} <ArrowUpRight size={18} />
                 </button>
               </div>
             ) : (
               <div className="draft-grid">
                 {drafts.map((d) => (
-                  <article className="draft-card" key={d.id}>
+                  <article className="draft-card glass-interactive" key={d.id}>
                     <div className="draft-card-top">
                       <FileText size={22} />
-                      <span className="pill">
-                        {tr("Draft · not submitted")}
-                      </span>
+                      <span className="pill">{tr("Draft · not submitted")}</span>
                     </div>
                     <span className="eyebrow">{serviceName(d.service)}</span>
                     <h3>{d.company || d.name || tr("Untitled project")}</h3>
@@ -337,6 +340,11 @@ function App() {
         ) : (
           <>
             <section className="hero shell" id="top">
+              <div className="studio-backdrop" aria-hidden="true">
+                <div className="studio-glow glow-one" />
+                <div className="studio-glow glow-two" />
+                <div className="studio-grid" />
+              </div>
               <div className="hero-kicker">
                 <span className="eyebrow">
                   <span className="status-dot" />{" "}
@@ -372,7 +380,7 @@ function App() {
                     )}
                   </p>
                   <div className="hero-actions">
-                    <button className="button lime" onClick={() => start()}>
+                    <button className="button primary" onClick={() => start()}>
                       {tr("Start a project")} <ArrowUpRight size={19} />
                     </button>
                     <a className="understated-link" href="#work">
@@ -384,16 +392,18 @@ function App() {
                     <span>
                       {tr("Work directly with Lucas.")}
                       <br />
-                      <strong>
-                        {tr("From the first idea to the final detail.")}
-                      </strong>
+                      <strong>{tr("From the first idea to the final detail.")}</strong>
                     </span>
                   </div>
                 </div>
                 <div className="hero-stage">
                   <div className="stage-grid" />
-                  <Mark className="stage-star" />
-                  <div className="showcase-window">
+                  <div className="glass-halo" aria-hidden="true">
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <div className="showcase-window glass-interactive">
                     <div className="window-toolbar">
                       <span className="window-dots">
                         <i />
@@ -401,9 +411,7 @@ function App() {
                         <i />
                       </span>
                       <span>
-                        {projects[preview].name
-                          .toLowerCase()
-                          .replaceAll(" ", "-")}
+                        {projects[preview].name.toLowerCase().replaceAll(" ", "-")}
                         .design
                       </span>
                       <ArrowUpRight size={12} />
@@ -431,9 +439,7 @@ function App() {
                     </a>
                     <div className="window-bottom">
                       <div>
-                        <span className="eyebrow">
-                          {tr(projects[preview].kind)}
-                        </span>
+                        <span className="eyebrow">{tr(projects[preview].kind)}</span>
                         <h2>{projects[preview].name}</h2>
                       </div>
                       <span className="window-index">
@@ -507,9 +513,7 @@ function App() {
             <section className="section shell services-section" id="services">
               <div className="section-heading reveal">
                 <div>
-                  <span className="eyebrow">
-                    {tr("02 / FIND YOUR STARTING POINT")}
-                  </span>
+                  <span className="eyebrow">{tr("02 / FIND YOUR STARTING POINT")}</span>
                   <h2>
                     {tr("You do your thing.")}
                     <br />
@@ -518,8 +522,7 @@ function App() {
                 </div>
                 <p>
                   {tr("A first website. A better one. Or a little attention")}
-                  <br className="desktop-break" />{" "}
-                  {tr("for the one you already have.")}
+                  <br className="desktop-break" /> {tr("for the one you already have.")}
                   <br />
                   {tr("There’s a good place to start.")}
                 </p>
@@ -527,7 +530,7 @@ function App() {
               <div className="service-grid">
                 {services.map((s, i) => (
                   <article
-                    className={`service-card reveal ${i === 1 ? "highlight" : ""}`}
+                    className={`service-card glass-interactive reveal ${i === 1 ? "highlight" : ""}`}
                     key={s.id}
                   >
                     <div className="service-card-top">
@@ -557,12 +560,8 @@ function App() {
                     </ul>
                     <div className="service-card-bottom">
                       <span>
-                        <strong className="service-budget">
-                          {tr(s.budget)}
-                        </strong>
-                        <small>
-                          {tr("Indicative · quote before approval")}
-                        </small>
+                        <strong className="service-budget">{tr(s.budget)}</strong>
+                        <small>{tr("Indicative · quote before approval")}</small>
                       </span>
                       <button
                         onClick={() => start(s.id)}
@@ -606,9 +605,7 @@ function App() {
                     "You shouldn’t need to speak developer to get the website you want.",
                   )}
                   <br className="desktop-break" />{" "}
-                  {tr(
-                    "We’ll keep the process clear, collaborative and focused on you.",
-                  )}
+                  {tr("We’ll keep the process clear, collaborative and focused on you.")}
                 </p>
               </div>
               <div className="steps">
@@ -639,15 +636,13 @@ function App() {
                   </article>
                 ))}
               </div>
-              <div className="process-banner">
+              <div className="process-banner glass-interactive">
                 <div>
                   <FolderOpen size={25} />
                   <span>
                     {tr("Ideas need a little room.")}
                     <small>
-                      {tr(
-                        "Start a brief now. Pick it up later in your project desk.",
-                      )}
+                      {tr("Start a brief now. Pick it up later in your project desk.")}
                     </small>
                   </span>
                 </div>
@@ -658,11 +653,9 @@ function App() {
             </section>
             <section className="about-section">
               <div className="shell about-grid">
-                <div className="identity-card reveal">
+                <div className="identity-card glass-interactive reveal">
                   <div className="identity-top">
-                    <span className="eyebrow">
-                      {tr("THE PERSON BEHIND THE PIXELS")}
-                    </span>
+                    <span className="eyebrow">{tr("THE PERSON BEHIND THE PIXELS")}</span>
                     <span>FR / 01</span>
                   </div>
                   <div className="identity-monogram">
@@ -713,8 +706,7 @@ function App() {
                     target="_blank"
                     rel="noreferrer"
                   >
-                    {tr("Meet the code behind the work")}{" "}
-                    <ArrowUpRight size={17} />
+                    {tr("Meet the code behind the work")} <ArrowUpRight size={17} />
                   </a>
                 </div>
               </div>
@@ -765,8 +757,7 @@ function App() {
             <section className="closing-section">
               <div className="shell closing-inner">
                 <span className="eyebrow">
-                  <span className="status-dot" />{" "}
-                  {tr("YOUR NEXT CHAPTER STARTS HERE")}
+                  <span className="status-dot" /> {tr("YOUR NEXT CHAPTER STARTS HERE")}
                 </span>
                 <div className="closing-heading">
                   <h2>
@@ -783,8 +774,7 @@ function App() {
                     {tr("the code and a fresh perspective.")}
                   </p>
                   <button className="button dark" onClick={() => start()}>
-                    {tr("Tell me what you’re building")}{" "}
-                    <ArrowUpRight size={20} />
+                    {tr("Tell me what you’re building")} <ArrowUpRight size={20} />
                   </button>
                   <a href="mailto:lucasberdy@gmail.com">
                     {tr("Or just say hello")} <ArrowUpRight size={16} />
@@ -796,11 +786,7 @@ function App() {
         )}
       </main>
       <footer className="site-footer shell">
-        <a
-          href="#top"
-          className="brand-symbol"
-          aria-label={tr("Lucas Berdy home")}
-        >
+        <a href="#top" className="brand-symbol" aria-label={tr("Lucas Berdy home")}>
           lb<span>.</span>
         </a>
         <span>
@@ -809,11 +795,7 @@ function App() {
           <small>{tr("INDEPENDENT BY CHOICE. INTENTIONAL BY DESIGN.")}</small>
         </span>
         <div>
-          <a
-            href="https://github.com/existing-prog"
-            target="_blank"
-            rel="noreferrer"
-          >
+          <a href="https://github.com/existing-prog" target="_blank" rel="noreferrer">
             {tr("GitHub")} <ArrowUpRight size={13} />
           </a>
           <a

@@ -1,12 +1,12 @@
 import { useTranslation } from "react-i18next";
+/**
+ * Noms natifs pour rester identifiable dans les deux langues ; aria-pressed annonce
+ * le choix actif. L’état appartient à i18next, pas à chaque instance du sélecteur.
+ */
 export default function LanguageSwitch() {
   const { t, i18n } = useTranslation();
   return (
-    <div
-      className="language-switch"
-      role="group"
-      aria-label={t("Website language")}
-    >
+    <div className="language-switch" role="group" aria-label={t("Website language")}>
       <button
         type="button"
         lang="fr"

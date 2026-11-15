@@ -25,9 +25,7 @@ test.describe("French-language visitors", () => {
         "Je conçois et développe des sites web pour les entreprises indépendantes et les professionnels.",
       );
       await expect(
-        page
-          .locator("header")
-          .getByRole("button", { name: "Français", exact: true }),
+        page.locator("header").getByRole("button", { name: "Français", exact: true }),
       ).toHaveAttribute("aria-pressed", "true");
       for (const name of ["Français", "English"]) {
         const r = await page
@@ -38,9 +36,7 @@ test.describe("French-language visitors", () => {
         expect(r!.height).toBeGreaterThanOrEqual(44);
       }
       expect(
-        await page.evaluate(
-          () => document.documentElement.scrollWidth - innerWidth,
-        ),
+        await page.evaluate(() => document.documentElement.scrollWidth - innerWidth),
       ).toBeLessThanOrEqual(1);
       await expect(page.locator(".service-budget")).toHaveText([
         "600–1 200 €",
@@ -62,9 +58,7 @@ test.describe("French-language visitors", () => {
           .locator(".builder-content")
           .evaluate((e) => e.scrollWidth - e.clientWidth),
       ).toBeLessThanOrEqual(1);
-      await page
-        .getByRole("button", { name: "Fermer le formulaire de projet" })
-        .click();
+      await page.getByRole("button", { name: "Fermer le formulaire de projet" }).click();
     });
   }
 });
@@ -98,20 +92,14 @@ test("language changes preserve the form and local drafts and localize exports",
   await expect(
     page.getByRole("heading", { name: "Tell me a little more.", exact: true }),
   ).toBeVisible();
-  await expect(page.getByRole("textbox", { name: "Your idea" })).toHaveValue(
-    brief,
-  );
+  await expect(page.getByRole("textbox", { name: "Your idea" })).toHaveValue(brief);
   await expect(page.getByLabel("How many pages?")).toHaveValue("2–5 pages");
   await expect(page.getByLabel("Subtle animations")).toBeChecked();
   await dialog.getByRole("button", { name: "Français", exact: true }).click();
   await dialog.getByRole("button", { name: "Continuer", exact: true }).click();
   await page.getByLabel("Votre nom", { exact: true }).fill("Camille Dupont");
-  await page
-    .getByLabel("Adresse e-mail", { exact: true })
-    .fill("camille@example.com");
-  await page
-    .getByLabel("Nom de l’entreprise ou du projet")
-    .fill("Atelier Camille");
+  await page.getByLabel("Adresse e-mail", { exact: true }).fill("camille@example.com");
+  await page.getByLabel("Nom de l’entreprise ou du projet").fill("Atelier Camille");
   await dialog.getByRole("button", { name: "Continuer", exact: true }).click();
   await expect(
     page.getByRole("heading", {
@@ -119,9 +107,7 @@ test("language changes preserve the form and local drafts and localize exports",
       exact: true,
     }),
   ).toBeVisible();
-  await expect(page.locator(".review-budget strong")).toHaveText(
-    "1 200–2 400 €",
-  );
+  await expect(page.locator(".review-budget strong")).toHaveText("1 200–2 400 €");
   const href = await dialog
     .getByRole("link", { name: "Envoyer la demande par e-mail" })
     .getAttribute("href");
@@ -139,12 +125,8 @@ test("language changes preserve the form and local drafts and localize exports",
   await dialog
     .getByRole("button", { name: "Enregistrer le brouillon sur cet appareil" })
     .click();
-  await expect(dialog.getByRole("status")).toContainText(
-    "Brouillon enregistré",
-  );
-  await dialog
-    .getByRole("button", { name: "Aller à mon bureau de projets" })
-    .click();
+  await expect(dialog.getByRole("status")).toContainText("Brouillon enregistré");
+  await dialog.getByRole("button", { name: "Aller à mon bureau de projets" }).click();
   await expect(page.locator(".draft-card")).toHaveCount(1);
   await expect(page).toHaveTitle("Bureau de projets — Lucas Berdy");
   await page
@@ -156,15 +138,11 @@ test("language changes preserve the form and local drafts and localize exports",
   await expect(page.locator(".draft-card")).toHaveCount(1);
   await page.getByRole("button", { name: "Continue project" }).click();
   await page.getByRole("button", { name: "Continue", exact: true }).click();
-  await expect(page.getByRole("textbox", { name: "Your idea" })).toHaveValue(
-    brief,
-  );
+  await expect(page.getByRole("textbox", { name: "Your idea" })).toHaveValue(brief);
   await expect(page.getByLabel("Subtle animations")).toBeChecked();
 });
 
-test("French remains selectable with blocked browser storage", async ({
-  page,
-}) => {
+test("French remains selectable with blocked browser storage", async ({ page }) => {
   await page.goto("");
   await page.evaluate(() => {
     Storage.prototype.setItem = () => {
@@ -176,9 +154,7 @@ test("French remains selectable with blocked browser storage", async ({
     .getByRole("button", { name: "Français", exact: true })
     .click();
   await expect(page.locator("html")).toHaveAttribute("lang", "fr");
-  await expect(page).toHaveTitle(
-    "Lucas Berdy — Votre prochaine étape, en ligne.",
-  );
+  await expect(page).toHaveTitle("Lucas Berdy — Votre prochaine étape, en ligne.");
   await expect(page.locator('meta[name="description"]')).toHaveAttribute(
     "content",
     /Des portfolios singuliers/,
@@ -200,34 +176,20 @@ test("French animated projects retain their service mapping when language change
   await expect(page.locator(".project-card")).toHaveCount(2);
   await page
     .locator("#chapter-nina")
-    .evaluate((e) =>
-      e.scrollIntoView({ block: "center", behavior: "instant" }),
-    );
-  await expect(page.locator(".project-stories")).toHaveAttribute(
-    "data-active",
-    "nina",
-  );
+    .evaluate((e) => e.scrollIntoView({ block: "center", behavior: "instant" }));
+  await expect(page.locator(".project-stories")).toHaveAttribute("data-active", "nina");
   await page
     .getByRole("button", { name: "Démarrer un projet comme Nina Carducci", exact: true })
     .click();
   const dialog = page.getByRole("dialog");
-  await expect(page.locator(".service-option.chosen strong")).toHaveText(
-    "Maintenance",
-  );
+  await expect(page.locator(".service-option.chosen strong")).toHaveText("Maintenance");
   for (const name of ["Français", "English"]) {
-    const rect = await dialog
-      .getByRole("button", { name, exact: true })
-      .boundingBox();
+    const rect = await dialog.getByRole("button", { name, exact: true }).boundingBox();
     expect(rect!.height).toBeGreaterThanOrEqual(44);
     expect(rect!.width).toBeGreaterThanOrEqual(44);
   }
   await dialog.getByRole("button", { name: "English", exact: true }).click();
-  await expect(page.locator(".service-option.chosen strong")).toHaveText(
-    "Website care",
-  );
+  await expect(page.locator(".service-option.chosen strong")).toHaveText("Website care");
   await dialog.getByRole("button", { name: "Close project planner" }).click();
-  await expect(page.locator(".project-stories")).toHaveAttribute(
-    "data-active",
-    "nina",
-  );
+  await expect(page.locator(".project-stories")).toHaveAttribute("data-active", "nina");
 });

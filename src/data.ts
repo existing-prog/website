@@ -1,4 +1,8 @@
 import { tr } from "./i18n";
+/**
+ * Contrat de données : ne pas traduire les identifiants ni les valeurs enregistrées.
+ * Les libellés anglais servent de clés vers FR.json / ENG.json au moment de l’affichage.
+ */
 export type ServiceId = "portfolio" | "website" | "care";
 export const services = [
   {
@@ -91,6 +95,7 @@ export const projects = [
     color: "sage",
   },
 ];
+/** Brouillon local uniquement : aucun état « payé » ou « reçu » n’est simulé. */
 export interface Draft {
   id: string;
   updatedAt: string;
@@ -121,6 +126,7 @@ export const serviceName = (id: ServiceId) =>
   tr(services.find((s) => s.id === id)?.short ?? "Website project");
 export const budgetGuide = (id: ServiceId) =>
   tr(services.find((s) => s.id === id)?.budget ?? "Custom quote");
+/** Traduire les étiquettes du brief, jamais le texte personnel rédigé par le visiteur. */
 export function briefText(d: Draft) {
   return tr("export.body", {
     service: serviceName(d.service),
@@ -135,6 +141,7 @@ export function briefText(d: Draft) {
     budget: budgetGuide(d.service),
   });
 }
+/** Valider aussi le stockage local : une ancienne version ou une saisie corrompue ne doit pas casser l’interface. */
 export function loadDrafts(): Draft[] {
   try {
     const value: unknown = JSON.parse(
@@ -167,5 +174,4 @@ export function loadDrafts(): Draft[] {
     return [];
   }
 }
-export const asset = (name: string) =>
-  `${import.meta.env.BASE_URL}assets/${name}`;
+export const asset = (name: string) => `${import.meta.env.BASE_URL}assets/${name}`;

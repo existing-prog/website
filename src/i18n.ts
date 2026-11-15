@@ -3,6 +3,7 @@ import { initReactI18next } from "react-i18next";
 import en from "./locales/ENG.json";
 import fr from "./locales/FR.json";
 const preferenceKey = "lb-language";
+/** Le choix explicite prime sur la langue du navigateur ; le stockage reste facultatif. */
 function initialLanguage() {
   try {
     const stored = localStorage.getItem(preferenceKey);
@@ -16,6 +17,8 @@ function initialLanguage() {
     ? "fr"
     : "en";
 }
+// Catalogues embarqués : aucun appel à une API de traduction et aucun texte utilisateur transmis.
+// Les phrases anglaises servent de clés, donc les points et deux-points ne sont pas des séparateurs.
 i18n.use(initReactI18next).init({
   resources: { en: { translation: en }, fr: { translation: fr } },
   lng: initialLanguage(),
@@ -26,6 +29,7 @@ i18n.use(initReactI18next).init({
   interpolation: { escapeValue: false },
   initAsync: false,
 });
+/** Maintenir les métadonnées et la langue annoncée aux technologies d’assistance. */
 function syncLanguage(language: string) {
   const code = language.startsWith("fr") ? "fr" : "en";
   document.documentElement.lang = code;
@@ -52,6 +56,5 @@ i18n.on("languageChanged", syncLanguage);
 syncLanguage(i18n.language);
 export const tr = (key: string, options?: Record<string, unknown>): string =>
   key ? String(i18n.t(key, options || {})) : "";
-export const dateLocale = () =>
-  i18n.language.startsWith("fr") ? "fr-FR" : "en-GB";
+export const dateLocale = () => (i18n.language.startsWith("fr") ? "fr-FR" : "en-GB");
 export default i18n;

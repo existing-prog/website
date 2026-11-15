@@ -15,10 +15,7 @@ for (const viewport of [
     await page.evaluate(() => document.fonts.ready);
     const layouts = [];
     for (const name of ["English", "Français"]) {
-      await page
-        .locator("header")
-        .getByRole("button", { name, exact: true })
-        .click();
+      await page.locator("header").getByRole("button", { name, exact: true }).click();
       const layout = await page.evaluate(() => {
         const hero = document.querySelector(".hero")!.getBoundingClientRect();
         const heading = document.querySelector(".hero-copy h1")!;
@@ -36,13 +33,12 @@ for (const viewport of [
       expect(layout.nextTop).toBeGreaterThanOrEqual(viewport.height - 1);
       expect(layout.overflow).toBeLessThanOrEqual(1);
       expect(layout.lineHeights).toHaveLength(3);
-      for (const overflow of layout.lineOverflow)
-        expect(overflow).toBeLessThanOrEqual(1);
+      for (const overflow of layout.lineOverflow) expect(overflow).toBeLessThanOrEqual(1);
       layouts.push(layout);
     }
-    expect(
-      Math.abs(layouts[0].heroHeight - layouts[1].heroHeight),
-    ).toBeLessThanOrEqual(1);
+    expect(Math.abs(layouts[0].heroHeight - layouts[1].heroHeight)).toBeLessThanOrEqual(
+      1,
+    );
     expect(
       Math.abs(layouts[0].headingHeight - layouts[1].headingHeight),
     ).toBeLessThanOrEqual(1);
@@ -50,17 +46,12 @@ for (const viewport of [
   });
 }
 for (const width of [1475, 1024, 768, 390]) {
-  test(`closing ornament never overlaps the heading at ${width}px`, async ({
-    page,
-  }) => {
+  test(`closing ornament never overlaps the heading at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("");
     await page.evaluate(() => document.fonts.ready);
     for (const name of ["Français", "English"]) {
-      await page
-        .locator("header")
-        .getByRole("button", { name, exact: true })
-        .click();
+      await page.locator("header").getByRole("button", { name, exact: true }).click();
       const star = page.locator(".closing-heading > .star-mark");
       if (width <= 760) await expect(star).toBeHidden();
       else {

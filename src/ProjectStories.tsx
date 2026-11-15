@@ -15,28 +15,28 @@ import { asset, projects, ServiceId } from "./data";
 import "./project-stories.scss";
 
 gsap.registerPlugin(ScrollTrigger);
+// Le cadre fixe est réservé aux écrans assez grands et aux visiteurs autorisant le mouvement.
 const desktopQuery =
   "(min-width: 1024px) and (min-height: 650px) and (prefers-reduced-motion: no-preference)";
-const directions: Record<
-  string,
-  { service: ServiceId; result: string; label: string }
-> = {
-  samantha: {
-    service: "portfolio",
-    label: "DESIGN & DEVELOPMENT",
-    result: "A distinctive home for your expertise, with room to explore.",
-  },
-  kasa: {
-    service: "website",
-    label: "RESPONSIVE DEVELOPMENT",
-    result: "A considered experience, wherever your visitors find you.",
-  },
-  nina: {
-    service: "care",
-    label: "PERFORMANCE & ACCESSIBILITY",
-    result: "Give your existing website the attention its content deserves.",
-  },
-};
+// Relier chaque exemple au service correspondant avec des identifiants stables.
+const directions: Record<string, { service: ServiceId; result: string; label: string }> =
+  {
+    samantha: {
+      service: "portfolio",
+      label: "DESIGN & DEVELOPMENT",
+      result: "A distinctive home for your expertise, with room to explore.",
+    },
+    kasa: {
+      service: "website",
+      label: "RESPONSIVE DEVELOPMENT",
+      result: "A considered experience, wherever your visitors find you.",
+    },
+    nina: {
+      service: "care",
+      label: "PERFORMANCE & ACCESSIBILITY",
+      result: "Give your existing website the attention its content deserves.",
+    },
+  };
 type Project = (typeof projects)[number];
 
 function BrowserFrame({ project }: { project: Project }) {
@@ -61,6 +61,7 @@ function BrowserFrame({ project }: { project: Project }) {
     </div>
   );
 }
+/** Visuels décoratifs : les vrais noms, descriptions et liens sont dans les chapitres. */
 function ProjectVisual({
   project,
   desktop = false,
@@ -88,20 +89,8 @@ function ProjectVisual({
             viewBox="0 0 640 460"
             fill="none"
           >
-            <ellipse
-              cx="382"
-              cy="180"
-              rx="208"
-              ry="69"
-              transform="rotate(-24 382 180)"
-            />
-            <ellipse
-              cx="382"
-              cy="180"
-              rx="252"
-              ry="108"
-              transform="rotate(21 382 180)"
-            />
+            <ellipse cx="382" cy="180" rx="208" ry="69" transform="rotate(-24 382 180)" />
+            <ellipse cx="382" cy="180" rx="252" ry="108" transform="rotate(21 382 180)" />
             <ellipse
               cx="382"
               cy="180"
@@ -150,11 +139,7 @@ function ProjectVisual({
             {[1, 2, 3].map((i) => (
               <div className={`photo-print photo-${i}`} key={i}>
                 <div className="photo-crop">
-                  <img
-                    src={asset(`nina-photo-${i}.webp`)}
-                    alt=""
-                    loading="lazy"
-                  />
+                  <img src={asset(`nina-photo-${i}.webp`)} alt="" loading="lazy" />
                 </div>
                 <span>0{i} / NINA CARDUCCI</span>
               </div>
@@ -177,18 +162,14 @@ export default function ProjectStories({
   const root = useRef<HTMLDivElement>(null);
   const [filter, setFilter] = useState("All work");
   const [active, setActive] = useState("samantha");
-  const [desktop, setDesktop] = useState(
-    () => matchMedia(desktopQuery).matches,
-  );
+  const [desktop, setDesktop] = useState(() => matchMedia(desktopQuery).matches);
   const [reduced, setReduced] = useState(
     () => matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
   const visible = useMemo(
     () =>
       projects.filter(
-        (_, i) =>
-          filter === "All work" ||
-          (filter === "Portfolios" ? i === 0 : i !== 0),
+        (_, i) => filter === "All work" || (filter === "Portfolios" ? i === 0 : i !== 0),
       ),
     [filter],
   );
@@ -206,6 +187,11 @@ export default function ProjectStories({
       rm.removeEventListener("change", update);
     };
   }, []);
+  /**
+   * Toutes les animations appartiennent à ce contexte GSAP : revert() les retire
+   * lors d’un filtre, d’un redimensionnement, d’un changement de langue ou du démontage.
+   * Le scroll reste natif : seul le dessin du cadre suit sa progression.
+   */
   useLayoutEffect(() => {
     const el = root.current;
     if (!el) return;
@@ -214,13 +200,9 @@ export default function ProjectStories({
     const context = gsap.context(() => {
       if (reduced) return;
       visible.forEach((project) => {
-        const chapter = el.querySelector<HTMLElement>(
-          `#chapter-${project.id}`,
-        )!;
+        const chapter = el.querySelector<HTMLElement>(`#chapter-${project.id}`)!;
         const scene = desktop
-          ? el.querySelector<HTMLElement>(
-              `.story-stage [data-scene="${project.id}"]`,
-            )!
+          ? el.querySelector<HTMLElement>(`.story-stage [data-scene="${project.id}"]`)!
           : chapter.querySelector<HTMLElement>(".story-scene")!;
         if (desktop)
           ScrollTrigger.create({
@@ -239,6 +221,7 @@ export default function ProjectStories({
           },
         });
         const browser = scene.querySelector(".story-browser");
+        // Chaque univers possède sa propre chronologie ; les durées sont relatives.
         if (project.id === "samantha") {
           const orbits = scene.querySelectorAll<SVGGeometryElement>(
             ".story-orbits ellipse",
@@ -249,11 +232,7 @@ export default function ProjectStories({
               strokeDasharray: length,
               strokeDashoffset: length,
             });
-            tl.to(
-              path,
-              { strokeDashoffset: 0, duration: 0.65, ease: "power1.inOut" },
-              0,
-            );
+            tl.to(path, { strokeDashoffset: 0, duration: 0.65, ease: "power1.inOut" }, 0);
           });
           tl.fromTo(
             scene.querySelector(".neptune-sphere"),
@@ -362,6 +341,8 @@ export default function ProjectStories({
         }
       });
     }, el);
+    // Polices et images peuvent modifier les mesures après le premier rendu.
+    // Ne jamais rafraîchir un composant déjà démonté.
     const refresh = () => {
       if (alive) ScrollTrigger.refresh();
     };

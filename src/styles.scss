@@ -1,3 +1,8 @@
+/*
+ * BASE STRUCTURELLE — typographie locale, géométrie et règles responsive.
+ * Les surfaces, couleurs et lumières sont dans glass-theme.scss, importé en dernier.
+ * Les tests layout-parity protègent la hauteur commune des versions FR et ENG.
+ */
 @font-face {
   font-family: "Space Grotesk";
   src: url("/fonts/space-grotesk.ttf") format("truetype");
@@ -12,11 +17,11 @@
   font-weight: 100 1000;
   font-display: swap;
 }
-$lime: #d6f478;
-$ink: #171914;
-$paper: #f1f1e9;
-$muted: #a2a69a;
-$line: #373c30;
+$accent: #dce6f6;
+$ink: #0b0f17;
+$paper: #eef2f8;
+$muted: #a7afbf;
+$line: #303846;
 :root {
   font-family: "DM Sans", Arial, sans-serif;
   color: $paper;
@@ -67,7 +72,7 @@ input,
 textarea,
 select {
   &:focus-visible {
-    outline: 2px solid $lime;
+    outline: 2px solid $accent;
     outline-offset: 5px;
   }
 }
@@ -85,7 +90,7 @@ img {
   height: auto;
 }
 ::selection {
-  background: $lime;
+  background: $accent;
   color: $ink;
 }
 .shell {
@@ -108,8 +113,8 @@ img {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: $lime;
-  box-shadow: 0 0 0 4px #d6f4780c;
+  background: $accent;
+  box-shadow: 0 0 0 4px #a9b2c30c;
 }
 .star-mark {
   width: 1em;
@@ -161,18 +166,18 @@ p {
     transform: translateY(-2px);
   }
 }
-.lime {
-  background: $lime;
+.primary {
+  background: $accent;
   color: $ink;
   &:hover {
-    background: #e1ff8f;
+    background: #bdc4d1;
   }
 }
 .dark {
   background: $ink;
   color: $paper;
   &:hover {
-    background: #303725;
+    background: #2b2d31;
   }
 }
 .understated-link,
@@ -182,16 +187,16 @@ p {
   gap: 20px;
   font-size: 12px;
   padding-bottom: 8px;
-  border-bottom: 1px solid #68705b;
+  border-bottom: 1px solid #626569;
   &:hover {
-    color: $lime;
+    color: $accent;
   }
 }
 .skip-link {
   position: fixed;
   top: -90px;
   left: 20px;
-  background: $lime;
+  background: $accent;
   color: $ink;
   padding: 12px;
   z-index: 100;
@@ -209,7 +214,7 @@ p {
 }
 .site-header {
   border-bottom: 1px solid $line;
-  background: #171914ed;
+  background: #161617ed;
   position: relative;
   z-index: 20;
 }
@@ -232,7 +237,7 @@ p {
   letter-spacing: -4px;
   white-space: nowrap;
   span {
-    color: $lime;
+    color: $accent;
   }
 }
 .brand-label {
@@ -259,7 +264,7 @@ p {
     padding-block: 10px;
     transition: color 0.2s;
     &:hover {
-      color: $lime;
+      color: $accent;
     }
   }
   .desk-link {
@@ -269,16 +274,16 @@ p {
     margin-left: 12px;
     padding-left: 26px;
     border-left: 1px solid $line;
-    color: #c6ccbc;
+    color: #c1c3c7;
   }
   .active {
-    color: $lime;
+    color: $accent;
   }
 }
 .count {
   display: inline-grid;
   place-items: center;
-  background: $lime;
+  background: $accent;
   color: $ink;
   border-radius: 50%;
   font-size: 9px;
@@ -289,18 +294,18 @@ p {
   display: flex;
   align-items: center;
   gap: 20px;
-  border: 1px solid #596147;
+  border: 1px solid #505358;
   padding: 12px 15px;
   min-height: 43px;
   border-radius: 4px;
   font-size: 11px;
   background: transparent;
   &:hover {
-    background: $lime;
+    background: $accent;
     color: $ink;
   }
   svg {
-    color: $lime;
+    color: $accent;
   }
   &:hover svg {
     color: $ink;
@@ -309,6 +314,7 @@ p {
 .menu-button {
   display: none;
 }
+/* Accueil : la structure commune aux langues est complétée en fin de fichier. */
 .hero {
   padding-top: 31px;
 }
@@ -320,7 +326,7 @@ p {
 .hero-location {
   font: 9px monospace;
   letter-spacing: 0.8px;
-  color: #828b76;
+  color: #7d8084;
 }
 .hero-grid {
   display: grid;
@@ -335,7 +341,7 @@ p {
   line-height: 1.02;
   letter-spacing: -5.5px;
   span {
-    color: $lime;
+    color: $accent;
     position: relative;
     white-space: nowrap;
     svg {
@@ -344,7 +350,7 @@ p {
       bottom: -7px;
       width: 100%;
       height: 17px;
-      stroke: $lime;
+      stroke: $accent;
       stroke-width: 2;
       fill: none;
       opacity: 0.7;
@@ -353,7 +359,7 @@ p {
 }
 .hero-copy > p {
   font-size: 14px;
-  color: #aeb4a3;
+  color: #a9abae;
   margin-top: 31px;
   line-height: 1.9;
 }
@@ -373,7 +379,7 @@ p {
   color: $muted;
   strong {
     font-weight: 400;
-    color: #c6cdbb;
+    color: #c1c3c7;
   }
 }
 .mini-monogram {
@@ -386,10 +392,10 @@ p {
     Arial,
     sans-serif;
   letter-spacing: -2px;
-  background: #2c3522;
+  background: #282b2f;
   border-radius: 50%;
-  color: $lime;
-  border: 1px solid #4e6133;
+  color: $accent;
+  border: 1px solid #434851;
 }
 .hero-stage {
   position: relative;
@@ -404,8 +410,8 @@ p {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(#64734420 1px, transparent 1px),
-    linear-gradient(90deg, #64734420 1px, transparent 1px);
+    linear-gradient(#54596320 1px, transparent 1px),
+    linear-gradient(90deg, #54596320 1px, transparent 1px);
   background-size: 42px 42px;
   mask-image: radial-gradient(ellipse, #000 25%, transparent 70%);
   z-index: -1;
@@ -415,17 +421,17 @@ p {
   top: 3px;
   right: 22px;
   font-size: 59px;
-  color: $lime;
+  color: $accent;
   animation: turn 40s linear infinite;
 }
 
 .showcase-window {
   position: relative;
   width: 100%;
-  border: 1px solid #545d48;
+  border: 1px solid #4f5256;
   border-radius: 9px;
   overflow: hidden;
-  background: #eaeae1;
+  background: #e4e5e7;
   transform: rotate(-5deg);
   box-shadow: 0 30px 60px #0006;
   transition: transform 0.5s;
@@ -436,8 +442,8 @@ p {
 }
 .window-toolbar {
   height: 29px;
-  background: #dadccf;
-  color: #737865;
+  background: #d3d5d8;
+  color: #6b6e72;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -450,7 +456,7 @@ p {
   i {
     width: 4px;
     height: 4px;
-    background: #929985;
+    background: #8c8e92;
     border-radius: 50%;
   }
 }
@@ -496,7 +502,7 @@ p {
   padding: 19px 22px;
   .eyebrow {
     font-size: 7px;
-    color: #646b57;
+    color: #5e6064;
   }
   h2 {
     font-size: 23px;
@@ -510,7 +516,7 @@ p {
       sans-serif;
     span {
       font-size: 10px;
-      color: #8c917f;
+      color: #85878b;
       padding-left: 6px;
     }
   }
@@ -523,7 +529,7 @@ p {
   align-items: center;
   gap: 10px;
   padding: 13px 17px;
-  background: $lime;
+  background: $accent;
   color: $ink;
   border-radius: 4px;
   transform: rotate(3deg);
@@ -540,7 +546,7 @@ p {
   gap: 7px;
   button {
     background: transparent;
-    border: 1px solid #424c34;
+    border: 1px solid #3c3f44;
     border-radius: 4px;
     min-height: 30px;
     padding: 8px 10px;
@@ -551,9 +557,9 @@ p {
     gap: 10px;
   }
   .selected {
-    border-color: #a4b77a;
-    color: $lime;
-    background: #2e3820;
+    border-color: #8f96a2;
+    color: $accent;
+    background: #282b30;
   }
 }
 
@@ -561,7 +567,7 @@ p {
   height: 60px;
   display: flex;
   align-items: center;
-  background: $lime;
+  background: $accent;
   color: $ink;
   overflow: hidden;
   contain: inline-size;
@@ -611,8 +617,8 @@ p {
   gap: 16px;
 }
 .service-card {
-  border: 1px solid #3a412f;
-  background: #1d2119;
+  border: 1px solid #35373b;
+  background: #1c1d1e;
   border-radius: 7px;
   padding: 28px;
   position: relative;
@@ -621,7 +627,7 @@ p {
     border-color 0.25s;
   &:hover {
     transform: translateY(-6px);
-    border-color: #7c9253;
+    border-color: #68707d;
   }
   .service-card-top {
     display: flex;
@@ -629,7 +635,7 @@ p {
     align-items: center;
     gap: 10px;
     svg {
-      color: $lime;
+      color: $accent;
     }
     .eyebrow {
       font-size: 8px;
@@ -637,8 +643,8 @@ p {
     }
   }
   &.highlight {
-    background: #293321;
-    border-color: #657d43;
+    background: #27292d;
+    border-color: #575e69;
   }
   .service-card-copy {
     padding: 39px 0 24px;
@@ -651,7 +657,7 @@ p {
     }
     .service-tagline {
       display: block;
-      color: #d9e0ca;
+      color: #d1d4d9;
       font-size: 10px;
       margin: 14px 0;
     }
@@ -674,12 +680,12 @@ p {
       margin-bottom: 13px;
     }
     svg {
-      color: $lime;
+      color: $accent;
     }
   }
   .service-card-bottom {
     padding-top: 22px;
-    border-top: 1px solid #444e35;
+    border-top: 1px solid #3d4046;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -695,8 +701,8 @@ p {
     }
     button {
       background: transparent;
-      border: 1px solid #66794b;
-      color: $lime;
+      border: 1px solid #5b6069;
+      color: $accent;
       width: 42px;
       height: 42px;
       border-radius: 50%;
@@ -704,7 +710,7 @@ p {
       place-items: center;
       transition: 0.2s;
       &:hover {
-        background: $lime;
+        background: $accent;
         color: $ink;
       }
     }
@@ -725,22 +731,22 @@ p {
     gap: 9px;
   }
   a:hover {
-    color: $lime;
+    color: $accent;
   }
 }
 .work-section {
-  background: #eaece2;
+  background: #e5e7e9;
   color: $ink;
   h2 > span {
-    color: #7c8571;
+    color: #787a7e;
   }
   .eyebrow {
-    color: #7c8571;
+    color: #787a7e;
   }
   .understated-link {
-    border-color: #a4af94;
+    border-color: #9da0a6;
     &:hover {
-      color: #465d26;
+      color: #393f4a;
     }
   }
 }
@@ -751,10 +757,10 @@ p {
   margin-bottom: 32px;
   button {
     background: transparent;
-    border: 1px solid #c5ccbc;
+    border: 1px solid #c1c3c7;
     border-radius: 25px;
     padding: 10px 15px;
-    color: #616b54;
+    color: #5c5f63;
     font-size: 10px;
     min-height: 36px;
     &.active {
@@ -776,7 +782,7 @@ p {
     grid-column: 1/-1;
     display: grid;
     grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr);
-    background: #dfe0dc;
+    background: #dddedf;
     border-radius: 8px;
     overflow: hidden;
     .project-visual {
@@ -832,7 +838,7 @@ p {
     }
   }
   &.sage .project-visual {
-    background: #9da58d;
+    background: #95989d;
   }
   .visit-project {
     position: absolute;
@@ -860,7 +866,7 @@ p {
     }
     p {
       font-size: 11px;
-      color: #66705b;
+      color: #626569;
       max-width: 330px;
       margin-top: 8px;
       line-height: 1.8;
@@ -878,7 +884,7 @@ p {
       max-width: 140px;
       span {
         font-size: 8px;
-        border: 1px solid #c3c9b9;
+        border: 1px solid #bec0c4;
         border-radius: 20px;
         padding: 6px 8px;
         white-space: nowrap;
@@ -890,7 +896,7 @@ p {
       transform: scale(1.025);
     }
     .visit-project {
-      background: $lime;
+      background: $accent;
       transform: rotate(4deg);
     }
   }
@@ -901,7 +907,7 @@ p {
     margin-top: 22px;
   }
   h2 > span {
-    color: $lime;
+    color: $accent;
   }
   p {
     font-size: 13px;
@@ -927,11 +933,11 @@ p {
         400 45px "Space Grotesk",
         Arial,
         sans-serif;
-      color: #657355;
+      color: #5f6369;
       letter-spacing: -2px;
     }
     svg {
-      color: $lime;
+      color: $accent;
     }
   }
   h3 {
@@ -948,9 +954,9 @@ p {
 }
 .process-banner {
   margin-top: 50px;
-  border: 1px solid #4a5937;
+  border: 1px solid #43474d;
   border-radius: 7px;
-  background: #232b1b;
+  background: #202226;
   padding: 24px 27px;
   display: flex;
   align-items: center;
@@ -961,7 +967,7 @@ p {
     align-items: center;
     gap: 18px;
     svg {
-      color: $lime;
+      color: $accent;
     }
     span {
       font-size: 14px;
@@ -977,15 +983,15 @@ p {
     display: flex;
     align-items: center;
     gap: 20px;
-    color: $lime;
+    color: $accent;
     font-size: 11px;
     white-space: nowrap;
   }
 }
 .about-section {
   padding-block: 85px;
-  background: #20251c;
-  border-block: 1px solid #343e2b;
+  background: #1f2022;
+  border-block: 1px solid #313438;
 }
 .about-grid {
   display: grid;
@@ -994,7 +1000,7 @@ p {
   align-items: center;
 }
 .identity-card {
-  background: #d7e0c7;
+  background: #cfd2d8;
   color: $ink;
   border-radius: 6px;
   position: relative;
@@ -1011,12 +1017,12 @@ p {
   gap: 15px;
   .eyebrow {
     font-size: 7px;
-    color: #667651;
+    color: #5e6269;
     letter-spacing: 0.5px;
   }
   > span:last-child {
     font: 8px monospace;
-    color: #667651;
+    color: #5e6269;
   }
 }
 .identity-monogram {
@@ -1036,7 +1042,7 @@ p {
     content: "";
     position: absolute;
     inset: 25px;
-    border: 1px solid #75895944;
+    border: 1px solid #696f7944;
     border-radius: 50%;
     transform: rotate(-30deg) scaleX(1.3);
     z-index: -1;
@@ -1046,7 +1052,7 @@ p {
   }
   .star-mark {
     font-size: 59px;
-    color: #7b924e;
+    color: #656d7b;
     position: absolute;
     right: 2px;
     bottom: 25px;
@@ -1068,7 +1074,7 @@ p {
     margin-top: 5px;
   }
   .status-dot {
-    background: #788f4b;
+    background: #626a78;
   }
 }
 .about-copy {
@@ -1078,7 +1084,7 @@ p {
   }
   p {
     font-size: 13px;
-    color: #adb6a1;
+    color: #a8abaf;
     margin-top: 23px;
     max-width: 470px;
   }
@@ -1092,10 +1098,10 @@ p {
       align-items: center;
       gap: 6px;
       font-size: 9px;
-      color: #c7d0bb;
+      color: #c2c5c9;
     }
     svg {
-      color: $lime;
+      color: $accent;
     }
   }
   .understated-link {
@@ -1134,7 +1140,7 @@ p {
       display: none;
     }
     svg {
-      color: $lime;
+      color: $accent;
     }
   }
   p {
@@ -1156,16 +1162,16 @@ p {
   }
 }
 .closing-section {
-  background: $lime;
+  background: $accent;
   color: $ink;
   padding-block: 80px;
   position: relative;
   overflow: hidden;
   .eyebrow {
-    color: #57683b;
+    color: #4a5059;
   }
   .status-dot {
-    background: #637c35;
+    background: #4d5564;
   }
   .closing-inner {
     position: relative;
@@ -1198,14 +1204,14 @@ p {
     justify-content: space-between;
     p {
       font-size: 13px;
-      color: #4b5e2a;
+      color: #3c424c;
     }
     a {
       display: flex;
       align-items: center;
       gap: 15px;
       font-size: 11px;
-      border-bottom: 1px solid #8ba54f;
+      border-bottom: 1px solid #6c7688;
       padding: 9px 0;
     }
     .button {
@@ -1222,10 +1228,10 @@ p {
   > span {
     font: 8px/1.8 monospace;
     letter-spacing: 0.6px;
-    color: #b4bea7;
+    color: #afb2b6;
     small {
       font-size: 7px;
-      color: #7b896b;
+      color: #75797f;
     }
   }
   div {
@@ -1237,7 +1243,7 @@ p {
       align-items: center;
       gap: 5px;
       &:hover {
-        color: $lime;
+        color: $accent;
       }
     }
   }
@@ -1269,15 +1275,15 @@ p {
 }
 .desk-note {
   margin-top: 40px;
-  border: 1px solid #4b5c36;
-  background: #242d1d;
+  border: 1px solid #43474f;
+  background: #222428;
   padding: 20px 23px;
   border-radius: 6px;
   display: flex;
   align-items: flex-start;
   gap: 15px;
   > svg {
-    color: $lime;
+    color: $accent;
     margin-top: 2px;
   }
   strong {
@@ -1294,7 +1300,7 @@ p {
 .notice {
   font-size: 12px;
   padding: 18px 0;
-  color: $lime;
+  color: $accent;
 }
 .desk-heading {
   display: flex;
@@ -1305,7 +1311,7 @@ p {
     font-size: 24px;
     letter-spacing: -1px;
     span {
-      color: #8f9b7e;
+      color: #888b91;
       font-size: 18px;
       margin-left: 6px;
     }
@@ -1316,8 +1322,8 @@ p {
   }
 }
 .empty-desk {
-  border: 1px dashed #465438;
-  background: #1c2118;
+  border: 1px dashed #42454a;
+  background: #1b1c1e;
   border-radius: 8px;
   padding: 70px 20px;
   text-align: center;
@@ -1342,8 +1348,8 @@ p {
   width: 95px;
   height: 85px;
   margin: 0 auto 25px;
-  background: #2b3820;
-  color: $lime;
+  background: #282b30;
+  color: $accent;
   border-radius: 16px;
   transform: rotate(-5deg);
   .star-mark {
@@ -1362,10 +1368,10 @@ p {
   gap: 20px;
 }
 .draft-card {
-  border: 1px solid #465337;
+  border: 1px solid #414449;
   border-radius: 7px;
   padding: 25px;
-  background: #20261b;
+  background: #1f2022;
   min-width: 0;
   .draft-card-top {
     display: flex;
@@ -1374,7 +1380,7 @@ p {
     gap: 10px;
     margin-bottom: 27px;
     > svg {
-      color: $lime;
+      color: $accent;
     }
   }
   .eyebrow {
@@ -1400,7 +1406,7 @@ p {
   small {
     display: block;
     font-size: 9px;
-    color: #7f8f6e;
+    color: #797d84;
     margin-top: 20px;
   }
   .draft-actions {
@@ -1418,15 +1424,15 @@ p {
       background: none;
       padding: 0;
       font-size: 11px;
-      color: $lime;
+      color: $accent;
     }
   }
 }
 .pill {
-  border: 1px solid #65754f;
+  border: 1px solid #5c6068;
   border-radius: 20px;
   padding: 5px 8px;
-  color: #c1cfae;
+  color: #b9bdc4;
   font: 8px monospace;
   white-space: nowrap;
 }
@@ -1437,18 +1443,19 @@ p {
   border-radius: 5px;
   min-width: 38px;
   min-height: 38px;
-  color: #a5b296;
+  color: #a0a3a8;
   &:hover {
-    background: #3d472e;
+    background: #37393f;
     color: $paper;
   }
 }
 /* Native dialog provides keyboard focus containment and Escape support. */
+/* Formulaire : dialogue natif, contenu défilant et barre d’actions toujours disponible. */
 .builder-dialog {
   padding: 0;
-  border: 1px solid #4a563a;
+  border: 1px solid #44474c;
   border-radius: 12px;
-  background: #1c2118;
+  background: #1b1c1e;
   color: $paper;
   width: min(1050px, calc(100vw - 60px));
   max-width: 1050px;
@@ -1457,7 +1464,7 @@ p {
   overflow: hidden;
   box-shadow: 0 30px 120px #0008;
   &::backdrop {
-    background: #090c08bf;
+    background: #090a0bbf;
     backdrop-filter: blur(8px);
   }
 }
@@ -1469,7 +1476,7 @@ p {
 }
 .builder-sidebar {
   padding: 38px 30px;
-  background: #303d25;
+  background: #2d3035;
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -1480,7 +1487,7 @@ p {
   .eyebrow {
     margin-top: 55px;
     font-size: 8px;
-    color: #9cae88;
+    color: #9599a1;
   }
   h2 {
     font-size: 36px;
@@ -1489,7 +1496,7 @@ p {
   }
   p {
     font-size: 11px;
-    color: #a7b599;
+    color: #a3a6ab;
     line-height: 1.9;
     margin-top: 20px;
   }
@@ -1501,7 +1508,7 @@ p {
     flex-direction: column;
     gap: 23px;
     font-size: 11px;
-    color: #9eae8b;
+    color: #979ba2;
     li {
       display: flex;
       align-items: center;
@@ -1511,22 +1518,22 @@ p {
         height: 25px;
         display: grid;
         place-items: center;
-        border: 1px solid #677b51;
+        border: 1px solid #5f646d;
         border-radius: 50%;
         font-size: 9px;
       }
       &.current {
         color: $paper;
         span {
-          background: $lime;
-          border-color: $lime;
+          background: $accent;
+          border-color: $accent;
           color: $ink;
         }
       }
       &.complete {
-        color: $lime;
+        color: $accent;
         span {
-          border-color: #94ae65;
+          border-color: #7e8695;
         }
       }
     }
@@ -1539,9 +1546,9 @@ p {
     gap: 12px;
     font-size: 8px;
     line-height: 1.8;
-    color: #a6b795;
+    color: #a1a5ab;
     > svg {
-      color: $lime;
+      color: $accent;
     }
   }
 }
@@ -1561,20 +1568,20 @@ p {
   padding: 0 30px;
   font: 8px monospace;
   letter-spacing: 0.7px;
-  color: #c2cfb1;
+  color: #bbbfc5;
   > span > span {
     margin-left: 12px;
-    color: #829270;
+    color: #7c8086;
   }
 }
 .builder-progress {
   height: 2px;
-  background: #303c25;
+  background: #2d3034;
   flex-shrink: 0;
   span {
     height: 100%;
     display: block;
-    background: $lime;
+    background: $accent;
     transition: width 0.3s;
   }
 }
@@ -1591,7 +1598,7 @@ p {
   flex: 1;
   overscroll-behavior: contain;
   scrollbar-width: thin;
-  scrollbar-color: #586b3f transparent;
+  scrollbar-color: #4e535c transparent;
   > .eyebrow {
     font-size: 8px;
   }
@@ -1604,7 +1611,7 @@ p {
   }
   .builder-intro {
     font-size: 12px;
-    color: #a0b08f;
+    color: #9a9ea5;
     line-height: 1.9;
     margin-top: 14px;
     max-width: 530px;
@@ -1625,9 +1632,9 @@ p {
   align-items: center;
   gap: 17px;
   padding: 21px 18px;
-  border: 1px solid #435335;
+  border: 1px solid #3f4349;
   border-radius: 6px;
-  background: #232b1d;
+  background: #222326;
   input {
     position: absolute;
     inset: 0;
@@ -1638,7 +1645,7 @@ p {
     margin: 0;
   }
   .option-icon {
-    color: #9aaf7c;
+    color: #8d939e;
     display: grid;
     place-items: center;
   }
@@ -1650,7 +1657,7 @@ p {
   small {
     display: block;
     font-size: 10px;
-    color: #98a987;
+    color: #93979d;
     margin-top: 5px;
   }
   .radio-circle {
@@ -1660,23 +1667,23 @@ p {
     flex: 0 0 18px;
     display: grid;
     place-items: center;
-    border: 1px solid #657b4a;
+    border: 1px solid #5b606a;
     border-radius: 50%;
   }
   &.chosen {
-    border-color: #b5d76e;
-    background: #2d3b22;
+    border-color: #929eb3;
+    background: #2b2d33;
     .option-icon {
-      color: $lime;
+      color: $accent;
     }
     .radio-circle {
-      background: $lime;
+      background: $accent;
       color: $ink;
-      border-color: $lime;
+      border-color: $accent;
     }
   }
   &:has(input:focus-visible) {
-    outline: 2px solid $lime;
+    outline: 2px solid $accent;
     outline-offset: 3px;
   }
 }
@@ -1684,14 +1691,14 @@ p {
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  color: #a5b793;
-  border: 1px solid #435433;
-  background: #252f1e;
+  color: #9fa3ab;
+  border: 1px solid #3e4249;
+  background: #242629;
   border-radius: 5px;
   padding: 16px;
   margin-top: 23px;
   svg {
-    color: $lime;
+    color: $accent;
     margin-top: 2px;
   }
   p {
@@ -1709,13 +1716,13 @@ p {
     display: block;
     font-size: 11px;
     font-weight: 500;
-    color: #d0dcc3;
+    color: #ccced3;
   }
   .required-note {
     float: right;
     font-size: 9px;
     font-weight: 400;
-    color: #7e9470;
+    color: #7c8088;
   }
   .form-row {
     display: grid;
@@ -1729,8 +1736,8 @@ p {
     min-width: 0;
     min-height: 47px;
     display: block;
-    background: #242e1e;
-    border: 1px solid #485c36;
+    background: #232529;
+    border: 1px solid #43474f;
     border-radius: 5px;
     color: $paper;
     padding: 12px 13px;
@@ -1738,7 +1745,7 @@ p {
     margin-top: 9px;
     outline-offset: 2px;
     &::placeholder {
-      color: #849875;
+      color: #81858c;
       opacity: 1;
     }
   }
@@ -1751,7 +1758,7 @@ p {
   .field-hint {
     display: block;
     font-size: 9px;
-    color: #82956f;
+    color: #7c8088;
     font-weight: 400;
     margin-top: 7px;
   }
@@ -1768,7 +1775,7 @@ p {
       span {
         float: right;
         font-size: 9px;
-        color: #7e9470;
+        color: #7c8088;
       }
     }
     label {
@@ -1782,7 +1789,7 @@ p {
       margin: 0;
       width: 15px;
       height: 15px;
-      accent-color: $lime;
+      accent-color: $accent;
       flex-shrink: 0;
     }
   }
@@ -1796,8 +1803,8 @@ p {
   justify-content: space-between;
   gap: 15px;
   padding: 20px 36px;
-  border-top: 1px solid #3a4a2b;
-  background: #20291a;
+  border-top: 1px solid #36393f;
+  background: #1f2124;
   flex-shrink: 0;
   .button {
     padding: 13px 20px;
@@ -1806,13 +1813,13 @@ p {
     gap: 19px;
   }
   .step-counter {
-    color: #82996e;
+    color: #7d828a;
     font-size: 10px;
   }
   .back-button {
     padding: 8px 0;
     background: transparent;
-    color: #b4c6a0;
+    color: #adb1b9;
     display: flex;
     align-items: center;
     gap: 4px;
@@ -1830,18 +1837,18 @@ p {
     align-items: center;
     gap: 7px;
     background: none;
-    border: 1px solid #546a3e;
+    border: 1px solid #4d525b;
     border-radius: 5px;
     padding: 13px 11px;
     font-size: 9px;
     min-height: 43px;
-    color: #c3d6ac;
+    color: #babfc8;
     white-space: nowrap;
   }
 }
 .review-card {
-  border: 1px solid #465c33;
-  background: #242f1e;
+  border: 1px solid #41464e;
+  background: #242629;
   border-radius: 7px;
   padding: 23px;
   margin-top: 24px;
@@ -1872,26 +1879,26 @@ p {
       gap: 15px;
     }
     dt {
-      color: #8da279;
+      color: #878c94;
     }
     dd {
       margin: 0;
-      color: #d1dfc2;
+      color: #cccfd5;
       overflow-wrap: anywhere;
       line-height: 1.6;
     }
   }
   .review-brief {
-    border-top: 1px solid #435932;
+    border-top: 1px solid #3f444c;
     margin-top: 20px;
     padding-top: 17px;
     > span {
       font-size: 9px;
-      color: #8da279;
+      color: #878c94;
     }
     p {
       font-size: 11px;
-      color: #c3d1b4;
+      color: #bec1c7;
       white-space: pre-wrap;
       overflow-wrap: anywhere;
       margin-top: 8px;
@@ -1899,7 +1906,7 @@ p {
     }
   }
   .review-quote {
-    border-top: 1px solid #435932;
+    border-top: 1px solid #3f444c;
     margin-top: 20px;
     padding-top: 17px;
     display: flex;
@@ -1908,10 +1915,10 @@ p {
     gap: 15px;
     font-size: 10px;
     span {
-      color: #8da279;
+      color: #878c94;
     }
     strong {
-      color: $lime;
+      color: $accent;
       font-size: 12px;
       font-weight: 500;
     }
@@ -1927,26 +1934,26 @@ p {
     gap: 7px;
     padding: 4px 0;
     background: none;
-    color: #b1c59b;
+    color: #a9aeb7;
     font-size: 10px;
   }
 }
 .email-note {
   font-size: 10px;
-  color: #889e73;
+  color: #82878f;
   line-height: 1.8;
   margin-top: 20px;
 }
 .action-status {
   font-size: 11px;
-  color: $lime;
+  color: $accent;
   margin-top: 14px;
   line-height: 1.7;
 }
 .saved-footer {
   flex-shrink: 0;
   padding: 0 36px 16px;
-  background: #20291a;
+  background: #1f2124;
   display: flex;
   justify-content: flex-end;
   button {
@@ -1954,7 +1961,7 @@ p {
     display: flex;
     align-items: center;
     gap: 8px;
-    color: $lime;
+    color: $accent;
     font-size: 10px;
   }
 }
@@ -2199,9 +2206,9 @@ p {
   .menu-button {
     display: grid;
     place-items: center;
-    background: #2c3623;
-    color: $lime;
-    border: 1px solid #52673b;
+    background: #292c30;
+    color: $accent;
+    border: 1px solid #4a4f58;
     border-radius: 50%;
     flex: 0 0 40px;
     width: 40px;
@@ -2215,8 +2222,8 @@ p {
     right: 0;
     top: calc(100% + 8px);
     padding: 10px;
-    background: #26311f;
-    border: 1px solid #4c6237;
+    background: #25272b;
+    border: 1px solid #464b53;
     border-radius: 8px;
     box-shadow: 0 15px 40px #0007;
     margin: 0;
@@ -2234,7 +2241,7 @@ p {
     }
     .desk-link {
       border-left: 0;
-      border-top: 1px solid #465b33;
+      border-top: 1px solid #41454d;
       padding: 14px;
       margin-top: 5px;
     }
@@ -3037,46 +3044,46 @@ p {
     Arial,
     sans-serif;
   letter-spacing: -0.8px;
-  color: #d6f478;
+  color: #a9b2c3;
 }
 .pricing-disclaimer {
   font-size: 10px;
   line-height: 1.8;
-  color: #8f9f7d;
+  color: #898d93;
   max-width: 960px;
   margin-top: 15px;
 }
 .service-option small.option-budget {
-  color: #d6f478;
+  color: #a9b2c3;
   font-size: 11px;
   margin-top: 9px;
   font-weight: 500;
   span {
-    color: #91a67a;
+    color: #898e97;
     font-size: 9px;
     font-weight: 400;
   }
 }
 .review-budget {
   margin-top: 22px;
-  border-top: 1px solid #435932;
+  border-top: 1px solid #3f444c;
   padding-top: 18px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 10px;
   > span {
-    color: #8da279;
+    color: #878c94;
     font-size: 10px;
   }
   strong {
     font-size: 17px;
     font-weight: 500;
-    color: #d6f478;
+    color: #a9b2c3;
   }
   p {
     grid-column: 1/-1;
     font-size: 10px;
-    color: #91a67a;
+    color: #898e97;
     line-height: 1.8;
   }
 }
@@ -3104,15 +3111,15 @@ p {
   font-size: 18px;
   line-height: 1.8;
   max-width: 490px;
-  color: #c4ccba;
+  color: #c0c2c6;
 }
 .preview-controls button {
   min-width: 44px;
   min-height: 44px;
   padding: 10px 12px;
   font-size: 12px;
-  color: #dbe3cf;
-  border-color: #64734f;
+  color: #d6d8dc;
+  border-color: #5b5f67;
 }
 .preview-controls button > span:nth-child(2) {
   font-size: 10px;
@@ -3120,7 +3127,7 @@ p {
 .project-card .project-details p,
 .project-card.featured .project-details p {
   font-size: 14px;
-  color: #47523c;
+  color: #43464b;
   line-height: 1.8;
 }
 .service-card .service-card-bottom > span {
@@ -3136,12 +3143,12 @@ p {
 .pricing-disclaimer {
   font-size: 14px;
   line-height: 1.8;
-  color: #a7b697;
+  color: #a2a5ab;
 }
 .review-budget p {
   font-size: 14px;
   line-height: 1.7;
-  color: #b0c39a;
+  color: #a8adb5;
 }
 @media (max-width: 760px) {
   .hero-copy > p {
@@ -3172,10 +3179,10 @@ p {
   display: inline-flex;
   align-items: center;
   flex: 0 0 auto;
-  border: 1px solid #566747;
+  border: 1px solid #52565c;
   border-radius: 5px;
   overflow: hidden;
-  background: #20291a;
+  background: #1f2124;
   button {
     display: grid;
     place-items: center;
@@ -3184,14 +3191,14 @@ p {
     padding: 9px 10px;
     font: 11px monospace;
     background: transparent;
-    color: #c4d1b4;
+    color: #bec1c7;
     border: 0;
     & + button {
-      border-left: 1px solid #566747;
+      border-left: 1px solid #52565c;
     }
     &[aria-pressed="true"] {
-      background: #d6f478;
-      color: #171914;
+      background: #a9b2c3;
+      color: #161617;
     }
     &:focus-visible {
       outline-offset: -3px;
@@ -3243,8 +3250,8 @@ p {
     right: 0;
     top: calc(100% + 8px);
     padding: 10px;
-    background: #26311f;
-    border: 1px solid #4c6237;
+    background: #25272b;
+    border: 1px solid #464b53;
     border-radius: 8px;
     box-shadow: 0 15px 40px #0007;
     margin: 0;
@@ -3262,7 +3269,7 @@ p {
     }
     .desk-link {
       border-left: 0;
-      border-top: 1px solid #465b33;
+      border-top: 1px solid #41454d;
       padding: 14px;
       margin: 5px 0 0;
     }
@@ -3270,9 +3277,9 @@ p {
   .menu-button {
     display: grid;
     place-items: center;
-    background: #2c3623;
-    color: #d6f478;
-    border: 1px solid #52673b;
+    background: #292c30;
+    color: #a9b2c3;
+    border: 1px solid #4a4f58;
     border-radius: 50%;
     flex: 0 0 44px;
     width: 44px;
@@ -3362,7 +3369,7 @@ p {
   color: inherit;
 }
 .hero-copy h1 .hero-accent {
-  color: #d6f478;
+  color: #a9b2c3;
 }
 .hero-copy > p {
   min-block-size: 5.4em;

@@ -22,6 +22,10 @@ import {
 } from "lucide-react";
 import { briefText, budgetGuide, Draft, services, serviceName } from "./data";
 
+/**
+ * Formulaire en quatre étapes. Les valeurs internes restent indépendantes de la
+ * langue ; seules les étiquettes et les exports passent par les catalogues i18n.
+ */
 export default function ProjectBuilder({
   initial,
   onClose,
@@ -44,6 +48,7 @@ export default function ProjectBuilder({
   const dialog = useRef<HTMLDialogElement>(null);
   const form = useRef<HTMLFormElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);
+  // Le dialogue natif contient le focus ; restaurer aussi le défilement au démontage.
   useEffect(() => {
     const el = dialog.current;
     const old = document.body.style.overflow;
@@ -60,9 +65,7 @@ export default function ProjectBuilder({
   }, [step]);
   useEffect(() => {
     form.current
-      ?.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>(
-        "input,textarea",
-      )
+      ?.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>("input,textarea")
       .forEach((field) => field.setCustomValidity(""));
   }, [i18n.resolvedLanguage]);
   const update = <K extends keyof Draft>(key: K, value: Draft[K]) => {
@@ -71,6 +74,7 @@ export default function ProjectBuilder({
     setSaveAttempted(false);
     setCopied("");
   };
+  // Validation native, puis contrôle du texte réellement saisi (hors espaces seuls).
   const next = () => {
     if (form.current?.reportValidity()) {
       if (step === 1 && draft.brief.trim().length < 20) {
@@ -84,6 +88,7 @@ export default function ProjectBuilder({
       setStep((s) => Math.min(s + 1, 3));
     }
   };
+  // Enregistrer un brouillon ne signifie ni envoyer une demande ni confirmer un achat.
   const save = () => {
     const result = onSave(draft);
     setDraft(result.draft);
@@ -91,6 +96,7 @@ export default function ProjectBuilder({
     setSaveAttempted(true);
     setCopied("");
   };
+  // Copie de secours sans serveur. L’URL temporaire est libérée après le téléchargement.
   const download = () => {
     const blob = new Blob([briefText(draft)], {
       type: "text/plain;charset=utf-8",
@@ -107,11 +113,10 @@ export default function ProjectBuilder({
       await navigator.clipboard.writeText(briefText(draft));
       setCopied("Brief copied. Paste it into your email to Lucas.");
     } catch {
-      setCopied(
-        "Clipboard access is unavailable. Use Download brief to keep a copy.",
-      );
+      setCopied("Clipboard access is unavailable. Use Download brief to keep a copy.");
     }
   };
+  // La messagerie du visiteur s’ouvre ; le site ne prétend jamais que l’e-mail est envoyé.
   const email = `mailto:lucasberdy@gmail.com?subject=${encodeURIComponent(tr("Project request — {{service}}", { service: serviceName(draft.service) }))}&body=${encodeURIComponent(briefText(draft))}`;
   return (
     <dialog
@@ -136,20 +141,17 @@ export default function ProjectBuilder({
           </h2>
           <p>{tr("A few thoughtful details make a better starting point.")}</p>
           <ol>
-            {[
-              "Your direction",
-              "The details",
-              "About you",
-              "Review & next step",
-            ].map((label, i) => (
-              <li
-                className={i === step ? "current" : i < step ? "complete" : ""}
-                key={label}
-              >
-                <span>{i < step ? <Check size={14} /> : i + 1}</span>
-                {tr(label)}
-              </li>
-            ))}
+            {["Your direction", "The details", "About you", "Review & next step"].map(
+              (label, i) => (
+                <li
+                  className={i === step ? "current" : i < step ? "complete" : ""}
+                  key={label}
+                >
+                  <span>{i < step ? <Check size={14} /> : i + 1}</span>
+                  {tr(label)}
+                </li>
+              ),
+            )}
           </ol>
           <div className="builder-promise">
             <ShieldCheck size={20} />
@@ -222,9 +224,7 @@ export default function ProjectBuilder({
               {step === 0 && (
                 <>
                   <fieldset className="service-options">
-                    <legend className="sr-only">
-                      {tr("Choose a service")}
-                    </legend>
+                    <legend className="sr-only">{tr("Choose a service")}</legend>
                     {services.map((s, i) => (
                       <label
                         key={s.id}
@@ -242,13 +242,7 @@ export default function ProjectBuilder({
                           onChange={() => update("service", s.id)}
                         />
                         <span className="option-icon">
-                          {i === 0 ? (
-                            <Layers />
-                          ) : i === 1 ? (
-                            <Monitor />
-                          ) : (
-                            <RefreshCw />
-                          )}
+                          {i === 0 ? <Layers /> : i === 1 ? <Monitor /> : <RefreshCw />}
                         </span>
                         <span>
                           <strong>{tr(s.short)}</strong>
@@ -363,8 +357,7 @@ export default function ProjectBuilder({
                       )}
                     />
                     <span className="field-hint">
-                      {tr("A few sentences is a good start.")}{" "}
-                      {draft.brief.length}/1800
+                      {tr("A few sentences is a good start.")} {draft.brief.length}/1800
                     </span>
                   </label>
                   <label>
@@ -477,8 +470,7 @@ export default function ProjectBuilder({
                       <strong>{budgetGuide(draft.service)}</strong>
                       <p>
                         {tr(
-                          services.find((s) => s.id === draft.service)
-                            ?.budgetScope || "",
+                          services.find((s) => s.id === draft.service)?.budgetScope || "",
                         )}
                         {tr(
                           ". Your selected scope and options may change the price. The written quote confirms the full total, any taxes and external costs.",
@@ -520,24 +512,20 @@ export default function ProjectBuilder({
                     <ChevronLeft size={16} /> {tr("Back")}
                   </button>
                 ) : (
-                  <span className="step-counter">
-                    {tr("Let’s make a start.")}
-                  </span>
+                  <span className="step-counter">{tr("Let’s make a start.")}</span>
                 )}
               </div>
               {step < 3 ? (
-                <button className="button lime" type="submit">
+                <button className="button primary" type="submit">
                   {tr("Continue")} <ChevronRight size={17} />
                 </button>
               ) : (
                 <div className="final-actions">
                   <button className="save-button" type="button" onClick={save}>
                     {saved ? <Check size={16} /> : <FolderOpen size={16} />}{" "}
-                    {saved
-                      ? tr("Saved on this device")
-                      : tr("Save draft on this device")}
+                    {saved ? tr("Saved on this device") : tr("Save draft on this device")}
                   </button>
-                  <a className="button lime" href={email}>
+                  <a className="button primary" href={email}>
                     <Mail size={17} /> {tr("Email project request")}
                   </a>
                 </div>

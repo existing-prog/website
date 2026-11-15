@@ -24,6 +24,12 @@ export default defineConfig({
       ? [{ name: "webkit", use: { browserName: "webkit" as const } }]
       : []),
   ],
-  webServer: process.env.TEST_URL ? undefined : {command: "npm run preview -- --port 4173", url: "http://127.0.0.1:4173/website/", reuseExistingServer: !process.env.CI},
+  webServer: process.env.TEST_URL
+    ? undefined
+    : {
+        command: "npm run preview -- --port 4173",
+        url: "http://127.0.0.1:4173/website/",
+        reuseExistingServer: !process.env.CI,
+      },
   reporter: "list",
 });

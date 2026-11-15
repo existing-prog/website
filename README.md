@@ -90,3 +90,29 @@ The site uses i18next and react-i18next, with two bundled catalogs: `src/locales
 A first visit follows the browser language (French for `fr-*`, English otherwise); an explicit FR/ENG choice is stored independently under `lb-language` when browser storage is available. The selector appears in the header and the project planner. Document language, title, metadata, UI labels, accessibility labels, dates, indicative EUR formatting, email subjects and exported briefs update with the selection.
 
 Draft service IDs, page counts, timeline values and selected options remain canonical and independent of the display language, including existing drafts. User-written text is retained exactly as entered. Switching language does not reset the planner step or discard a draft. Language preference storage failure does not prevent switching for the current page.
+
+## Maintenance et lisibilité
+
+Le code utilise une indentation de **2 espaces**, avec des règles partagées dans `.editorconfig` et `.prettierrc.json`. Après une modification :
+
+```sh
+npm run format
+npm run format:check
+npm run build
+npm test
+```
+
+Le contrôle de formatage fait aussi partie du déploiement GitHub Actions. Les commentaires expliquent les contrats et les mécanismes importants : nettoyage des animations et observateurs, retour du focus sans déplacement de la page, valeurs de brouillon indépendantes de la langue et distinction entre sauvegarde locale et envoi réel.
+
+### Où modifier quoi ?
+
+- `src/styles.scss` : dimensions, typographie, dispositions et points de rupture. Les règles de parité FR/ENG du hero sont regroupées en fin de fichier.
+- `src/glass-theme.scss` : palette anthracite/argent, surfaces dépolies, bordures et lumières. Importé après les styles structurels ; éviter d’y changer les dimensions du hero.
+- `src/useGlassMotion.ts` : reflets au pointeur et légère inclinaison du cadre. Une mise à jour par frame, aucune sur écran tactile ou en mode mouvement réduit.
+- `src/ProjectStories.tsx` et `src/project-stories.scss` : chronologies GSAP, correspondance projet/service et dessin de chaque scène.
+- `src/ProjectBuilder.tsx` et `src/data.ts` : étapes, validation, stockage local et exports. Ne pas traduire les identifiants enregistrés.
+- `src/locales/FR.json` et `src/locales/ENG.json` : textes ; conserver les mêmes clés et variables `{{…}}`.
+
+### Direction visuelle
+
+Le thème emploie les principes généraux du verre dépoli (translucidité, bordures lumineuses et profondeur), avec une composition et du code propres à ce site. Aucun code, modèle 3D, carte de paiement, visuel ou texte de la référence T.RICKS/Webflow n’a été intégré. Les aperçus restent ceux des projets de Lucas. Le flou est limité aux panneaux ; le contenu et les actions restent nets et utilisables sans animation.

@@ -18,6 +18,11 @@ for (const width of [320, 360, 375, 390, 430, 768, 1024, 1440, 1920]) {
     expect(dimensions.scroll).toBeLessThanOrEqual(dimensions.client + 1);
     expect(dimensions.ribbon).toBeLessThanOrEqual(60);
     await expect(page.locator(".project-card")).toHaveCount(3);
+    await expect(page.locator(".service-budget")).toHaveText([
+      "€600–€1,200",
+      "€1,200–€2,400",
+      "€45 / hour",
+    ]);
     await page
       .getByRole("button", { name: "Start a project", exact: true })
       .click();
@@ -74,6 +79,13 @@ test("project request validates, saves, reloads, resumes and exports", async ({
     .getAttribute("href");
   expect(href).toContain("mailto:lucasberdy@gmail.com");
   expect(decodeURIComponent(href!)).toContain("Subtle animations");
+  expect(decodeURIComponent(href!)).toContain("€1,200–€2,400");
+  await expect(page.locator(".review-budget strong")).toHaveText(
+    "€1,200–€2,400",
+  );
+  await expect(page.locator(".review-quote strong")).toHaveText(
+    "Written quote to approve",
+  );
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "Download brief" }).click();
   const download = await downloadPromise;
@@ -153,4 +165,53 @@ test("corrupt local drafts fail safely and reduced motion is respected", async (
       .locator(".stage-star")
       .evaluate((e) => getComputedStyle(e).animationName),
   ).toBe("none");
+});
+
+test("storage failure never claims a draft was saved", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("");
+  await page.evaluate(() => {
+    localStorage.setItem(
+      "lb-project-drafts-v1",
+      JSON.stringify([
+        {
+          id: "storage-test",
+          updatedAt: new Date().toISOString(),
+          service: "portfolio",
+          pages: "One page / small update",
+          extras: [],
+          name: "Alex",
+          email: "alex@example.com",
+          company: "Storage test",
+          website: "",
+          timeline: "Flexible",
+          brief:
+            "A portfolio for my independent design work and creative projects.",
+        },
+      ]),
+    );
+  });
+  await page.reload();
+  await page.goto("#workspace");
+  await page.getByRole("button", { name: "Continue project" }).click();
+  for (let i = 0; i < 3; i++)
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await page.evaluate(() => {
+    Storage.prototype.setItem = () => {
+      throw new DOMException("Storage blocked", "QuotaExceededError");
+    };
+  });
+  await page.getByRole("button", { name: "Save draft on this device" }).click();
+  await expect(page.getByRole("dialog").getByRole("status")).toContainText(
+    "Browser storage is unavailable",
+  );
+  await expect(
+    page.getByRole("button", { name: "Save draft on this device" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Saved on this device", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Download brief" }),
+  ).toBeVisible();
 });

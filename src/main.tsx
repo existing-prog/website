@@ -71,6 +71,7 @@ function App() {
       setMenu(false);
       if (location.hash === "#workspace") window.scrollTo({ top: 0 });
     };
+    change();
     window.addEventListener("hashchange", change);
     return () => window.removeEventListener("hashchange", change);
   }, []);
@@ -145,7 +146,7 @@ function App() {
       return true;
     } catch {
       setNotice(
-        "Browser storage is unavailable. Your draft is kept only until this page closes. Download a copy to keep it.",
+        "Browser storage is unavailable. Changes are temporary and may be lost when this page closes. Download a copy of important briefs.",
       );
       return false;
     }
@@ -164,11 +165,11 @@ function App() {
     if (stored)
       setNotice("Draft saved on this device. It has not been sent to Lucas.");
     setEditing(saved);
-    return saved;
+    return { draft: saved, persisted: stored };
   };
   const remove = (id: string) => {
-    persist(drafts.filter((d) => d.id !== id));
-    setNotice("Draft removed from this device.");
+    const stored = persist(drafts.filter((d) => d.id !== id));
+    if (stored) setNotice("Draft removed from this device.");
   };
   const showDesk = () => {
     close();
@@ -530,8 +531,8 @@ function App() {
                     </ul>
                     <div className="service-card-bottom">
                       <span>
-                        Made to fit your brief.
-                        <small>Custom quote after review</small>
+                        <strong className="service-budget">{s.budget}</strong>
+                        <small>Indicative · quote before approval</small>
                       </span>
                       <button
                         onClick={() => start(s.id)}
@@ -552,6 +553,12 @@ function App() {
                   A few questions? <ArrowUpRight size={14} />
                 </a>
               </div>
+              <p className="pricing-disclaimer">
+                Indicative EUR budgets for a focused starting scope. Larger
+                projects, extra features, any applicable taxes, domain, hosting
+                and third-party costs are confirmed separately in your written
+                quote. Nothing is booked or charged without your approval.
+              </p>
             </section>
             <section className="work-section section" id="work">
               <div className="shell">
@@ -768,7 +775,7 @@ function App() {
                 {[
                   {
                     q: "How much will my project cost?",
-                    a: "Every project is scoped individually. Your pages, content, design and features all play a part. Build a brief and send it to me; we’ll agree on a written quote before any work begins.",
+                    a: "As a guide, a focused portfolio is €600–€1,200, a small business website €1,200–€2,400, and frontend care €45/hour. Project guides use a €300/day development basis. Your actual scope, features, any applicable taxes and external costs are confirmed in a written quote, which you approve before work begins.",
                   },
                   {
                     q: "Can I order and pay directly here?",

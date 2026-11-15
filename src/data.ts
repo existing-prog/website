@@ -5,6 +5,8 @@ export const services = [
     no: "01",
     name: "The personal statement.",
     short: "Portfolio",
+    budget: "€600–€1,200",
+    budgetScope: "Focused portfolio · approx. 2–4 development days",
     tagline: "For the work only you can do.",
     description:
       "A distinctive home for your work, your story and your next opportunity. Make every introduction count.",
@@ -20,6 +22,8 @@ export const services = [
     no: "02",
     name: "The next big move.",
     short: "Business website",
+    budget: "€1,200–€2,400",
+    budgetScope: "Small brochure website · approx. 4–8 development days",
     tagline: "For the business you’re building.",
     description:
       "Turn a first impression into a next step. A considered website that makes your offer clear and your business memorable.",
@@ -35,6 +39,8 @@ export const services = [
     no: "03",
     name: "The ongoing attention.",
     short: "Website care",
+    budget: "€45 / hour",
+    budgetScope: "Frontend updates · time and scope agreed in advance",
     tagline: "For a website that keeps getting better.",
     description:
       "The launch is just the beginning. Get a helping hand with updates, frontend fixes and the details that need attention.",
@@ -109,8 +115,10 @@ export const emptyDraft = (service: ServiceId = "website"): Draft => ({
 });
 export const serviceName = (id: ServiceId) =>
   services.find((s) => s.id === id)?.short ?? "Website project";
+export const budgetGuide = (id: ServiceId) =>
+  services.find((s) => s.id === id)?.budget ?? "Custom quote";
 export function briefText(d: Draft) {
-  return `PROJECT REQUEST — ${serviceName(d.service)}\n\nName: ${d.name}\nEmail: ${d.email}\nBusiness: ${d.company || "Not provided"}\nExisting website: ${d.website || "Not provided"}\nPages / scope: ${d.pages}\nInterested in: ${d.extras.join(", ") || "Core service"}\nPreferred timeline: ${d.timeline}\n\nPROJECT BRIEF\n${d.brief}\n\nPlease review my requirements and send a tailored quote. I understand that scope, price and dates need to be agreed before work starts.`;
+  return `PROJECT REQUEST — ${serviceName(d.service)}\n\nName: ${d.name}\nEmail: ${d.email}\nBusiness: ${d.company || "Not provided"}\nExisting website: ${d.website || "Not provided"}\nPages / scope: ${d.pages}\nInterested in: ${d.extras.join(", ") || "Core service"}\nPreferred timeline: ${d.timeline}\n\nPROJECT BRIEF\n${d.brief}\n\nINDICATIVE SERVICE BUDGET GUIDE\n${budgetGuide(d.service)} — a starter-scope guide, not a quote or a confirmed total. Larger scopes, optional features, applicable taxes and external costs are confirmed in the written quote.\n\nPlease review my requirements and send a tailored quote. I understand that scope, price and dates need to be agreed before work starts.`;
 }
 export function loadDrafts(): Draft[] {
   try {

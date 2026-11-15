@@ -17,7 +17,7 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
-import { briefText, Draft, services, serviceName } from "./data";
+import { briefText, budgetGuide, Draft, services, serviceName } from "./data";
 
 export default function ProjectBuilder({
   initial,
@@ -28,7 +28,7 @@ export default function ProjectBuilder({
 }: {
   initial: Draft;
   onClose: () => void;
-  onSave: (d: Draft) => Draft;
+  onSave: (d: Draft) => { draft: Draft; persisted: boolean };
   onDesk: () => void;
   notice: string;
 }) {
@@ -36,6 +36,7 @@ export default function ProjectBuilder({
   const [step, setStep] = useState(0);
   const [copied, setCopied] = useState("");
   const [saved, setSaved] = useState(false);
+  const [saveAttempted, setSaveAttempted] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
   const form = useRef<HTMLFormElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);
@@ -56,6 +57,8 @@ export default function ProjectBuilder({
   const update = <K extends keyof Draft>(key: K, value: Draft[K]) => {
     setDraft((d) => ({ ...d, [key]: value }));
     setSaved(false);
+    setSaveAttempted(false);
+    setCopied("");
   };
   const next = () => {
     if (form.current?.reportValidity()) {
@@ -71,9 +74,11 @@ export default function ProjectBuilder({
     }
   };
   const save = () => {
-    const d = onSave(draft);
-    setDraft(d);
-    setSaved(true);
+    const result = onSave(draft);
+    setDraft(result.draft);
+    setSaved(result.persisted);
+    setSaveAttempted(true);
+    setCopied("");
   };
   const download = () => {
     const blob = new Blob([briefText(draft)], {
@@ -231,6 +236,9 @@ export default function ProjectBuilder({
                         <span>
                           <strong>{s.short}</strong>
                           <small>{s.tagline}</small>
+                          <small className="option-budget">
+                            {s.budget} <span>· indicative</span>
+                          </small>
                         </span>
                         <span className="radio-circle">
                           {draft.service === s.id && <Check size={12} />}
@@ -241,8 +249,9 @@ export default function ProjectBuilder({
                   <div className="planner-note">
                     <Sparkles size={18} />
                     <p>
-                      Each project gets a tailored quote. Scope, price and
-                      timing are agreed together before the work begins.
+                      Budgets are guides, not fixed totals. You receive a
+                      written quote with the scope, final price and timing to
+                      approve before any work begins.
                     </p>
                   </div>
                 </>
@@ -434,9 +443,22 @@ export default function ProjectBuilder({
                       <span>Your idea</span>
                       <p>{draft.brief}</p>
                     </div>
+                    <div className="review-budget">
+                      <span>Indicative service guide</span>
+                      <strong>{budgetGuide(draft.service)}</strong>
+                      <p>
+                        {
+                          services.find((s) => s.id === draft.service)
+                            ?.budgetScope
+                        }
+                        . Your selected scope and options may change the price.
+                        The written quote confirms the full total, any taxes and
+                        external costs.
+                      </p>
+                    </div>
                     <div className="review-quote">
-                      <span>Project investment</span>
-                      <strong>Quoted after review</strong>
+                      <span>Final project total</span>
+                      <strong>Written quote to approve</strong>
                     </div>
                   </div>
                   <div className="review-actions">
@@ -453,7 +475,7 @@ export default function ProjectBuilder({
                     here.
                   </p>
                   <p className="action-status" role="status">
-                    {copied || (saved ? notice : "")}
+                    {copied || (saveAttempted ? notice : "")}
                   </p>
                 </>
               )}

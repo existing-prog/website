@@ -13,7 +13,7 @@ A React + TypeScript storefront for independent frontend services, with SCSS, a 
 
 ## Placeholders and production boundaries
 
-Pricing is **custom quote after review**. No prices, client testimonials, checkout, confirmed bookings or delivery guarantees are invented.
+Pricing follows **request a quote → approve the scope**, as requested by the owner. Published indicative guides are €600–€1,200 for a focused portfolio, €1,200–€2,400 for a small brochure/business site, and €45/hour for frontend care. These are proposed starter budgets, not fixed prices or market averages for complete projects. Final scope, price, timing, any taxes and external costs are confirmed in a written quote before approval. No checkout, confirmed bookings, testimonials or delivery guarantees are fabricated.
 
 The website has **no backend** at this stage. The project desk is not an authenticated client account; drafts do not sync across devices. Email requests open the visitor's email application and still require the visitor to press Send. The UI never marks a request as received or paid.
 
@@ -68,3 +68,7 @@ Settings → Pages must use **GitHub Actions**. Pushes to `main` install depende
 - `tests/storefront.spec.ts`: functional and viewport regression tests.
 
 Samantha Ramsey’s portfolio is a featured project. Kasa and Nina Carducci are explicitly labelled training projects. External links point to the supplied live portfolio and case studies.
+
+## Pricing basis (15 November 2026)
+
+The owner requested rates appropriate for a new frontend freelancer based in France. [Malt’s French frontend rate barometer](https://www.malt.fr/t/barometre-tarifs/tech/developpeur-frontend) lists **€300/day** for 0–2 years of experience on the date checked. This is a marketplace benchmark, not an affiliation with Malt. The portfolio range assumes a focused 2–4 development-day scope; the small business site assumes 4–8 days. The €45/hour care guide rounds a seven-hour-day equivalent of that daily basis. These effort assumptions are our suggested offer structure, not figures reported by the benchmark. Larger scopes and selected options do not produce an automatic total; they require a tailored quote.

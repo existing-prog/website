@@ -3105,3 +3105,72 @@ p {
     transform: translateX(0);
   }
 }
+
+.service-budget {
+  display: block;
+  font:
+    500 25px/1.2 "Space Grotesk",
+    Arial,
+    sans-serif;
+  letter-spacing: -0.8px;
+  color: #d6f478;
+}
+.pricing-disclaimer {
+  font-size: 10px;
+  line-height: 1.8;
+  color: #8f9f7d;
+  max-width: 960px;
+  margin-top: 15px;
+}
+.service-option small.option-budget {
+  color: #d6f478;
+  font-size: 11px;
+  margin-top: 9px;
+  font-weight: 500;
+  span {
+    color: #91a67a;
+    font-size: 9px;
+    font-weight: 400;
+  }
+}
+.review-budget {
+  margin-top: 22px;
+  border-top: 1px solid #435932;
+  padding-top: 18px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  > span {
+    color: #8da279;
+    font-size: 10px;
+  }
+  strong {
+    font-size: 17px;
+    font-weight: 500;
+    color: #d6f478;
+  }
+  p {
+    grid-column: 1/-1;
+    font-size: 10px;
+    color: #91a67a;
+    line-height: 1.8;
+  }
+}
+@media (max-width: 760px) {
+  .service-budget {
+    font-size: 25px;
+  }
+  .pricing-disclaimer {
+    font-size: 9px;
+    margin-top: 16px;
+  }
+  .service-option small.option-budget {
+    font-size: 11px;
+  }
+  .review-budget {
+    gap: 10px;
+    strong {
+      font-size: 15px;
+    }
+  }
+}

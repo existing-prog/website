@@ -329,12 +329,7 @@ p {
   align-items: center;
   padding: 53px 0 65px;
 }
-.hero-overline {
-  font: 9px monospace;
-  letter-spacing: 1.3px;
-  color: $muted;
-  margin-bottom: 22px;
-}
+
 .hero-copy h1 {
   font-size: clamp(60px, 6.6vw, 96px);
   line-height: 1.02;
@@ -423,17 +418,7 @@ p {
   color: $lime;
   animation: turn 40s linear infinite;
 }
-.stage-label {
-  position: absolute;
-  left: 22px;
-  top: 16px;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  font: 8px monospace;
-  letter-spacing: 1px;
-  color: #b7c0a7;
-}
+
 .showcase-window {
   position: relative;
   width: 100%;
@@ -571,32 +556,7 @@ p {
     background: #2e3820;
   }
 }
-.stage-caption {
-  position: absolute;
-  bottom: 15px;
-  left: 5px;
-  color: #737e66;
-  font: 7px monospace;
-  letter-spacing: 0.7px;
-}
-.hero-bottom {
-  border-top: 1px solid $line;
-  padding: 22px 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font: 8px monospace;
-  letter-spacing: 0.8px;
-  color: $muted;
-  a {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-  }
-  svg {
-    color: $lime;
-  }
-}
+
 .service-ribbon {
   height: 60px;
   display: flex;
@@ -2070,9 +2030,7 @@ p {
   .showcase-image {
     height: 225px;
   }
-  .stage-caption {
-    display: none;
-  }
+
   .preview-controls {
     bottom: 15px;
     right: 0;
@@ -2088,10 +2046,7 @@ p {
   .window-bottom h2 {
     font-size: 20px;
   }
-  .hero-overline {
-    font-size: 8px;
-    letter-spacing: 0.8px;
-  }
+
   .service-card {
     padding: 23px;
   }
@@ -2300,11 +2255,7 @@ p {
     gap: 0;
     padding: 34px 0 24px;
   }
-  .hero-overline {
-    font-size: 7px;
-    letter-spacing: 0.9px;
-    margin-bottom: 19px;
-  }
+
   .hero-copy h1 {
     font-size: clamp(56px, 13.6vw, 88px);
     letter-spacing: -3.8px;
@@ -2352,12 +2303,7 @@ p {
     top: 2px;
     right: 18px;
   }
-  .stage-label {
-    left: 18px;
-    top: 13px;
-    font-size: 6px;
-    letter-spacing: 0.8px;
-  }
+
   .showcase-window {
     transform: rotate(-4deg);
   }
@@ -2416,27 +2362,7 @@ p {
       gap: 8px;
     }
   }
-  .hero-bottom {
-    font-size: 6px;
-    letter-spacing: 0.4px;
-    gap: 20px;
-    align-items: flex-start;
-    line-height: 1.8;
-    padding-block: 20px;
-    > span {
-      max-width: 49%;
-    }
-    a {
-      gap: 8px;
-      max-width: 45%;
-      text-align: right;
-      align-items: center;
-      svg {
-        width: 12px;
-        height: 12px;
-      }
-    }
-  }
+
   .service-ribbon {
     height: 46px;
     > div {
@@ -3028,9 +2954,7 @@ p {
     right: 9px;
     bottom: 6px;
   }
-  .stage-label {
-    font-size: 5.5px;
-  }
+
   .hero-actions {
     gap: 20px;
     align-items: flex-start;
@@ -3172,5 +3096,73 @@ p {
     strong {
       font-size: 15px;
     }
+  }
+}
+
+/* Clearer offer and accessible supporting content at every breakpoint. */
+.hero-copy > p {
+  font-size: 18px;
+  line-height: 1.8;
+  max-width: 490px;
+  color: #c4ccba;
+}
+.preview-controls button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: #dbe3cf;
+  border-color: #64734f;
+}
+.preview-controls button > span:nth-child(2) {
+  font-size: 10px;
+}
+.project-card .project-details p,
+.project-card.featured .project-details p {
+  font-size: 14px;
+  color: #47523c;
+  line-height: 1.8;
+}
+.service-card .service-card-bottom > span {
+  min-width: 0;
+}
+.service-card .service-card-bottom small {
+  font-size: 14px;
+  line-height: 1.6;
+}
+.service-card .service-card-bottom button {
+  flex-shrink: 0;
+}
+.pricing-disclaimer {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #a7b697;
+}
+.review-budget p {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #b0c39a;
+}
+@media (max-width: 760px) {
+  .hero-copy > p {
+    font-size: 16px;
+    max-width: 100%;
+  }
+  .hero-actions .button {
+    font-size: 13px;
+    min-height: 52px;
+    gap: 32px;
+  }
+  .preview-controls {
+    gap: 7px;
+    right: 12px;
+  }
+  .preview-controls button {
+    padding: 10px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .pricing-disclaimer {
+    font-size: 14px;
   }
 }

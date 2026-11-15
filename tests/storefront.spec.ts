@@ -25,6 +25,7 @@ for (const width of [320, 360, 375, 390, 430, 768, 1024, 1440, 1920]) {
     ]);
     await page
       .getByRole("button", { name: "Start a project", exact: true })
+      .first()
       .click();
     await expect(page.getByRole("dialog")).toBeVisible();
     const dialog = await page.getByRole("dialog").boundingBox();
@@ -136,11 +137,12 @@ test("mobile menu, filters, preview switching, and Escape", async ({
   await expect(page.locator(".window-bottom h2")).toHaveText("Kasa");
   await page
     .getByRole("button", { name: "Start a project", exact: true })
+    .first()
     .click();
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(
-    page.getByRole("button", { name: "Start a project", exact: true }),
+    page.getByRole("button", { name: "Start a project", exact: true }).first(),
   ).toBeFocused();
 });
 test("corrupt local drafts fail safely and reduced motion is respected", async ({
@@ -215,3 +217,79 @@ test("storage failure never claims a draft was saved", async ({ page }) => {
     page.getByRole("button", { name: "Download brief" }),
   ).toBeVisible();
 });
+
+for (const width of [390, 1440]) {
+  test(`offer hierarchy and accessible project cards at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("");
+    await page.evaluate(() => document.fonts.ready);
+    await expect(page.locator(".hero-copy > p")).toHaveText(
+      "I design and build websites for independent businesses and professionals.",
+    );
+    await expect(page.locator(".hero-actions .button")).toHaveAccessibleName(
+      "Start a project",
+    );
+    expect(
+      await page.locator("#top").evaluate((e) => e.nextElementSibling?.id),
+    ).toBe("work");
+    await expect(
+      page.locator(".hero-overline,.stage-label,.stage-caption,.hero-bottom"),
+    ).toHaveCount(0);
+    for (const name of ["Samantha Ramsey", "Kasa", "Nina Carducci"])
+      await expect(
+        page
+          .locator(".project-card")
+          .filter({ has: page.getByRole("heading", { name, exact: true }) }),
+      ).toHaveAccessibleName(name);
+    await expect(page.locator("#project-samantha-description")).toContainText(
+      "I designed and developed",
+    );
+    for (const button of await page.locator(".preview-controls button").all()) {
+      const r = await button.boundingBox();
+      expect(r!.width).toBeGreaterThanOrEqual(44);
+      expect(r!.height).toBeGreaterThanOrEqual(44);
+    }
+    const result = await page
+      .locator("#project-samantha-description")
+      .evaluate((e) => {
+        const style = getComputedStyle(e);
+        let parent: Element | null = e;
+        let bg = "";
+        while (parent) {
+          bg = getComputedStyle(parent).backgroundColor;
+          if (bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent") break;
+          parent = parent.parentElement;
+        }
+        const luminance = (c: string) => {
+          const rgb = c
+            .match(/[\d.]+/g)!
+            .slice(0, 3)
+            .map(Number)
+            .map((v) => {
+              v /= 255;
+              return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+            });
+          return rgb[0] * 0.2126 + rgb[1] * 0.7152 + rgb[2] * 0.0722;
+        };
+        const a = luminance(style.color),
+          b = luminance(bg);
+        return {
+          font: parseFloat(style.fontSize),
+          contrast: (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05),
+        };
+      });
+    expect(result.font).toBeGreaterThanOrEqual(14);
+    expect(result.contrast).toBeGreaterThanOrEqual(4.5);
+    for (const selector of [
+      ".project-card .project-details p",
+      ".pricing-disclaimer",
+      ".service-card-bottom small",
+    ])
+      for (const node of await page.locator(selector).all())
+        expect(
+          await node.evaluate((e) => parseFloat(getComputedStyle(e).fontSize)),
+        ).toBeGreaterThanOrEqual(14);
+  });
+}

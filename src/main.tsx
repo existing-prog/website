@@ -335,9 +335,6 @@ function App() {
               </div>
               <div className="hero-grid">
                 <div className="hero-copy">
-                  <div className="hero-overline">
-                    A SMALL STUDIO FOR YOUR NEXT BIG THING
-                  </div>
                   <h1>
                     Your business.
                     <br />
@@ -357,15 +354,12 @@ function App() {
                     </span>
                   </h1>
                   <p>
-                    Websites with personality. Development with care.
-                    <br className="desktop-break" /> I help independent people
-                    turn what they do
-                    <br className="desktop-break" /> into a website worth
-                    choosing.
+                    I design and build websites for independent businesses and
+                    professionals.
                   </p>
                   <div className="hero-actions">
                     <button className="button lime" onClick={() => start()}>
-                      Let’s build your next chapter <ArrowUpRight size={19} />
+                      Start a project <ArrowUpRight size={19} />
                     </button>
                     <a className="understated-link" href="#work">
                       See the work <ArrowDown size={15} />
@@ -383,9 +377,6 @@ function App() {
                 <div className="hero-stage">
                   <div className="stage-grid" />
                   <Mark className="stage-star" />
-                  <span className="stage-label">
-                    <span className="status-dot" /> A LITTLE OF WHAT’S POSSIBLE
-                  </span>
                   <div className="showcase-window">
                     <div className="window-toolbar">
                       <span className="window-dots">
@@ -452,18 +443,91 @@ function App() {
                       </button>
                     ))}
                   </div>
-                  <div className="stage-caption">
-                    REAL PROJECTS. DIFFERENT POSSIBILITIES.
-                  </div>
                 </div>
               </div>
-              <div className="hero-bottom">
-                <span>
-                  GOOD DESIGN GETS NOTICED. GOOD DEVELOPMENT MAKES IT LAST.
-                </span>
-                <a href="#services">
-                  FIND YOUR STARTING POINT <ArrowDown size={14} />
-                </a>
+            </section>
+            <section className="work-section section" id="work">
+              <div className="shell">
+                <div className="section-heading reveal">
+                  <div>
+                    <span className="eyebrow">01 / SELECTED WORK</span>
+                    <h2>
+                      Different worlds.
+                      <br />
+                      <span>The same care.</span>
+                    </h2>
+                  </div>
+                  <a
+                    className="understated-link"
+                    href="https://portfolio-swart-psi-26.vercel.app/"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Explore my full portfolio <ArrowUpRight size={17} />
+                  </a>
+                </div>
+                <div
+                  className="work-filters"
+                  aria-label="Filter selected projects"
+                >
+                  {["All work", "Portfolios", "Frontend & performance"].map(
+                    (f) => (
+                      <button
+                        key={f}
+                        className={filter === f ? "active" : ""}
+                        aria-pressed={filter === f}
+                        onClick={() => setFilter(f)}
+                      >
+                        {f}
+                      </button>
+                    ),
+                  )}
+                </div>
+                <div className="project-grid">
+                  {projects
+                    .filter(
+                      (_, i) =>
+                        filter === "All work" ||
+                        (filter === "Portfolios" ? i === 0 : i !== 0),
+                    )
+                    .map((p) => (
+                      <a
+                        href={p.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        key={p.name}
+                        aria-labelledby={`project-${p.id}-title`}
+                        className={`project-card ${p.color} ${p.name === "Samantha Ramsey" ? "featured" : ""}`}
+                      >
+                        <div className="project-visual">
+                          <img
+                            src={asset(p.image)}
+                            alt={`${p.name} website preview`}
+                            loading="lazy"
+                            width="1200"
+                            height={p.image === "samantha.webp" ? 630 : 750}
+                          />
+                          <span className="visit-project">
+                            <ArrowUpRight size={22} />
+                          </span>
+                        </div>
+                        <div className="project-details">
+                          <div>
+                            <span className="eyebrow">{p.kind}</span>
+                            <h3 id={`project-${p.id}-title`}>{p.name}</h3>
+                            <p id={`project-${p.id}-description`}>
+                              {p.description}
+                            </p>
+                          </div>
+                          <div className="project-tags">
+                            {p.tags.map((t) => (
+                              <span key={t}>{t}</span>
+                            ))}
+                          </div>
+                        </div>
+                      </a>
+                    ))}
+                </div>
               </div>
             </section>
             <div
@@ -484,7 +548,7 @@ function App() {
             <section className="section shell services-section" id="services">
               <div className="section-heading reveal">
                 <div>
-                  <span className="eyebrow">01 / FIND YOUR STARTING POINT</span>
+                  <span className="eyebrow">02 / FIND YOUR STARTING POINT</span>
                   <h2>
                     You do your thing.
                     <br />
@@ -559,87 +623,6 @@ function App() {
                 and third-party costs are confirmed separately in your written
                 quote. Nothing is booked or charged without your approval.
               </p>
-            </section>
-            <section className="work-section section" id="work">
-              <div className="shell">
-                <div className="section-heading reveal">
-                  <div>
-                    <span className="eyebrow">02 / THE WORK SPEAKS FIRST</span>
-                    <h2>
-                      Different worlds.
-                      <br />
-                      <span>The same care.</span>
-                    </h2>
-                  </div>
-                  <a
-                    className="understated-link"
-                    href="https://portfolio-swart-psi-26.vercel.app/"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Explore my full portfolio <ArrowUpRight size={17} />
-                  </a>
-                </div>
-                <div
-                  className="work-filters"
-                  aria-label="Filter selected projects"
-                >
-                  {["All work", "Portfolios", "Frontend & performance"].map(
-                    (f) => (
-                      <button
-                        key={f}
-                        className={filter === f ? "active" : ""}
-                        aria-pressed={filter === f}
-                        onClick={() => setFilter(f)}
-                      >
-                        {f}
-                      </button>
-                    ),
-                  )}
-                </div>
-                <div className="project-grid">
-                  {projects
-                    .filter(
-                      (_, i) =>
-                        filter === "All work" ||
-                        (filter === "Portfolios" ? i === 0 : i !== 0),
-                    )
-                    .map((p) => (
-                      <a
-                        href={p.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        key={p.name}
-                        className={`project-card ${p.color} ${p.name === "Samantha Ramsey" ? "featured" : ""}`}
-                      >
-                        <div className="project-visual">
-                          <img
-                            src={asset(p.image)}
-                            alt={`${p.name} website preview`}
-                            loading="lazy"
-                            width="1200"
-                            height={p.image === "samantha.webp" ? 630 : 750}
-                          />
-                          <span className="visit-project">
-                            <ArrowUpRight size={22} />
-                          </span>
-                        </div>
-                        <div className="project-details">
-                          <div>
-                            <span className="eyebrow">{p.kind}</span>
-                            <h3>{p.name}</h3>
-                            <p>{p.description}</p>
-                          </div>
-                          <div className="project-tags">
-                            {p.tags.map((t) => (
-                              <span key={t}>{t}</span>
-                            ))}
-                          </div>
-                        </div>
-                      </a>
-                    ))}
-                </div>
-              </div>
             </section>
             <section className="section shell approach" id="approach">
               <div className="approach-intro reveal">

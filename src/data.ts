@@ -54,17 +54,19 @@ export const services = [
 ];
 export const projects = [
   {
+    id: "samantha",
     name: "Samantha Ramsey",
     kind: "Academic portfolio",
     caption: "Research with a sense of discovery.",
     description:
-      "An academic portfolio bringing research, publications and interactive orbital mechanics together in one distinctive experience.",
+      "I designed and developed a responsive academic portfolio, bringing research, publications and interactive orbital mechanics together in one distinctive experience.",
     image: "samantha.webp",
     url: "https://samantharamsey.github.io/portfolio_samantha/",
     tags: ["Academic portfolio", "Interactive experience"],
     color: "violet",
   },
   {
+    id: "kasa",
     name: "Kasa",
     kind: "Training project",
     caption: "A place to feel at home.",
@@ -76,6 +78,7 @@ export const projects = [
     color: "sand",
   },
   {
+    id: "nina",
     name: "Nina Carducci",
     kind: "Training project",
     caption: "A sharper digital picture.",

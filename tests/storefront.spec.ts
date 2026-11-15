@@ -349,9 +349,8 @@ test("reduced motion shows every project without a sticky animation", async ({
   for (const id of ["samantha", "kasa", "nina"]) {
     const visual = page.locator(`#chapter-${id} .chapter-visual`);
     await expect(visual).toBeVisible();
-    for (const browser of await visual.locator(".story-browser").all()) {
-      await expect(browser).toHaveCSS("opacity", "1");
-    }
+    await expect(visual.locator(".story-browser")).toHaveCount(1);
+    await expect(visual.locator(".story-browser")).toHaveCSS("opacity", "1");
   }
   await page
     .getByRole("button", {

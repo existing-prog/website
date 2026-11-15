@@ -78,7 +78,7 @@ function ProjectVisual({
       <span className="scene-corner">
         0{projects.indexOf(project) + 1} / {tr(directions[project.id].label)}
       </span>
-      {projectHref(project).startsWith("#") && (
+      {project.id === "samantha" && (
         <>
           <div className="story-stars" />
           <div className="neptune-sphere" />

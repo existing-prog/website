@@ -1,43 +1,70 @@
-# Lucas Berdy — Freelance frontend services
+# Lucas Berdy Studio
 
-A responsive, animated website for portfolio creation, business websites and website maintenance. Built with HTML, CSS and vanilla JavaScript, without a dependency install or build step.
+A React + TypeScript storefront for independent frontend services, with SCSS, a guided project-request planner and a browser-local project desk. Published at https://existing-prog.github.io/website/.
 
-## Publish on GitHub Pages
+## What works today
 
-1. Open [Settings → Pages](https://github.com/existing-prog/website/settings/pages).
-2. Under **Build and deployment**, select **GitHub Actions** as the source.
-3. Open **Actions → Deploy website to GitHub Pages** and run the workflow, or push a change to `main`.
-4. After a successful deployment, the site is available at **https://existing-prog.github.io/website/**.
+- Responsive storefront, subtle motion with reduced-motion support, SVG icons, and locally hosted fonts.
+- Three service directions, interactive project previews, project filters, and real portfolio links.
+- Four-step planner for service, scope, options, project brief and contact details.
+- Native validation, review, downloadable text brief, clipboard copy and an email handoff addressed to `lucasberdy@gmail.com`.
+- Explicitly saved drafts in localStorage: resume, edit, update and delete. The UI explains that these are local drafts, not submitted orders. Storage failure is reported; a downloadable brief remains available.
+- Browser tests for responsive widths from 320–1920px, navigation, project filtering, draft persistence, export, validation, focus return, corrupted storage and reduced motion.
 
-The repository is private. GitHub Pages support for private repositories depends on your GitHub plan and organization policy. If Pages is unavailable, connect the repository to Vercel or Netlify as a static site (no build command; publish the repository root). Do not change repository visibility unless you want the source to become public. A public Pages deployment makes website assets publicly available even when the source repository is private.
+## Placeholders and production boundaries
 
-## Contact flow
+Pricing is **custom quote after review**. No prices, client testimonials, checkout, confirmed bookings or delivery guarantees are invented.
 
-The form validates the visitor's details and creates an email addressed to **lucasberdy@gmail.com**, the contact address on the supplied portfolio. The visitor sends the email from their own email application. The page does not submit or store enquiries on a server, and never claims an enquiry has been sent. A copyable project brief is available if an email app is not configured; clipboard failures reveal a selectable text fallback.
+The website has **no backend** at this stage. The project desk is not an authenticated client account; drafts do not sync across devices. Email requests open the visitor's email application and still require the visitor to press Send. The UI never marks a request as received or paid.
 
-Service buttons preselect the requested service. All three services are quoted individually; there are no invented prices, client testimonials or delivery guarantees.
+To accept real on-site orders, the next implementation needs:
 
-## Edit
+1. The business's approved services, scope, prices/currency, billing identity and terms.
+2. A backend with authenticated customer accounts, a database, ownership checks and server-side validation.
+3. A transactional email provider and an order/request submission endpoint.
+4. A payment provider with server-created checkout sessions and verified payment webhooks, if direct payments are desired.
+5. An owner dashboard and authenticated client views for real order states, messages and deliverables.
 
-- `index.html`: services, project links, contact address and text.
-- `styles.css`: palette, layouts, mobile breakpoints and animations.
-- `app.js`: navigation, service selection, scroll reveals and email brief.
-- `assets/`: optimized project screenshots from Lucas's supplied portfolio, Samantha Ramsey’s portfolio preview artwork and an SVG favicon.
+Keep secret keys out of `VITE_*` variables, frontend code and GitHub Pages. GitHub Pages serves static files; server functions must run on a separate supported backend. These integrations are intentionally not simulated by local draft statuses.
 
-Change the email in both `index.html` and `app.js` if needed. Kasa and Nina Carducci are explicitly identified as training work; Samantha Ramsey’s academic portfolio is featured separately. External portfolio links are retained for full case studies.
+## Development
 
-## Local preview
+```sh
+npm ci
+npm run dev
+```
 
-From this directory run `python3 -m http.server 8000`, then visit `http://localhost:8000`.
+Visit the URL printed by Vite, with `/website/` as the path. The repository uses a `/website/` base for GitHub Pages. Change `base` in `vite.config.ts` when deploying at another path.
 
-## Accessibility and behavior
+```sh
+npm run build
+npm run preview
+```
 
-Includes semantic landmarks, labeled fields, native form validation, keyboard focus styles, a skip link, mobile menu with Escape handling, expandable FAQ answers, and reduced-motion support. Content remains visible without JavaScript. The email brief and menu enhancement require JavaScript. Google Fonts is optional; system fonts provide a fallback.
+The build typechecks the application and emits hashed files in `dist/`.
 
-## Checks
+## Tests
 
-`node --check app.js`
+```sh
+npx playwright install --with-deps chromium
+npm run build
+npm test
+```
 
-The Pages workflow checks JavaScript syntax and deploys only the static website files, excluding repository documentation and workflow configuration.
+Tests start the production preview automatically. Set `CHROMIUM_PATH` to use an existing Chromium executable. Set `TEST_WEBKIT=1` to also test WebKit after installing it with `npx playwright install --with-deps webkit`. `TEST_URL` can point tests at an already running deployment.
 
-Decorative and navigation icons use inline SVG (and an SVG mask for service bullets), so iOS Safari cannot substitute emoji artwork. Motion preferences are still respected.
+## GitHub Pages
+
+Settings → Pages must use **GitHub Actions**. Pushes to `main` install dependencies, typecheck, build, run Chromium regression tests and deploy `dist/`. No manual source copying is needed.
+
+## Main files
+
+- `src/main.tsx`: storefront, navigation and project desk.
+- `src/ProjectBuilder.tsx`: accessible native-dialog project planner.
+- `src/data.ts`: service and project definitions, draft types and storage loading.
+- `src/styles.scss`: responsive styles, motion and locally hosted font declarations.
+- `public/assets/`: optimized preview images and favicon.
+- `public/fonts/`: variable fonts and their SIL Open Font License texts.
+- `tests/storefront.spec.ts`: functional and viewport regression tests.
+
+Samantha Ramsey’s portfolio is a featured project. Kasa and Nina Carducci are explicitly labelled training projects. External links point to the supplied live portfolio and case studies.

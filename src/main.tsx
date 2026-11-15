@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+import { tr, dateLocale } from "./i18n";
 import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
@@ -39,6 +41,7 @@ import {
 import "./styles.scss";
 import ProjectBuilder from "./ProjectBuilder";
 import ProjectStories from "./ProjectStories";
+import LanguageSwitch from "./LanguageSwitch";
 
 function Mark({ className = "" }: { className?: string }) {
   return (
@@ -58,6 +61,7 @@ function Mark({ className = "" }: { className?: string }) {
   );
 }
 function App() {
+  const { i18n } = useTranslation();
   const [menu, setMenu] = useState(false);
   const [workspace, setWorkspace] = useState(location.hash === "#workspace");
   const [drafts, setDrafts] = useState<Draft[]>(loadDrafts);
@@ -77,9 +81,12 @@ function App() {
   }, []);
   useEffect(() => {
     document.title = workspace
-      ? "Project desk — Lucas Berdy"
-      : "Lucas Berdy — Your next chapter, online.";
-  }, [workspace]);
+      ? tr("Project desk — Lucas Berdy")
+      : tr("Lucas Berdy — Your next chapter, online.");
+    document
+      .querySelector('meta[property="og:title"]')
+      ?.setAttribute("content", document.title);
+  }, [workspace, i18n.resolvedLanguage]);
   useEffect(() => {
     if (!workspace && location.hash) {
       requestAnimationFrame(() =>
@@ -137,7 +144,9 @@ function App() {
   };
   const close = () => {
     setEditing(null);
-    requestAnimationFrame(() => previousFocus.current?.focus({ preventScroll: true }));
+    requestAnimationFrame(() =>
+      previousFocus.current?.focus({ preventScroll: true }),
+    );
   };
   const persist = (next: Draft[]) => {
     setDrafts(next);
@@ -180,42 +189,43 @@ function App() {
   return (
     <>
       <a className="skip-link" href="#main">
-        Skip to content
+        {tr("Skip to content")}
       </a>
       <header className="site-header">
         <div className="shell header-inner">
-          <a className="brand" href="#top" aria-label="Lucas Berdy home">
+          <a className="brand" href="#top" aria-label={tr("Lucas Berdy home")}>
             <span className="brand-symbol">
               lb<span>.</span>
             </span>
             <span className="brand-label">
-              LUCAS BERDY<span>Independent frontend developer</span>
+              LUCAS BERDY<span>{tr("Independent frontend developer")}</span>
             </span>
           </a>
           <nav
             className={menu ? "main-nav open" : "main-nav"}
             id="main-nav"
-            aria-label="Main navigation"
+            aria-label={tr("Main navigation")}
           >
-            <a href="#services">Services</a>
-            <a href="#work">Selected work</a>
-            <a href="#approach">The approach</a>
+            <a href="#services">{tr("Services")}</a>
+            <a href="#work">{tr("Selected work")}</a>
+            <a href="#approach">{tr("The approach")}</a>
             <a
               className={workspace ? "desk-link active" : "desk-link"}
               href="#workspace"
             >
-              <FolderOpen size={15} /> Project desk{" "}
+              <FolderOpen size={15} /> {tr("Project desk")}{" "}
               {drafts.length > 0 && (
                 <span className="count">{drafts.length}</span>
               )}
             </a>
           </nav>
+          <LanguageSwitch />
           <button className="header-cta" onClick={() => start()}>
-            Start a project <ArrowUpRight size={17} />
+            {tr("Start a project")} <ArrowUpRight size={17} />
           </button>
           <button
             className="menu-button"
-            aria-label={menu ? "Close navigation" : "Open navigation"}
+            aria-label={menu ? tr("Close navigation") : tr("Open navigation")}
             aria-expanded={menu}
             aria-controls="main-nav"
             onClick={() => setMenu(!menu)}
@@ -230,43 +240,44 @@ function App() {
             <div className="desk-top">
               <div>
                 <span className="eyebrow">
-                  <FolderOpen size={14} /> YOUR PROJECT DESK
+                  <FolderOpen size={14} /> {tr("YOUR PROJECT DESK")}
                 </span>
                 <h1>
-                  A little space.
+                  {tr("A little space.")}
                   <br />
-                  For your next big idea.
+                  {tr("For your next big idea.")}
                 </h1>
                 <p>
-                  Plan it, save it, come back to it. Your next website starts
-                  here.
+                  {tr(
+                    "Plan it, save it, come back to it. Your next website starts here.",
+                  )}
                 </p>
               </div>
               <button className="button lime" onClick={() => start()}>
-                New project <Plus size={18} />
+                {tr("New project")} <Plus size={18} />
               </button>
             </div>
             <div className="desk-note">
               <ShieldCheck size={22} />
               <div>
-                <strong>Your drafts. On this device.</strong>
+                <strong>{tr("Your drafts. On this device.")}</strong>
                 <p>
-                  This desk saves drafts in this browser. Nothing is sent
-                  automatically. Secure client accounts, payments and order
-                  tracking are not connected yet.
+                  {tr(
+                    "This desk saves drafts in this browser. Nothing is sent automatically. Secure client accounts, payments and order tracking are not connected yet.",
+                  )}
                 </p>
               </div>
             </div>
             {notice && (
               <p className="notice" role="status">
-                {notice}
+                {tr(notice)}
               </p>
             )}
             <div className="desk-heading">
               <h2>
-                Project drafts <span>{drafts.length}</span>
+                {tr("Project drafts")} <span>{drafts.length}</span>
               </h2>
-              <span>Not submitted</span>
+              <span>{tr("Not submitted")}</span>
             </div>
             {drafts.length === 0 ? (
               <div className="empty-desk">
@@ -274,14 +285,14 @@ function App() {
                   <FolderOpen size={50} />
                   <Mark />
                 </div>
-                <h3>Good things start with a rough idea.</h3>
+                <h3>{tr("Good things start with a rough idea.")}</h3>
                 <p>
-                  Choose a service, tell me what you have in mind,
+                  {tr("Choose a service, tell me what you have in mind,")}
                   <br />
-                  and build a brief at your own pace.
+                  {tr("and build a brief at your own pace.")}
                 </p>
                 <button className="button lime" onClick={() => start()}>
-                  Plan my first project <ArrowUpRight size={18} />
+                  {tr("Plan my first project")} <ArrowUpRight size={18} />
                 </button>
               </div>
             ) : (
@@ -290,24 +301,26 @@ function App() {
                   <article className="draft-card" key={d.id}>
                     <div className="draft-card-top">
                       <FileText size={22} />
-                      <span className="pill">Draft · not submitted</span>
+                      <span className="pill">
+                        {tr("Draft · not submitted")}
+                      </span>
                     </div>
                     <span className="eyebrow">{serviceName(d.service)}</span>
-                    <h3>{d.company || d.name || "Untitled project"}</h3>
-                    <p>{d.brief || "Your next website, taking shape."}</p>
+                    <h3>{d.company || d.name || tr("Untitled project")}</h3>
+                    <p>{d.brief || tr("Your next website, taking shape.")}</p>
                     <small>
-                      Saved{" "}
-                      {new Intl.DateTimeFormat("en", {
+                      {tr("Saved")}{" "}
+                      {new Intl.DateTimeFormat(dateLocale(), {
                         dateStyle: "medium",
                       }).format(new Date(d.updatedAt))}
                     </small>
                     <div className="draft-actions">
                       <button onClick={() => resume(d)}>
-                        Continue project <ArrowUpRight size={16} />
+                        {tr("Continue project")} <ArrowUpRight size={16} />
                       </button>
                       <button
                         className="icon-button"
-                        aria-label={`Delete ${d.company || d.name || "untitled"} draft`}
+                        aria-label={`Delete ${d.company || d.name || tr("untitled")} draft`}
                         onClick={() => remove(d.id)}
                       >
                         <Trash2 size={16} />
@@ -318,7 +331,7 @@ function App() {
               </div>
             )}
             <a className="inline-link" href="#services">
-              Back to the services <ArrowRight size={16} />
+              {tr("Back to the services")} <ArrowRight size={16} />
             </a>
           </section>
         ) : (
@@ -326,23 +339,23 @@ function App() {
             <section className="hero shell" id="top">
               <div className="hero-kicker">
                 <span className="eyebrow">
-                  <span className="status-dot" /> INDEPENDENT DEVELOPER.
-                  PERSONAL APPROACH.
+                  <span className="status-dot" />{" "}
+                  {tr("INDEPENDENT DEVELOPER. PERSONAL APPROACH.")}
                 </span>
                 <span className="hero-location">
-                  BASED IN FRANCE / WORKING ONLINE
+                  {tr("BASED IN FRANCE / WORKING ONLINE")}
                 </span>
               </div>
               <div className="hero-grid">
                 <div className="hero-copy">
                   <h1>
-                    Your business.
+                    {tr("Your business.")}
                     <br />
-                    Impossible
+                    {tr("Impossible")}
                     <br />
-                    to{" "}
+                    {tr("to")}{" "}
                     <span>
-                      ignore
+                      {tr("ignore")}
                       <svg
                         viewBox="0 0 340 22"
                         preserveAspectRatio="none"
@@ -354,23 +367,26 @@ function App() {
                     </span>
                   </h1>
                   <p>
-                    I design and build websites for independent businesses and
-                    professionals.
+                    {tr(
+                      "I design and build websites for independent businesses and professionals.",
+                    )}
                   </p>
                   <div className="hero-actions">
                     <button className="button lime" onClick={() => start()}>
-                      Start a project <ArrowUpRight size={19} />
+                      {tr("Start a project")} <ArrowUpRight size={19} />
                     </button>
                     <a className="understated-link" href="#work">
-                      See the work <ArrowDown size={15} />
+                      {tr("See the work")} <ArrowDown size={15} />
                     </a>
                   </div>
                   <div className="hero-footnote">
                     <span className="mini-monogram">lb.</span>
                     <span>
-                      Work directly with Lucas.
+                      {tr("Work directly with Lucas.")}
                       <br />
-                      <strong>From the first idea to the final detail.</strong>
+                      <strong>
+                        {tr("From the first idea to the final detail.")}
+                      </strong>
                     </span>
                   </div>
                 </div>
@@ -397,22 +413,26 @@ function App() {
                       href={projects[preview].url}
                       target="_blank"
                       rel="noreferrer"
-                      aria-label={`Explore ${projects[preview].name}`}
+                      aria-label={tr("Explore {{name}}", {
+                        name: projects[preview].name,
+                      })}
                     >
                       <img
                         src={asset(projects[preview].image)}
-                        alt={`${projects[preview].name} website preview`}
+                        alt={tr("{{name}} website preview", {
+                          name: projects[preview].name,
+                        })}
                         width="1200"
                         height="630"
                       />
                       <span className="preview-live">
-                        Explore the project <ArrowUpRight size={15} />
+                        {tr("Explore the project")} <ArrowUpRight size={15} />
                       </span>
                     </a>
                     <div className="window-bottom">
                       <div>
                         <span className="eyebrow">
-                          {projects[preview].kind}
+                          {tr(projects[preview].kind)}
                         </span>
                         <h2>{projects[preview].name}</h2>
                       </div>
@@ -424,18 +444,18 @@ function App() {
                   </div>
                   <div className="stage-note">
                     <MousePointer2 size={17} />
-                    <span>Thoughtful on every screen.</span>
+                    <span>{tr("Thoughtful on every screen.")}</span>
                   </div>
                   <div
                     className="preview-controls"
-                    aria-label="Choose a project preview"
+                    aria-label={tr("Choose a project preview")}
                   >
                     {projects.map((p, i) => (
                       <button
                         key={p.name}
                         className={preview === i ? "selected" : ""}
                         onClick={() => setPreview(i)}
-                        aria-label={`Preview ${p.name}`}
+                        aria-label={tr("Preview {{name}}", { name: p.name })}
                         aria-pressed={preview === i}
                       >
                         <span>0{i + 1}</span>
@@ -450,11 +470,11 @@ function App() {
               <div className="shell">
                 <div className="section-heading reveal">
                   <div>
-                    <span className="eyebrow">01 / SELECTED WORK</span>
+                    <span className="eyebrow">{tr("01 / SELECTED WORK")}</span>
                     <h2>
-                      Different worlds.
+                      {tr("Different worlds.")}
                       <br />
-                      <span>The same care.</span>
+                      <span>{tr("The same care.")}</span>
                     </h2>
                   </div>
                   <a
@@ -463,7 +483,7 @@ function App() {
                     target="_blank"
                     rel="noreferrer"
                   >
-                    Explore my full portfolio <ArrowUpRight size={17} />
+                    {tr("Explore my full portfolio")} <ArrowUpRight size={17} />
                   </a>
                 </div>
                 <ProjectStories onStart={start} />
@@ -471,34 +491,37 @@ function App() {
             </section>
             <div
               className="service-ribbon"
-              aria-label="Portfolios, business websites and website care"
+              aria-label={tr("Portfolios, business websites and website care")}
             >
               <div>
-                <span>PERSONAL PORTFOLIOS</span>
+                <span>{tr("PERSONAL PORTFOLIOS")}</span>
                 <Mark />
-                <span>BUSINESS WEBSITES</span>
+                <span>{tr("BUSINESS WEBSITES")}</span>
                 <Mark />
-                <span>ONGOING WEBSITE CARE</span>
+                <span>{tr("ONGOING WEBSITE CARE")}</span>
                 <Mark />
-                <span>YOUR NEXT CHAPTER, ONLINE</span>
+                <span>{tr("YOUR NEXT CHAPTER, ONLINE")}</span>
                 <Mark />
               </div>
             </div>
             <section className="section shell services-section" id="services">
               <div className="section-heading reveal">
                 <div>
-                  <span className="eyebrow">02 / FIND YOUR STARTING POINT</span>
+                  <span className="eyebrow">
+                    {tr("02 / FIND YOUR STARTING POINT")}
+                  </span>
                   <h2>
-                    You do your thing.
+                    {tr("You do your thing.")}
                     <br />
-                    <span>I’ll build its home.</span>
+                    <span>{tr("I’ll build its home.")}</span>
                   </h2>
                 </div>
                 <p>
-                  A first website. A better one. Or a little attention
-                  <br className="desktop-break" /> for the one you already have.
+                  {tr("A first website. A better one. Or a little attention")}
+                  <br className="desktop-break" />{" "}
+                  {tr("for the one you already have.")}
                   <br />
-                  There’s a good place to start.
+                  {tr("There’s a good place to start.")}
                 </p>
               </div>
               <div className="service-grid">
@@ -509,7 +532,7 @@ function App() {
                   >
                     <div className="service-card-top">
                       <span className="eyebrow">
-                        {s.no} / {s.short.toUpperCase()}
+                        {s.no} / {tr(s.short).toUpperCase()}
                       </span>
                       {i === 0 ? (
                         <Layers size={25} />
@@ -520,26 +543,32 @@ function App() {
                       )}
                     </div>
                     <div className="service-card-copy">
-                      <h3>{s.name}</h3>
-                      <span className="service-tagline">{s.tagline}</span>
-                      <p>{s.description}</p>
+                      <h3>{tr(s.name)}</h3>
+                      <span className="service-tagline">{tr(s.tagline)}</span>
+                      <p>{tr(s.description)}</p>
                     </div>
                     <ul>
                       {s.features.map((f) => (
                         <li key={f}>
                           <Check size={14} />
-                          {f}
+                          {tr(f)}
                         </li>
                       ))}
                     </ul>
                     <div className="service-card-bottom">
                       <span>
-                        <strong className="service-budget">{s.budget}</strong>
-                        <small>Indicative · quote before approval</small>
+                        <strong className="service-budget">
+                          {tr(s.budget)}
+                        </strong>
+                        <small>
+                          {tr("Indicative · quote before approval")}
+                        </small>
                       </span>
                       <button
                         onClick={() => start(s.id)}
-                        aria-label={`Start a ${s.short.toLowerCase()} project`}
+                        aria-label={tr("Start a {{service}} project", {
+                          service: tr(s.short).toLowerCase(),
+                        })}
                       >
                         <ArrowUpRight size={23} />
                       </button>
@@ -549,35 +578,37 @@ function App() {
               </div>
               <div className="services-note">
                 <span>
-                  <ShieldCheck size={15} /> Scope, price and timeline agreed
-                  before we start.
+                  <ShieldCheck size={15} />{" "}
+                  {tr("Scope, price and timeline agreed before we start.")}
                 </span>
                 <a href="#faq">
-                  A few questions? <ArrowUpRight size={14} />
+                  {tr("A few questions?")} <ArrowUpRight size={14} />
                 </a>
               </div>
               <p className="pricing-disclaimer">
-                Indicative EUR budgets for a focused starting scope. Larger
-                projects, extra features, any applicable taxes, domain, hosting
-                and third-party costs are confirmed separately in your written
-                quote. Nothing is booked or charged without your approval.
+                {tr(
+                  "Indicative EUR budgets for a focused starting scope. Larger projects, extra features, any applicable taxes, domain, hosting and third-party costs are confirmed separately in your written quote. Nothing is booked or charged without your approval.",
+                )}
               </p>
             </section>
             <section className="section shell approach" id="approach">
               <div className="approach-intro reveal">
                 <span className="eyebrow">
-                  03 / LESS BACK-AND-FORTH. MORE FORWARD.
+                  {tr("03 / LESS BACK-AND-FORTH. MORE FORWARD.")}
                 </span>
                 <h2>
-                  A good website starts
+                  {tr("A good website starts")}
                   <br />
-                  with a good <span>conversation.</span>
+                  {tr("with a good")} <span>{tr("conversation.")}</span>
                 </h2>
                 <p>
-                  You shouldn’t need to speak developer to get the website you
-                  want.
-                  <br className="desktop-break" /> We’ll keep the process clear,
-                  collaborative and focused on you.
+                  {tr(
+                    "You shouldn’t need to speak developer to get the website you want.",
+                  )}
+                  <br className="desktop-break" />{" "}
+                  {tr(
+                    "We’ll keep the process clear, collaborative and focused on you.",
+                  )}
                 </p>
               </div>
               <div className="steps">
@@ -603,8 +634,8 @@ function App() {
                       <span>{s.n}</span>
                       <ArrowUpRight size={23} />
                     </div>
-                    <h3>{s.title}</h3>
-                    <p>{s.text}</p>
+                    <h3>{tr(s.title)}</h3>
+                    <p>{tr(s.text)}</p>
                   </article>
                 ))}
               </div>
@@ -612,14 +643,16 @@ function App() {
                 <div>
                   <FolderOpen size={25} />
                   <span>
-                    Ideas need a little room.
+                    {tr("Ideas need a little room.")}
                     <small>
-                      Start a brief now. Pick it up later in your project desk.
+                      {tr(
+                        "Start a brief now. Pick it up later in your project desk.",
+                      )}
                     </small>
                   </span>
                 </div>
                 <a href="#workspace">
-                  Take a look <ArrowUpRight size={18} />
+                  {tr("Take a look")} <ArrowUpRight size={18} />
                 </a>
               </div>
             </section>
@@ -628,7 +661,7 @@ function App() {
                 <div className="identity-card reveal">
                   <div className="identity-top">
                     <span className="eyebrow">
-                      THE PERSON BEHIND THE PIXELS
+                      {tr("THE PERSON BEHIND THE PIXELS")}
                     </span>
                     <span>FR / 01</span>
                   </div>
@@ -638,39 +671,40 @@ function App() {
                   </div>
                   <div className="identity-bottom">
                     <span>
-                      LUCAS BERDY<small>Independent frontend developer</small>
+                      LUCAS BERDY
+                      <small>{tr("Independent frontend developer")}</small>
                     </span>
                     <span className="status-dot" />
                   </div>
                 </div>
                 <div className="about-copy reveal">
                   <span className="eyebrow">
-                    A PERSON. NOT A PRODUCTION LINE.
+                    {tr("A PERSON. NOT A PRODUCTION LINE.")}
                   </span>
                   <h2>
-                    Small studio energy.
+                    {tr("Small studio energy.")}
                     <br />
-                    <span>Personal attention.</span>
+                    <span>{tr("Personal attention.")}</span>
                   </h2>
                   <p>
-                    I’m Lucas, a frontend developer based in France. I love
-                    clean interfaces, expressive details and the moment a
-                    website starts to feel like the person behind it.
+                    {tr(
+                      "I’m Lucas, a frontend developer based in France. I love clean interfaces, expressive details and the moment a website starts to feel like the person behind it.",
+                    )}
                   </p>
                   <p>
-                    When we work together, you’re talking to the person building
-                    your website. I take the time to understand what matters to
-                    you, explain the choices and sweat the small stuff.
+                    {tr(
+                      "When we work together, you’re talking to the person building your website. I take the time to understand what matters to you, explain the choices and sweat the small stuff.",
+                    )}
                   </p>
                   <div className="about-principles">
                     <span>
-                      <Check size={15} /> Direct communication
+                      <Check size={15} /> {tr("Direct communication")}
                     </span>
                     <span>
-                      <Check size={15} /> Thoughtful details
+                      <Check size={15} /> {tr("Thoughtful details")}
                     </span>
                     <span>
-                      <Check size={15} /> Clean, considered code
+                      <Check size={15} /> {tr("Clean, considered code")}
                     </span>
                   </div>
                   <a
@@ -679,18 +713,19 @@ function App() {
                     target="_blank"
                     rel="noreferrer"
                   >
-                    Meet the code behind the work <ArrowUpRight size={17} />
+                    {tr("Meet the code behind the work")}{" "}
+                    <ArrowUpRight size={17} />
                   </a>
                 </div>
               </div>
             </section>
             <section className="section shell faq-section" id="faq">
               <div>
-                <span className="eyebrow">BEFORE WE GET STARTED</span>
+                <span className="eyebrow">{tr("BEFORE WE GET STARTED")}</span>
                 <h2>
-                  Good questions.
+                  {tr("Good questions.")}
                   <br />
-                  <span>Straight answers.</span>
+                  <span>{tr("Straight answers.")}</span>
                 </h2>
               </div>
               <div className="faq-list">
@@ -718,11 +753,11 @@ function App() {
                 ].map((f) => (
                   <details key={f.q}>
                     <summary>
-                      {f.q}
+                      {tr(f.q)}
                       <Plus className="faq-plus" size={18} />
                       <Minus className="faq-minus" size={18} />
                     </summary>
-                    <p>{f.a}</p>
+                    <p>{tr(f.a)}</p>
                   </details>
                 ))}
               </div>
@@ -730,25 +765,27 @@ function App() {
             <section className="closing-section">
               <div className="shell closing-inner">
                 <span className="eyebrow">
-                  <span className="status-dot" /> YOUR NEXT CHAPTER STARTS HERE
+                  <span className="status-dot" />{" "}
+                  {tr("YOUR NEXT CHAPTER STARTS HERE")}
                 </span>
                 <h2>
-                  Let’s make your
+                  {tr("Let’s make your")}
                   <br />
-                  next move a <em>good one.</em>
+                  {tr("next move a")} <em>{tr("good one.")}</em>
                   <Mark />
                 </h2>
                 <div className="closing-bottom">
                   <p>
-                    Bring the idea. I’ll bring the care,
+                    {tr("Bring the idea. I’ll bring the care,")}
                     <br />
-                    the code and a fresh perspective.
+                    {tr("the code and a fresh perspective.")}
                   </p>
                   <button className="button dark" onClick={() => start()}>
-                    Tell me what you’re building <ArrowUpRight size={20} />
+                    {tr("Tell me what you’re building")}{" "}
+                    <ArrowUpRight size={20} />
                   </button>
                   <a href="mailto:lucasberdy@gmail.com">
-                    Or just say hello <ArrowUpRight size={16} />
+                    {tr("Or just say hello")} <ArrowUpRight size={16} />
                   </a>
                 </div>
               </div>
@@ -757,13 +794,17 @@ function App() {
         )}
       </main>
       <footer className="site-footer shell">
-        <a href="#top" className="brand-symbol" aria-label="Lucas Berdy home">
+        <a
+          href="#top"
+          className="brand-symbol"
+          aria-label={tr("Lucas Berdy home")}
+        >
           lb<span>.</span>
         </a>
         <span>
           © {new Date().getFullYear()} LUCAS BERDY
           <br />
-          <small>INDEPENDENT BY CHOICE. INTENTIONAL BY DESIGN.</small>
+          <small>{tr("INDEPENDENT BY CHOICE. INTENTIONAL BY DESIGN.")}</small>
         </span>
         <div>
           <a
@@ -771,17 +812,17 @@ function App() {
             target="_blank"
             rel="noreferrer"
           >
-            GitHub <ArrowUpRight size={13} />
+            {tr("GitHub")} <ArrowUpRight size={13} />
           </a>
           <a
             href="https://portfolio-swart-psi-26.vercel.app/"
             target="_blank"
             rel="noreferrer"
           >
-            Portfolio <ArrowUpRight size={13} />
+            {tr("Portfolio")} <ArrowUpRight size={13} />
           </a>
           <a href="mailto:lucasberdy@gmail.com">
-            Email <ArrowUpRight size={13} />
+            {tr("Email")} <ArrowUpRight size={13} />
           </a>
         </div>
       </footer>

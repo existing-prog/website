@@ -3166,3 +3166,180 @@ p {
     font-size: 14px;
   }
 }
+
+/* A persistent language choice, with native-language accessible labels. */
+.language-switch {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  border: 1px solid #566747;
+  border-radius: 5px;
+  overflow: hidden;
+  background: #20291a;
+  button {
+    display: grid;
+    place-items: center;
+    min-width: 43px;
+    min-height: 44px;
+    padding: 9px 10px;
+    font: 11px monospace;
+    background: transparent;
+    color: #c4d1b4;
+    border: 0;
+    & + button {
+      border-left: 1px solid #566747;
+    }
+    &[aria-pressed="true"] {
+      background: #d6f478;
+      color: #171914;
+    }
+    &:focus-visible {
+      outline-offset: -3px;
+    }
+  }
+}
+.builder-topbar > span {
+  min-width: 0;
+  line-height: 1.6;
+  flex: 1;
+}
+.builder-topbar .language-switch {
+  margin-left: auto;
+}
+.builder-topbar .language-switch button {
+  min-width: 44px;
+  min-height: 44px;
+  font-size: 10px;
+  padding: 8px;
+}
+.builder-bottom .final-actions {
+  min-width: 0;
+}
+.builder-bottom .save-button {
+  white-space: normal;
+  line-height: 1.5;
+  max-width: 100%;
+  text-align: center;
+}
+html[lang="fr"] .hero-copy h1 {
+  font-size: clamp(58px, 6.3vw, 92px);
+}
+@media (max-width: 1000px) {
+  .header-inner {
+    position: relative;
+    gap: 15px;
+  }
+  .header-inner .brand-label {
+    display: none;
+  }
+  .header-inner .language-switch {
+    margin-left: auto;
+  }
+  .header-cta {
+    margin-left: 0;
+  }
+  .main-nav {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 8px);
+    padding: 10px;
+    background: #26311f;
+    border: 1px solid #4c6237;
+    border-radius: 8px;
+    box-shadow: 0 15px 40px #0007;
+    margin: 0;
+    z-index: 30;
+    &.open {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      align-items: stretch;
+    }
+    a {
+      min-height: 46px;
+      padding: 14px;
+      font-size: 12px;
+    }
+    .desk-link {
+      border-left: 0;
+      border-top: 1px solid #465b33;
+      padding: 14px;
+      margin: 5px 0 0;
+    }
+  }
+  .menu-button {
+    display: grid;
+    place-items: center;
+    background: #2c3623;
+    color: #d6f478;
+    border: 1px solid #52673b;
+    border-radius: 50%;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+  }
+}
+@media (max-width: 760px) {
+  html[lang="fr"] .hero-copy h1 {
+    font-size: clamp(51px, 12.8vw, 80px);
+    letter-spacing: -3px;
+  }
+  .header-inner .language-switch {
+    margin-left: auto;
+  }
+  .builder-topbar {
+    gap: 9px;
+  }
+  .builder-topbar > span > span {
+    display: block;
+    margin-left: 0;
+  }
+  .builder-content h2 {
+    overflow-wrap: break-word;
+  }
+  .service-card .service-card-copy h3 {
+    overflow-wrap: break-word;
+  }
+  .builder-bottom .save-button {
+    font-size: 10px;
+  }
+}
+@media (max-width: 600px) {
+  .header-cta {
+    display: none;
+  }
+  .header-inner {
+    gap: 12px;
+  }
+  .header-inner .language-switch {
+    margin-left: auto;
+  }
+  .hero-actions .button {
+    max-width: 100%;
+  }
+  .language-switch button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+@media (max-width: 380px) {
+  html[lang="fr"] .hero-copy h1 {
+    font-size: clamp(46px, 12.8vw, 50px);
+    letter-spacing: -2.5px;
+  }
+  .builder-topbar {
+    padding-inline: 14px;
+  }
+  .builder-topbar .language-switch button {
+    min-width: 44px;
+  }
+}
+
+@media (max-width: 1280px) {
+  .site-header .brand-label {
+    display: none;
+  }
+}

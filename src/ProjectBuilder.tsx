@@ -1,3 +1,6 @@
+import LanguageSwitch from "./LanguageSwitch";
+import { useTranslation } from "react-i18next";
+import { tr } from "./i18n";
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
@@ -32,6 +35,7 @@ export default function ProjectBuilder({
   onDesk: () => void;
   notice: string;
 }) {
+  const { i18n } = useTranslation();
   const [draft, setDraft] = useState<Draft>(initial);
   const [step, setStep] = useState(0);
   const [copied, setCopied] = useState("");
@@ -54,6 +58,13 @@ export default function ProjectBuilder({
     heading.current?.focus();
     dialog.current?.querySelector(".builder-content")?.scrollTo(0, 0);
   }, [step]);
+  useEffect(() => {
+    form.current
+      ?.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>(
+        "input,textarea",
+      )
+      .forEach((field) => field.setCustomValidity(""));
+  }, [i18n.resolvedLanguage]);
   const update = <K extends keyof Draft>(key: K, value: Draft[K]) => {
     setDraft((d) => ({ ...d, [key]: value }));
     setSaved(false);
@@ -65,7 +76,7 @@ export default function ProjectBuilder({
       if (step === 1 && draft.brief.trim().length < 20) {
         const el = form.current.querySelector<HTMLTextAreaElement>("textarea");
         el?.setCustomValidity(
-          "Please describe your project in at least 20 characters.",
+          tr("Please describe your project in at least 20 characters."),
         );
         el?.reportValidity();
         return;
@@ -87,7 +98,7 @@ export default function ProjectBuilder({
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "lucas-berdy-project-brief.txt";
+    a.download = tr("export.filename");
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
@@ -101,7 +112,7 @@ export default function ProjectBuilder({
       );
     }
   };
-  const email = `mailto:lucasberdy@gmail.com?subject=${encodeURIComponent(`Project request — ${serviceName(draft.service)}`)}&body=${encodeURIComponent(briefText(draft))}`;
+  const email = `mailto:lucasberdy@gmail.com?subject=${encodeURIComponent(tr("Project request — {{service}}", { service: serviceName(draft.service) }))}&body=${encodeURIComponent(briefText(draft))}`;
   return (
     <dialog
       className="builder-dialog"
@@ -117,13 +128,13 @@ export default function ProjectBuilder({
           <a className="brand-symbol" href="#top" onClick={onClose}>
             lb<span>.</span>
           </a>
-          <span className="eyebrow">A GOOD PLACE TO BEGIN</span>
+          <span className="eyebrow">{tr("A GOOD PLACE TO BEGIN")}</span>
           <h2>
-            Big ideas.
+            {tr("Big ideas.")}
             <br />
-            Small first step.
+            {tr("Small first step.")}
           </h2>
-          <p>A few thoughtful details make a better starting point.</p>
+          <p>{tr("A few thoughtful details make a better starting point.")}</p>
           <ol>
             {[
               "Your direction",
@@ -136,27 +147,31 @@ export default function ProjectBuilder({
                 key={label}
               >
                 <span>{i < step ? <Check size={14} /> : i + 1}</span>
-                {label}
+                {tr(label)}
               </li>
             ))}
           </ol>
           <div className="builder-promise">
             <ShieldCheck size={20} />
             <span>
-              No payment. No commitment.
+              {tr("No payment. No commitment.")}
               <br />
-              Just the start of a conversation.
+              {tr("Just the start of a conversation.")}
             </span>
           </div>
         </aside>
         <div className="builder-main">
           <div className="builder-topbar">
             <span>
-              PROJECT PLANNER <span>/ 0{step + 1} OF 04</span>
+              {tr("PROJECT PLANNER")}{" "}
+              <span>
+                / 0{step + 1} {tr("OF 04")}
+              </span>
             </span>
+            <LanguageSwitch />
             <button
               className="icon-button"
-              aria-label="Close project planner"
+              aria-label={tr("Close project planner")}
               onClick={onClose}
             >
               <X size={22} />
@@ -175,39 +190,41 @@ export default function ProjectBuilder({
           >
             <div className="builder-content">
               <span className="eyebrow">
-                {
+                {tr(
                   [
                     "01 / THE STARTING POINT",
                     "02 / YOUR VISION",
                     "03 / NICE TO MEET YOU",
                     "04 / ALL COMING TOGETHER",
-                  ][step]
-                }
+                  ][step],
+                )}
               </span>
               <h2 tabIndex={-1} ref={heading} id="builder-heading">
-                {
+                {tr(
                   [
                     "What are we building?",
                     "Tell me a little more.",
                     "Who’s behind the idea?",
                     "Your next chapter, outlined.",
-                  ][step]
-                }
+                  ][step],
+                )}
               </h2>
               <p className="builder-intro">
-                {
+                {tr(
                   [
                     "Choose the direction that’s closest to your idea. We can figure out the finer details together.",
                     "A rough idea is plenty. What should your website do, and who is it for?",
                     "So I know who I’m speaking to and where to reply.",
                     "Check your brief, then email it to me to start the conversation. Nothing has been submitted yet.",
-                  ][step]
-                }
+                  ][step],
+                )}
               </p>
               {step === 0 && (
                 <>
                   <fieldset className="service-options">
-                    <legend className="sr-only">Choose a service</legend>
+                    <legend className="sr-only">
+                      {tr("Choose a service")}
+                    </legend>
                     {services.map((s, i) => (
                       <label
                         key={s.id}
@@ -234,10 +251,10 @@ export default function ProjectBuilder({
                           )}
                         </span>
                         <span>
-                          <strong>{s.short}</strong>
-                          <small>{s.tagline}</small>
+                          <strong>{tr(s.short)}</strong>
+                          <small>{tr(s.tagline)}</small>
                           <small className="option-budget">
-                            {s.budget} <span>· indicative</span>
+                            {tr(s.budget)} <span>{tr("· indicative")}</span>
                           </small>
                         </span>
                         <span className="radio-circle">
@@ -249,9 +266,9 @@ export default function ProjectBuilder({
                   <div className="planner-note">
                     <Sparkles size={18} />
                     <p>
-                      Budgets are guides, not fixed totals. You receive a
-                      written quote with the scope, final price and timing to
-                      approve before any work begins.
+                      {tr(
+                        "Budgets are guides, not fixed totals. You receive a written quote with the scope, final price and timing to approve before any work begins.",
+                      )}
                     </p>
                   </div>
                 </>
@@ -261,8 +278,8 @@ export default function ProjectBuilder({
                   <div className="form-row">
                     <label>
                       {draft.service === "care"
-                        ? "Amount of work"
-                        : "How many pages?"}
+                        ? tr("Amount of work")
+                        : tr("How many pages?")}
                       <select
                         value={draft.pages}
                         onChange={(e) => update("pages", e.target.value)}
@@ -274,12 +291,14 @@ export default function ProjectBuilder({
                           "6–10 pages",
                           "Larger project",
                         ].map((x) => (
-                          <option key={x}>{x}</option>
+                          <option key={x} value={x}>
+                            {tr(x)}
+                          </option>
                         ))}
                       </select>
                     </label>
                     <label>
-                      Preferred timeline
+                      {tr("Preferred timeline")}
                       <select
                         value={draft.timeline}
                         onChange={(e) => update("timeline", e.target.value)}
@@ -290,14 +309,17 @@ export default function ProjectBuilder({
                           "1–3 months",
                           "A specific date — see brief",
                         ].map((x) => (
-                          <option key={x}>{x}</option>
+                          <option key={x} value={x}>
+                            {tr(x)}
+                          </option>
                         ))}
                       </select>
                     </label>
                   </div>
                   <fieldset className="extra-options">
                     <legend>
-                      Anything else you have in mind? <span>Optional</span>
+                      {tr("Anything else you have in mind?")}{" "}
+                      <span>{tr("Optional")}</span>
                     </legend>
                     {[
                       "Subtle animations",
@@ -318,12 +340,13 @@ export default function ProjectBuilder({
                             )
                           }
                         />
-                        <span>{x}</span>
+                        <span>{tr(x)}</span>
                       </label>
                     ))}
                   </fieldset>
                   <label>
-                    Your idea <span className="required-note">Required</span>
+                    {tr("Your idea")}{" "}
+                    <span className="required-note">{tr("Required")}</span>
                     <textarea
                       name="brief"
                       value={draft.brief}
@@ -335,15 +358,18 @@ export default function ProjectBuilder({
                       minLength={20}
                       maxLength={1800}
                       rows={5}
-                      placeholder="What do you do? What would a great website help you achieve? Any references or must-haves?"
+                      placeholder={tr(
+                        "What do you do? What would a great website help you achieve? Any references or must-haves?",
+                      )}
                     />
                     <span className="field-hint">
-                      A few sentences is a good start. {draft.brief.length}/1800
+                      {tr("A few sentences is a good start.")}{" "}
+                      {draft.brief.length}/1800
                     </span>
                   </label>
                   <label>
-                    Existing website{" "}
-                    <span className="required-note">Optional</span>
+                    {tr("Existing website")}{" "}
+                    <span className="required-note">{tr("Optional")}</span>
                     <input
                       type="url"
                       value={draft.website}
@@ -357,7 +383,7 @@ export default function ProjectBuilder({
               {step === 2 && (
                 <div className="form-fields">
                   <label>
-                    Your name
+                    {tr("Your name")}
                     <input
                       autoComplete="name"
                       value={draft.name}
@@ -365,11 +391,11 @@ export default function ProjectBuilder({
                       required
                       pattern=".*\S.*"
                       maxLength={100}
-                      placeholder="Alex Taylor"
+                      placeholder={tr("Alex Taylor")}
                     />
                   </label>
                   <label>
-                    Email address
+                    {tr("Email address")}
                     <input
                       type="email"
                       autoComplete="email"
@@ -381,22 +407,22 @@ export default function ProjectBuilder({
                     />
                   </label>
                   <label>
-                    Business or project name{" "}
-                    <span className="required-note">Optional</span>
+                    {tr("Business or project name")}{" "}
+                    <span className="required-note">{tr("Optional")}</span>
                     <input
                       autoComplete="organization"
                       value={draft.company}
                       onChange={(e) => update("company", e.target.value)}
                       maxLength={100}
-                      placeholder="Your next big thing"
+                      placeholder={tr("Your next big thing")}
                     />
                   </label>
                   <div className="planner-note">
                     <ShieldCheck size={20} />
                     <p>
-                      Your details are included in your project brief. If you
-                      save a draft, they stay in this browser until you delete
-                      it or clear its storage.
+                      {tr(
+                        "Your details are included in your project brief. If you save a draft, they stay in this browser until you delete it or clear its storage.",
+                      )}
                     </p>
                   </div>
                 </div>
@@ -405,77 +431,80 @@ export default function ProjectBuilder({
                 <>
                   <div className="review-card">
                     <div className="review-title">
-                      <span className="eyebrow">YOUR PROJECT</span>
-                      <span className="pill">Request a quote</span>
+                      <span className="eyebrow">{tr("YOUR PROJECT")}</span>
+                      <span className="pill">{tr("Request a quote")}</span>
                     </div>
                     <h3>{draft.company || serviceName(draft.service)}</h3>
                     <dl>
                       <div>
-                        <dt>Service</dt>
+                        <dt>{tr("Service")}</dt>
                         <dd>{serviceName(draft.service)}</dd>
                       </div>
                       <div>
-                        <dt>Pages / scope</dt>
-                        <dd>{draft.pages}</dd>
+                        <dt>{tr("Pages / scope")}</dt>
+                        <dd>{tr(draft.pages)}</dd>
                       </div>
                       <div>
-                        <dt>Preferred timeline</dt>
-                        <dd>{draft.timeline}</dd>
+                        <dt>{tr("Preferred timeline")}</dt>
+                        <dd>{tr(draft.timeline)}</dd>
                       </div>
                       <div>
-                        <dt>Interested in</dt>
-                        <dd>{draft.extras.join(", ") || "Core service"}</dd>
+                        <dt>{tr("Interested in")}</dt>
+                        <dd>
+                          {draft.extras.map((x) => tr(x)).join(", ") ||
+                            tr("Core service")}
+                        </dd>
                       </div>
                       <div>
-                        <dt>Contact</dt>
+                        <dt>{tr("Contact")}</dt>
                         <dd>
                           {draft.name} · {draft.email}
                         </dd>
                       </div>
                       {draft.website && (
                         <div>
-                          <dt>Existing website</dt>
+                          <dt>{tr("Existing website")}</dt>
                           <dd>{draft.website}</dd>
                         </div>
                       )}
                     </dl>
                     <div className="review-brief">
-                      <span>Your idea</span>
+                      <span>{tr("Your idea")}</span>
                       <p>{draft.brief}</p>
                     </div>
                     <div className="review-budget">
-                      <span>Indicative service guide</span>
+                      <span>{tr("Indicative service guide")}</span>
                       <strong>{budgetGuide(draft.service)}</strong>
                       <p>
-                        {
+                        {tr(
                           services.find((s) => s.id === draft.service)
-                            ?.budgetScope
-                        }
-                        . Your selected scope and options may change the price.
-                        The written quote confirms the full total, any taxes and
-                        external costs.
+                            ?.budgetScope || "",
+                        )}
+                        {tr(
+                          ". Your selected scope and options may change the price. The written quote confirms the full total, any taxes and external costs.",
+                        )}
                       </p>
                     </div>
                     <div className="review-quote">
-                      <span>Final project total</span>
-                      <strong>Written quote to approve</strong>
+                      <span>{tr("Final project total")}</span>
+                      <strong>{tr("Written quote to approve")}</strong>
                     </div>
                   </div>
                   <div className="review-actions">
                     <button type="button" onClick={copy}>
-                      <Copy size={15} /> Copy brief
+                      <Copy size={15} /> {tr("Copy brief")}
                     </button>
                     <button type="button" onClick={download}>
-                      <Download size={15} /> Download brief
+                      <Download size={15} /> {tr("Download brief")}
                     </button>
                   </div>
                   <p className="email-note">
-                    Email opens your email app with the brief filled in. You’ll
-                    still need to press Send. No payment or booking is made
-                    here.
+                    {tr(
+                      "Email opens your email app with the brief filled in. You’ll still need to press Send. No payment or booking is made here.",
+                    )}
                   </p>
                   <p className="action-status" role="status">
-                    {copied || (saveAttempted ? notice : "")}
+                    {tr(copied || (saveAttempted ? notice : ""))}
                   </p>
                 </>
               )}
@@ -488,26 +517,28 @@ export default function ProjectBuilder({
                     className="back-button"
                     onClick={() => setStep((s) => s - 1)}
                   >
-                    <ChevronLeft size={16} /> Back
+                    <ChevronLeft size={16} /> {tr("Back")}
                   </button>
                 ) : (
-                  <span className="step-counter">Let’s make a start.</span>
+                  <span className="step-counter">
+                    {tr("Let’s make a start.")}
+                  </span>
                 )}
               </div>
               {step < 3 ? (
                 <button className="button lime" type="submit">
-                  Continue <ChevronRight size={17} />
+                  {tr("Continue")} <ChevronRight size={17} />
                 </button>
               ) : (
                 <div className="final-actions">
                   <button className="save-button" type="button" onClick={save}>
                     {saved ? <Check size={16} /> : <FolderOpen size={16} />}{" "}
                     {saved
-                      ? "Saved on this device"
-                      : "Save draft on this device"}
+                      ? tr("Saved on this device")
+                      : tr("Save draft on this device")}
                   </button>
                   <a className="button lime" href={email}>
-                    <Mail size={17} /> Email project request
+                    <Mail size={17} /> {tr("Email project request")}
                   </a>
                 </div>
               )}
@@ -515,7 +546,7 @@ export default function ProjectBuilder({
             {saved && step === 3 && (
               <div className="saved-footer">
                 <button type="button" onClick={onDesk}>
-                  Go to my project desk <ArrowRight size={14} />
+                  {tr("Go to my project desk")} <ArrowRight size={14} />
                 </button>
               </div>
             )}

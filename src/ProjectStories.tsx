@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+import { tr } from "./i18n";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowDown,
@@ -73,7 +75,7 @@ function ProjectVisual({
       aria-hidden="true"
     >
       <span className="scene-corner">
-        0{projects.indexOf(project) + 1} / {directions[project.id].label}
+        0{projects.indexOf(project) + 1} / {tr(directions[project.id].label)}
       </span>
       {project.id === "samantha" && (
         <>
@@ -136,7 +138,7 @@ function ProjectVisual({
           </div>
           <div className="device-caption">
             <Monitor size={15} />
-            <span>One experience</span>
+            <span>{tr("One experience")}</span>
             <ArrowRight size={14} />
             <Smartphone size={14} />
           </div>
@@ -171,6 +173,7 @@ export default function ProjectStories({
 }: {
   onStart: (service: ServiceId) => void;
 }) {
+  const { i18n } = useTranslation();
   const root = useRef<HTMLDivElement>(null);
   const [filter, setFilter] = useState("All work");
   const [active, setActive] = useState("samantha");
@@ -370,7 +373,7 @@ export default function ProjectStories({
       images.forEach((image) => image.removeEventListener("load", refresh));
       context.revert();
     };
-  }, [visible, desktop, reduced]);
+  }, [visible, desktop, reduced, i18n.resolvedLanguage]);
   const jump = (id: string) =>
     document.getElementById(`chapter-${id}`)?.scrollIntoView({
       behavior: reduced ? "instant" : "smooth",
@@ -384,7 +387,7 @@ export default function ProjectStories({
       data-reduced-motion={reduced}
       ref={root}
     >
-      <div className="work-filters" aria-label="Filter selected projects">
+      <div className="work-filters" aria-label={tr("Filter selected projects")}>
         {["All work", "Portfolios", "Frontend & performance"].map((f) => (
           <button
             key={f}
@@ -392,11 +395,11 @@ export default function ProjectStories({
             aria-pressed={filter === f}
             onClick={() => setFilter(f)}
           >
-            {f}
+            {tr(f)}
           </button>
         ))}
         <a className="story-skip" href="#services">
-          Skip to services <ArrowDown size={14} />
+          {tr("Skip to services")} <ArrowDown size={14} />
         </a>
       </div>
       <div className="story-layout">
@@ -408,14 +411,14 @@ export default function ProjectStories({
           </div>
           <div className="story-stage-footer">
             <span>
-              <ArrowDown size={14} /> SCROLL TO EXPLORE
+              <ArrowDown size={14} /> {tr("SCROLL TO EXPLORE")}
             </span>
-            <nav aria-label="Jump to a project">
+            <nav aria-label={tr("Jump to a project")}>
               {visible.map((project) => (
                 <button
                   key={project.id}
                   onClick={() => jump(project.id)}
-                  aria-label={`Show ${project.name}`}
+                  aria-label={tr("Show {{name}}", { name: project.name })}
                   aria-pressed={active === project.id}
                 >
                   0{projects.indexOf(project) + 1}
@@ -448,32 +451,34 @@ export default function ProjectStories({
                 >
                   <div className="project-details">
                     <div>
-                      <span className="eyebrow">{project.kind}</span>
+                      <span className="eyebrow">{tr(project.kind)}</span>
                       <h3 id={`project-${project.id}-title`}>
                         {project.name}
                         <ArrowUpRight size={23} />
                       </h3>
                       <p id={`project-${project.id}-description`}>
-                        {project.description}
+                        {tr(project.description)}
                       </p>
                     </div>
                     <div className="project-tags">
                       {project.tags.map((tag) => (
-                        <span key={tag}>{tag}</span>
+                        <span key={tag}>{tr(tag)}</span>
                       ))}
                     </div>
                   </div>
                 </a>
                 <p className="chapter-outcome">
                   <Check size={16} />
-                  {directions[project.id].result}
+                  {tr(directions[project.id].result)}
                 </p>
                 <button
                   className="chapter-cta"
-                  aria-label={`Start a project like ${project.name}`}
+                  aria-label={tr("Start a project like {{name}}", {
+                    name: project.name,
+                  })}
                   onClick={() => onStart(directions[project.id].service)}
                 >
-                  A project like this?
+                  {tr("A project like this?")}
                   <ArrowUpRight size={18} />
                 </button>
               </div>

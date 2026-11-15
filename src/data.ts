@@ -1,3 +1,4 @@
+import { tr } from "./i18n";
 export type ServiceId = "portfolio" | "website" | "care";
 export const services = [
   {
@@ -117,11 +118,22 @@ export const emptyDraft = (service: ServiceId = "website"): Draft => ({
   brief: "",
 });
 export const serviceName = (id: ServiceId) =>
-  services.find((s) => s.id === id)?.short ?? "Website project";
+  tr(services.find((s) => s.id === id)?.short ?? "Website project");
 export const budgetGuide = (id: ServiceId) =>
-  services.find((s) => s.id === id)?.budget ?? "Custom quote";
+  tr(services.find((s) => s.id === id)?.budget ?? "Custom quote");
 export function briefText(d: Draft) {
-  return `PROJECT REQUEST — ${serviceName(d.service)}\n\nName: ${d.name}\nEmail: ${d.email}\nBusiness: ${d.company || "Not provided"}\nExisting website: ${d.website || "Not provided"}\nPages / scope: ${d.pages}\nInterested in: ${d.extras.join(", ") || "Core service"}\nPreferred timeline: ${d.timeline}\n\nPROJECT BRIEF\n${d.brief}\n\nINDICATIVE SERVICE BUDGET GUIDE\n${budgetGuide(d.service)} — a starter-scope guide, not a quote or a confirmed total. Larger scopes, optional features, applicable taxes and external costs are confirmed in the written quote.\n\nPlease review my requirements and send a tailored quote. I understand that scope, price and dates need to be agreed before work starts.`;
+  return tr("export.body", {
+    service: serviceName(d.service),
+    name: d.name,
+    email: d.email,
+    company: d.company || tr("Not provided"),
+    website: d.website || tr("Not provided"),
+    pages: tr(d.pages),
+    extras: d.extras.map((x) => tr(x)).join(", ") || tr("Core service"),
+    timeline: tr(d.timeline),
+    brief: d.brief,
+    budget: budgetGuide(d.service),
+  });
 }
 export function loadDrafts(): Draft[] {
   try {

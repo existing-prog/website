@@ -63,6 +63,7 @@ Settings → Pages must use **GitHub Actions**. Pushes to `main` install depende
 - `src/ProjectBuilder.tsx`: accessible native-dialog project planner.
 - `src/ProjectStories.tsx` and `src/project-stories.scss`: scroll-driven project sequence, per-case artwork, filters and service-matched quote buttons.
 - `src/data.ts`: service and project definitions, draft types and storage loading.
+- `src/i18n.ts`, `src/LanguageSwitch.tsx`, `src/locales/FR.json` and `src/locales/ENG.json`: French/English localization and persistent language controls.
 - `src/styles.scss`: responsive styles, motion and locally hosted font declarations.
 - `public/assets/`: optimized preview images and favicon.
 - `public/fonts/`: variable fonts and their SIL Open Font License texts.
@@ -81,3 +82,11 @@ GSAP ScrollTrigger drives three illustrative scenes: Neptune and drawn orbital p
 Smaller screens use independent inline scenes. Reduced-motion mode uses static visuals and disables the sticky stage. Filters, skip-to-services, project links and quote buttons work in every mode. MatchMedia listeners, timelines, image listeners and ScrollTriggers are cleaned up on filter changes, viewport changes and unmount.
 
 The Kasa phone preview is optimized from Lucas’s portfolio screenshot at `/projects/kasa-mobile.png`. The three Nina photo thumbnails come from the existing training site at `https://existing-prog.github.io/projet-4/`, retaining its Unsplash images: Aaron Paul (`wnX-fXzB6Cw`), Hannah Busing (`RvF2R_qMpRk`) and Nino van Prattenburg (`-443cl1uR_8`). The Neptune backdrop is a decorative CSS illustration, not a scientific simulation.
+
+## French / English
+
+The site uses i18next and react-i18next, with two bundled catalogs: `src/locales/FR.json` and `src/locales/ENG.json`. Their matching keys are readable English phrases; special export and metadata templates use explicit keys. Preserve the `{{placeholder}}` names when editing translations. No translation API or external translation request is used.
+
+A first visit follows the browser language (French for `fr-*`, English otherwise); an explicit FR/ENG choice is stored independently under `lb-language` when browser storage is available. The selector appears in the header and the project planner. Document language, title, metadata, UI labels, accessibility labels, dates, indicative EUR formatting, email subjects and exported briefs update with the selection.
+
+Draft service IDs, page counts, timeline values and selected options remain canonical and independent of the display language, including existing drafts. User-written text is retained exactly as entered. Switching language does not reset the planner step or discard a draft. Language preference storage failure does not prevent switching for the current page.

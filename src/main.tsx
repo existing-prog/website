@@ -47,6 +47,7 @@ import LanguageSwitch from "./LanguageSwitch";
 import HeroWorkTransition from "./HeroWorkTransition";
 import { useScrollHeader } from "./useScrollHeader";
 import "./interaction-polish.scss";
+import HeroProjectBackdrop from "./HeroProjectBackdrop";
 
 function Mark({ className = "" }: { className?: string }) {
   return (
@@ -413,11 +414,7 @@ function App() {
                   </div>
                 </div>
                 <div className="hero-stage">
-                  <div className="glass-halo" aria-hidden="true">
-                    <span />
-                    <span />
-                    <span />
-                  </div>
+                  <HeroProjectBackdrop projectId={projects[preview].id} />
                   <div className="showcase-window glass-interactive">
                     <div className="window-toolbar">
                       <span className="window-dots">
@@ -441,6 +438,7 @@ function App() {
                       })}
                     >
                       <img
+                        key={projects[preview].id}
                         src={asset(projects[preview].image)}
                         alt={tr("{{name}} website preview", {
                           name: projects[preview].name,

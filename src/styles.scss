@@ -406,16 +406,7 @@ p {
   isolation: isolate;
   padding: 30px 12px 35px;
 }
-.stage-grid {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(#54596320 1px, transparent 1px),
-    linear-gradient(90deg, #54596320 1px, transparent 1px);
-  background-size: 42px 42px;
-  mask-image: radial-gradient(ellipse, #000 25%, transparent 70%);
-  z-index: -1;
-}
+
 .stage-star {
   position: absolute;
   top: 3px;

@@ -360,7 +360,6 @@ function App() {
               <div className="studio-backdrop" aria-hidden="true">
                 <div className="studio-glow glow-one" />
                 <div className="studio-glow glow-two" />
-                <div className="studio-grid" />
               </div>
               <div className="hero-kicker">
                 <span className="eyebrow">
@@ -414,7 +413,6 @@ function App() {
                   </div>
                 </div>
                 <div className="hero-stage">
-                  <div className="stage-grid" />
                   <div className="glass-halo" aria-hidden="true">
                     <span />
                     <span />

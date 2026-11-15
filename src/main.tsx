@@ -51,6 +51,7 @@ import "./interaction-polish.scss";
 import HeroProjectBackdrop from "./HeroProjectBackdrop";
 
 const SamanthaCaseStudy = lazy(() => import("./SamanthaCaseStudy"));
+const KasaCaseStudy = lazy(() => import("./KasaCaseStudy"));
 
 function Mark({ className = "" }: { className?: string }) {
   return (
@@ -80,7 +81,8 @@ function App() {
   // Routes en hash : liens partageables et rechargements compatibles GitHub Pages.
   const [route, setRoute] = useState(location.hash);
   const workspace = route === "#workspace";
-  const caseStudy = route === "#project/samantha";
+  const kasaCase = route === "#project/kasa";
+  const caseStudy = route === "#project/samantha" || kasaCase;
   useScrollHeader(menu, workspace || caseStudy);
   const [drafts, setDrafts] = useState<Draft[]>(loadDrafts);
   const [editing, setEditing] = useState<Draft | null>(null);
@@ -92,7 +94,7 @@ function App() {
     const change = () => {
       setRoute(location.hash);
       setMenu(false);
-      if (["#workspace", "#project/samantha"].includes(location.hash))
+      if (["#workspace", "#project/samantha", "#project/kasa"].includes(location.hash))
         window.scrollTo({ top: 0, behavior: "instant" });
     };
     change();
@@ -102,24 +104,30 @@ function App() {
   useEffect(() => {
     document.title = workspace
       ? tr("Project desk — Lucas Berdy")
-      : caseStudy
-        ? tr("Samantha Ramsey — Case study · Lucas Berdy")
-        : tr("Lucas Berdy — Your next chapter, online.");
+      : kasaCase
+        ? tr("Kasa — Case study · Lucas Berdy")
+        : caseStudy
+          ? tr("Samantha Ramsey — Case study · Lucas Berdy")
+          : tr("Lucas Berdy — Your next chapter, online.");
     document
       .querySelector('meta[property="og:title"]')
       ?.setAttribute("content", document.title);
-    const description = caseStudy
+    const description = kasaCase
       ? tr(
-          "A scientific portfolio designed and developed by Lucas Berdy: visual identity, responsive interface and orbital demonstrations.",
+          "Kasa: a responsive React rental interface built by Lucas Berdy as a frontend training project.",
         )
-      : tr("meta.description");
+      : caseStudy
+        ? tr(
+            "A scientific portfolio designed and developed by Lucas Berdy: visual identity, responsive interface and orbital demonstrations.",
+          )
+        : tr("meta.description");
     document
       .querySelector('meta[name="description"]')
       ?.setAttribute("content", description);
     document
       .querySelector('meta[property="og:description"]')
       ?.setAttribute("content", description);
-  }, [workspace, caseStudy, i18n.resolvedLanguage]);
+  }, [workspace, caseStudy, kasaCase, i18n.resolvedLanguage]);
   useEffect(() => {
     if (workspace || caseStudy || !location.hash) return;
     const anchor = location.hash;
@@ -382,7 +390,11 @@ function App() {
               </section>
             }
           >
-            <SamanthaCaseStudy onStart={() => start("portfolio")} />
+            {kasaCase ? (
+              <KasaCaseStudy onStart={() => start("website")} />
+            ) : (
+              <SamanthaCaseStudy onStart={() => start("portfolio")} />
+            )}
           </Suspense>
         ) : (
           <>
@@ -461,7 +473,11 @@ function App() {
                     <a
                       className={`showcase-image ${projects[preview].color}`}
                       href={projectHref(projects[preview])}
-                      target={projects[preview].id === "samantha" ? undefined : "_blank"}
+                      target={
+                        projectHref(projects[preview]).startsWith("#")
+                          ? undefined
+                          : "_blank"
+                      }
                       rel="noreferrer"
                       aria-label={tr("Explore {{name}}", {
                         name: projects[preview].name,

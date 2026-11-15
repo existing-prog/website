@@ -78,7 +78,7 @@ function ProjectVisual({
       <span className="scene-corner">
         0{projects.indexOf(project) + 1} / {tr(directions[project.id].label)}
       </span>
-      {project.id === "samantha" && (
+      {projectHref(project).startsWith("#") && (
         <>
           <div className="story-stars" />
           <div className="neptune-sphere" />
@@ -436,7 +436,7 @@ export default function ProjectStories({
                 </span>
                 <a
                   href={projectHref(project)}
-                  target={project.id === "samantha" ? undefined : "_blank"}
+                  target={projectHref(project).startsWith("#") ? undefined : "_blank"}
                   rel="noreferrer"
                   className={`story-card project-card ${project.color} ${project.id === "samantha" ? "featured" : ""}`}
                   aria-labelledby={`project-${project.id}-title`}
@@ -451,7 +451,7 @@ export default function ProjectStories({
                       <p id={`project-${project.id}-description`}>
                         {tr(project.description)}
                       </p>
-                      {project.id === "samantha" && (
+                      {projectHref(project).startsWith("#") && (
                         <span className="case-study-link-label">
                           {tr("Read the case study")} <ArrowRight size={15} />
                         </span>

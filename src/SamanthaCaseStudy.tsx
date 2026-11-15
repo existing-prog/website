@@ -1,26 +1,12 @@
-import { Fragment, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft, ArrowUpRight, Check, PlayCircle } from "lucide-react";
 import { asset, projects } from "./data";
 import { tr } from "./i18n";
-import "./samantha-case-study.scss";
+import "./case-study.scss";
 import { useCaseStudyMotion } from "./useCaseStudyMotion";
 
-/** Les masques sont décoratifs ; chaque titre porte son texte accessible complet. */
-function CaseWords({ text }: { text: string }) {
-  return (
-    <>
-      {text.split(/\s+/).map((word, index) => (
-        <Fragment key={`${text}-${index}`}>
-          {index > 0 && " "}
-          <span className="case-word-mask" aria-hidden="true">
-            <span className="case-word">{word}</span>
-          </span>
-        </Fragment>
-      ))}
-    </>
-  );
-}
+import CaseWords from "./CaseWords";
 
 /** Étude intégrée, chargée uniquement à l’ouverture de sa route.
  * Les médias sont des captures du vrai portfolio ; la vidéo reste à la demande.

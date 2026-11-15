@@ -97,7 +97,7 @@ export const projects = [
 ];
 /** Un seul point pour les liens de projet : étude interne ou site externe. */
 export const projectHref = (project: (typeof projects)[number]) =>
-  project.id === "samantha" ? "#project/samantha" : project.url;
+  ["samantha", "kasa"].includes(project.id) ? `#project/${project.id}` : project.url;
 
 /** Brouillon local uniquement : aucun état « payé » ou « reçu » n’est simulé. */
 export interface Draft {

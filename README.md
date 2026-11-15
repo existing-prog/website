@@ -123,7 +123,7 @@ Le thème emploie les principes généraux du verre dépoli (translucidité, bor
 
 ## Étude de cas Samantha
 
-La route `#project/samantha` affiche une vraie page intégrée et partageable, compatible avec GitHub Pages sans règle de réécriture. L’accueil et les réalisations utilisent `projectHref` dans `src/data.ts`. Les autres projets conservent leur destination actuelle.
+La route `#project/samantha` affiche une vraie page intégrée et partageable, compatible avec GitHub Pages sans règle de réécriture. L’accueil et les réalisations utilisent `projectHref` dans `src/data.ts`. Kasa possède également une étude intégrée ; Nina conserve son lien externe.
 
 `src/SamanthaCaseStudy.tsx` et son SCSS sont chargés à la demande. Les textes viennent des deux catalogues existants. Le formulaire reste géré par `App` ; le CTA de l’étude sélectionne le service `portfolio`. Les effets GSAP sont retirés au démontage et en mode mouvement réduit. Le titre reçoit le focus à l’ouverture, et les liens de retour rejoignent les réalisations.
 
@@ -132,3 +132,11 @@ Les captures `samantha-journal.webp` et `samantha-mobile.webp` proviennent des p
 ### Chorégraphie de l’étude
 
 `src/useCaseStudyMotion.ts` regroupe les ScrollTriggers : révélation des titres par masques de mots, ouverture de l’aperçu, déplacement vertical du journal dans sa fenêtre, entrée du téléphone et progression de lecture. Les titres gardent leur nom accessible complet avec `aria-label`. Le texte de conception devient sticky en CSS sur les grands écrans, sans pin ni défilement forcé. Les amplitudes sont réduites sur téléphone ; le mode mouvement réduit restaure immédiatement le contenu statique. Le contexte `matchMedia` retire aussi ses attributs et styles lors du démontage, d’un redimensionnement ou d’un changement de langue.
+
+## Étude de cas Kasa
+
+La route `#project/kasa` charge `src/KasaCaseStudy.tsx` à la demande. Kasa est explicitement présenté comme un projet de formation réalisé à partir de maquettes fournies. Les captures locales `kasa-study-*.webp` ont été prises le 15 novembre 2026 sur la vraie application : https://existing-prog.github.io/projet-5/ (sources : https://github.com/existing-prog/projet-5). Elles illustrent le catalogue, une fiche et sa galerie, puis les écrans mobiles ; elles ne simulent pas une réservation ni un paiement.
+
+`src/useKasaMotion.ts` centralise les animations et leur nettoyage : entrée des appareils, titres par mots, progression et changement d’aperçu selon le chapitre visible. À partir de 1024 × 700 px, la scène reste sticky pendant les trois étapes, sans bloquer le scroll natif. Les petits écrans et le mode mouvement réduit affichent les captures dans le flux. Les boutons de la scène permettent aussi de rejoindre chaque étape. Le CTA ouvre le formulaire existant avec le service `website` sélectionné.
+
+`src/CaseWords.tsx` et `src/case-study.scss` partagent les bases accessibles des deux études ; `src/kasa-case-study.scss` définit la composition et la palette propres à Kasa. Les textes FR/ENG restent dans les deux catalogues JSON. Les tests `tests/kasa-case-study.spec.ts` couvrent les dimensions, les langues, les étapes dans les deux sens, le mouvement réduit et le parcours vers le devis.

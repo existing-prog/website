@@ -1,0 +1,398 @@
+/* Kasa possède un rythme produit distinct : appareils assemblés, parcours en
+ * chapitres et captures inline lorsque la scène sticky n’est pas appropriée.
+ */
+.kasa-study {
+  --case-accent: #e4c5ac;
+}
+.kasa-intro-grid {
+  display: grid;
+  grid-template-columns: 1.25fr 0.85fr;
+  align-items: end;
+  gap: 70px;
+}
+.kasa-title {
+  font-size: clamp(48px, 6.5vw, 92px);
+  max-width: 760px;
+}
+.kasa-brief > p {
+  color: var(--case-muted);
+  font-size: 17px;
+  line-height: 1.85;
+}
+.kasa-tech {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px 20px;
+  margin-top: 24px;
+  padding: 0;
+  list-style: none;
+  font: 12px monospace;
+  color: #d8c1ac;
+}
+.kasa-study .kasa-hero-art {
+  position: relative;
+  margin-top: 64px;
+  padding-bottom: 80px;
+  perspective: 1400px;
+}
+.kasa-hero-setting {
+  position: absolute;
+  inset: -7% 0 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 46% 43% at 50% 45%, #d3aa7d20, transparent 100%);
+  span {
+    position: absolute;
+    inset: 5% 10% 25% 2%;
+    border: 1px solid #dfb58c30;
+    border-radius: 16px;
+    transform: rotate(-5deg);
+  }
+  span + span {
+    inset: 13% 3% 18% 8%;
+    transform: rotate(4deg);
+  }
+}
+.kasa-hero-browser {
+  position: relative;
+  width: 88%;
+  overflow: clip;
+  border: 1px solid #c7d8f04d;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 24px 55px #0005;
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
+.kasa-hero-phone {
+  position: absolute;
+  width: 22%;
+  max-width: 250px;
+  right: 2%;
+  bottom: 65px;
+  border: 7px solid #283246;
+  border-radius: 23px;
+  overflow: hidden;
+  box-shadow: 0 20px 45px #0006;
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
+.kasa-hero-art figcaption {
+  position: absolute;
+  bottom: 28px;
+  left: 0;
+}
+.kasa-journey {
+  padding-block: 100px;
+  background: #eee9e2;
+  color: #252d39;
+  .eyebrow {
+    color: #725944;
+  }
+  .kasa-section-heading > p:not(.eyebrow),
+  .kasa-chapter-copy > p {
+    color: #4b5667;
+  }
+  h2 > .case-word-mask {
+    color: inherit;
+  }
+}
+.kasa-section-heading {
+  max-width: 850px;
+  margin-bottom: 50px;
+  > p:not(.eyebrow) {
+    font-size: 17px;
+    color: var(--case-muted);
+    max-width: 690px;
+    margin-top: 26px;
+  }
+}
+.kasa-flow-stage {
+  display: none;
+}
+.kasa-flow-chapter {
+  padding-block: 32px;
+  scroll-margin-top: 130px;
+}
+.kasa-inline-preview {
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 28px !important;
+  border: 1px solid #b4a5956b;
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
+.kasa-step-number {
+  font:
+    32px/1.2 "Space Grotesk",
+    sans-serif;
+  color: #8e6752;
+  small {
+    font: 12px monospace;
+    color: #596375;
+  }
+}
+.kasa-chapter-copy h3 {
+  margin: 18px 0;
+  font-size: 28px;
+  line-height: 1.2;
+  letter-spacing: -0.9px;
+}
+.kasa-chapter-copy p {
+  font-size: 16px;
+}
+.kasa-system {
+  padding-block: 105px;
+}
+.kasa-components {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 38px;
+}
+.kasa-component {
+  padding-top: 28px;
+  border-top: 1px solid #dcc0a34a;
+  svg {
+    color: var(--case-accent);
+  }
+  h3 {
+    margin: 25px 0 18px;
+    font-size: 25px;
+    line-height: 1.25;
+    letter-spacing: -0.6px;
+  }
+  p {
+    font-size: 16px;
+    color: var(--case-muted);
+  }
+}
+.kasa-responsive {
+  padding-block: 60px 110px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 90px;
+  align-items: center;
+}
+.kasa-device-pair {
+  position: relative;
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  padding: 45px 22px;
+  perspective: 1400px;
+  background: radial-gradient(ellipse 45% 44% at 50% 50%, #b8957122, transparent 100%);
+}
+.kasa-study .kasa-device {
+  width: 44%;
+  max-width: 220px;
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 6px solid #283246;
+    border-radius: 22px;
+    box-shadow: 0 18px 35px #0005;
+  }
+}
+.kasa-device-property {
+  margin-top: 75px !important;
+}
+.kasa-responsive-copy p:not(.eyebrow) {
+  margin-top: 26px;
+  font-size: 17px;
+  color: var(--case-muted);
+}
+.kasa-responsive-copy .kasa-capture-note {
+  font-size: 14px !important;
+  color: #cfbba5 !important;
+}
+.kasa-contact {
+  background: linear-gradient(125deg, #272734, #101722 75%);
+}
+@media (min-width: 1024px) and (min-height: 700px) and (prefers-reduced-motion: no-preference) {
+  .kasa-flow-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    gap: 65px;
+    align-items: start;
+  }
+  .kasa-flow-stage {
+    display: block;
+    position: sticky;
+    top: 130px;
+    height: clamp(420px, 65svh, 620px);
+    border: 1px solid #bcae9a;
+    border-radius: 13px;
+    overflow: clip;
+    background: #e4ddd2;
+  }
+  .kasa-flow-art {
+    position: absolute;
+    inset: 0 0 66px;
+    overflow: clip;
+  }
+  .kasa-flow-shot {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.45s ease;
+    &[data-active="true"] {
+      opacity: 1;
+    }
+    img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      object-position: top;
+    }
+  }
+  .kasa-flow-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 66px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: #172234;
+    color: #d7e1ef;
+    > span {
+      font-size: 12px;
+    }
+    nav {
+      display: flex;
+      gap: 6px;
+    }
+    button {
+      min-width: 44px;
+      min-height: 44px;
+      border: 1px solid #7d8ca5;
+      border-radius: 5px;
+      background: transparent;
+      color: #dae4f4;
+      font: 12px monospace;
+      transition:
+        background-color 0.2s,
+        color 0.2s;
+      &[aria-pressed="true"] {
+        background: #e5cfb8;
+        color: #1b2638;
+        border-color: #ead8c5;
+      }
+      &:is(:hover, :focus-visible) {
+        background: #c7ddff25;
+        border-color: #bcb4f0;
+      }
+    }
+  }
+  .kasa-flow-chapter {
+    min-height: 65svh;
+    display: flex;
+    align-items: center;
+    padding: 65px 0;
+  }
+  .kasa-chapter-copy {
+    padding-left: 24px;
+    border-left: 1px solid #bcae9a;
+  }
+  .kasa-flow-chapter[data-active="true"] .kasa-chapter-copy {
+    border-color: #926b4d;
+  }
+  .kasa-inline-preview {
+    display: none;
+  }
+}
+@media (max-width: 1023px) {
+  .kasa-intro-grid {
+    gap: 35px;
+  }
+  .kasa-responsive {
+    gap: 35px;
+  }
+  .kasa-components {
+    gap: 24px;
+  }
+}
+@media (max-width: 760px) {
+  .kasa-intro-grid,
+  .kasa-responsive,
+  .kasa-components {
+    grid-template-columns: 1fr;
+  }
+  .kasa-title {
+    font-size: clamp(44px, 12vw, 68px);
+  }
+  .kasa-brief > p {
+    font-size: 16px;
+  }
+  .kasa-study .kasa-hero-art {
+    margin-top: 35px;
+    padding-bottom: 0;
+  }
+  .kasa-hero-browser {
+    width: 100%;
+  }
+  .kasa-hero-phone {
+    display: none;
+  }
+  .kasa-hero-art figcaption {
+    position: static;
+  }
+  .kasa-journey,
+  .kasa-system {
+    padding-block: 65px;
+  }
+  .kasa-section-heading {
+    margin-bottom: 32px;
+  }
+  .kasa-section-heading > p:not(.eyebrow) {
+    font-size: 16px;
+  }
+  .kasa-components {
+    gap: 35px;
+  }
+  .kasa-responsive {
+    padding-block: 15px 65px;
+  }
+  .kasa-responsive-copy {
+    order: -1;
+  }
+  .kasa-device-pair {
+    padding: 15px 8px;
+    gap: 12px;
+  }
+  .kasa-study .kasa-device img {
+    border-width: 4px;
+    border-radius: 15px;
+  }
+  .kasa-responsive-copy p:not(.eyebrow) {
+    font-size: 16px;
+  }
+  .kasa-device-property {
+    margin-top: 45px !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kasa-flow-shot {
+    transition: none;
+  }
+  .kasa-hero-browser,
+  .kasa-hero-phone,
+  .kasa-device {
+    transform: none;
+    clip-path: none;
+  }
+}

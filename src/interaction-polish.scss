@@ -57,6 +57,7 @@
 .chapter-cta,
 .service-card-bottom button,
 .preview-controls button,
+.story-stage-footer button,
 .work-filters button,
 .language-switch button {
   transition:
@@ -80,6 +81,9 @@
   border-color: #b7cef5;
   box-shadow: 0 4px 24px #9ec5ff25;
 }
+.project-stories[data-enhanced="true"]
+  .story-stage-footer
+  button:is(:hover, :focus-visible),
 .preview-controls button:is(:hover, :focus-visible),
 .service-card-bottom button:is(:hover, :focus-visible) {
   background: #c7ddff25;

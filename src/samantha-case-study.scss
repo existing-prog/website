@@ -12,7 +12,7 @@
     letter-spacing: -2px;
     font-weight: 400;
   }
-  h2 span {
+  h2 > .case-muted-line {
     color: #aab7cc;
   }
   p {
@@ -346,4 +346,81 @@
 .case-demo-play.button:hover {
   transform: translate(-50%, -50%);
   z-index: 1;
+}
+
+/* Masques typographiques sans changement de nom accessible ni découpe des mots. */
+.case-word-mask {
+  display: inline-block;
+  overflow: clip;
+  vertical-align: bottom;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+.case-word {
+  display: inline-block;
+}
+.case-hero-viewport,
+.case-journal-window {
+  overflow: clip;
+  border-radius: 10px;
+}
+.case-hero-viewport {
+  perspective: 1400px;
+}
+.case-reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 21;
+  pointer-events: none;
+}
+.case-reading-progress span {
+  display: block;
+  height: 100%;
+  transform: scaleX(0);
+  transform-origin: left;
+  background: linear-gradient(90deg, #a6dbe9, #cbc2ef);
+}
+.case-mobile {
+  perspective: 1400px;
+}
+@media (min-width: 1024px) and (min-height: 700px) and (prefers-reduced-motion: no-preference) {
+  .case-design {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: 70px;
+    align-items: start;
+    min-height: 110svh;
+  }
+  .case-design .case-section-heading {
+    position: sticky;
+    top: 145px;
+    margin-bottom: 0;
+  }
+  .case-design .case-journal {
+    margin-top: 110px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .case-reading-progress {
+    display: none;
+  }
+  .case-word,
+  .case-phone,
+  .case-journal img {
+    transform: none;
+  }
+  .case-hero-viewport,
+  .case-video-wrap {
+    clip-path: none;
+  }
+}
+
+.case-study h2 > .case-word-mask {
+  color: inherit;
+}
+.case-journal-window {
+  aspect-ratio: 16 / 9;
 }

@@ -1,13 +1,26 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { Fragment, useLayoutEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, ArrowUpRight, ArrowRight, Check, PlayCircle } from "lucide-react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ArrowLeft, ArrowUpRight, Check, PlayCircle } from "lucide-react";
 import { asset, projects } from "./data";
 import { tr } from "./i18n";
 import "./samantha-case-study.scss";
+import { useCaseStudyMotion } from "./useCaseStudyMotion";
 
-gsap.registerPlugin(ScrollTrigger);
+/** Les masques sont décoratifs ; chaque titre porte son texte accessible complet. */
+function CaseWords({ text }: { text: string }) {
+  return (
+    <>
+      {text.split(/\s+/).map((word, index) => (
+        <Fragment key={`${text}-${index}`}>
+          {index > 0 && " "}
+          <span className="case-word-mask" aria-hidden="true">
+            <span className="case-word">{word}</span>
+          </span>
+        </Fragment>
+      ))}
+    </>
+  );
+}
 
 /** Étude intégrée, chargée uniquement à l’ouverture de sa route.
  * Les médias sont des captures du vrai portfolio ; la vidéo reste à la demande.
@@ -34,67 +47,13 @@ export default function SamanthaCaseStudy({ onStart }: { onStart: () => void }) 
   useLayoutEffect(() => {
     heading.current?.focus({ preventScroll: true });
   }, []);
-  useLayoutEffect(() => {
-    const page = root.current;
-    if (!page) return;
-    let alive = true;
-    const media = gsap.matchMedia();
-    media.add("(prefers-reduced-motion: no-preference)", () => {
-      gsap.fromTo(
-        page.querySelectorAll(".case-intro-reveal"),
-        { y: 22, opacity: 0.25 },
-        { y: 0, opacity: 1, duration: 0.85, stagger: 0.09, ease: "power2.out" },
-      );
-      page.querySelectorAll<HTMLElement>(".case-reveal").forEach((section) => {
-        gsap.fromTo(
-          section,
-          { y: 32, opacity: 0.25 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.8,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: section,
-              start: "top 90%",
-              toggleActions: "play none none none",
-            },
-          },
-        );
-      });
-      // Redressement contenu dans le visuel. Ni pin ni espace de scroll ajouté.
-      gsap.fromTo(
-        page.querySelector(".case-hero-image"),
-        { rotationX: 8, rotationY: -5, y: 24 },
-        {
-          rotationX: 0,
-          rotationY: 0,
-          y: 0,
-          ease: "none",
-          scrollTrigger: {
-            trigger: page.querySelector(".case-hero-art"),
-            start: "top 85%",
-            end: "top 22%",
-            scrub: 0.55,
-          },
-        },
-      );
-    });
-    const refresh = () => {
-      if (alive) ScrollTrigger.refresh();
-    };
-    document.fonts.ready.then(refresh);
-    const images = page.querySelectorAll("img");
-    images.forEach((image) => image.addEventListener("load", refresh));
-    return () => {
-      alive = false;
-      images.forEach((image) => image.removeEventListener("load", refresh));
-      media.revert();
-    };
-  }, [i18n.resolvedLanguage]);
+  useCaseStudyMotion(root, i18n.resolvedLanguage);
 
   return (
     <article className="case-study" ref={root} aria-labelledby="case-samantha-title">
+      <div className="case-reading-progress" aria-hidden="true">
+        <span />
+      </div>
       <section className="case-hero shell">
         <a className="case-back" href="#work">
           <ArrowLeft size={16} /> {tr("Back to selected work")}
@@ -103,12 +62,16 @@ export default function SamanthaCaseStudy({ onStart }: { onStart: () => void }) 
           {tr("SAMANTHA RAMSEY / SCIENTIFIC PORTFOLIO")}
         </p>
         <h1
+          aria-label={`${tr("Research takes on a new")} ${tr("dimension.")}`}
           id="case-samantha-title"
           className="case-title case-intro-reveal"
           ref={heading}
           tabIndex={-1}
         >
-          {tr("Research takes on a new")} <em>{tr("dimension.")}</em>
+          <CaseWords text={tr("Research takes on a new")} />{" "}
+          <em>
+            <CaseWords text={tr("dimension.")} />
+          </em>
         </h1>
         <p className="case-lead case-intro-reveal">
           {tr(
@@ -130,14 +93,16 @@ export default function SamanthaCaseStudy({ onStart }: { onStart: () => void }) 
           </div>
         </dl>
         <figure className="case-hero-art">
-          <img
-            className="case-hero-image"
-            src={asset("samantha-current.webp")}
-            alt={tr("Samantha Ramsey portfolio homepage with its Neptune illustration")}
-            width="1434"
-            height="807"
-            fetchPriority="high"
-          />
+          <div className="case-hero-viewport">
+            <img
+              className="case-hero-image"
+              src={asset("samantha-current.webp")}
+              alt={tr("Samantha Ramsey portfolio homepage with its Neptune illustration")}
+              width="1434"
+              height="807"
+              fetchPriority="high"
+            />
+          </div>
           <figcaption>
             {tr("Samantha Ramsey — Astrodynamics & Celestial Mechanics Research")}
           </figcaption>
@@ -147,7 +112,9 @@ export default function SamanthaCaseStudy({ onStart }: { onStart: () => void }) 
       <section className="case-overview shell case-reveal">
         <div>
           <p className="eyebrow">{tr("01 / THE BRIEF")}</p>
-          <h2>{tr("Make a scientific world approachable.")}</h2>
+          <h2 aria-label={tr("Make a scientific world approachable.")}>
+            <CaseWords text={tr("Make a scientific world approachable.")} />
+          </h2>
         </div>
         <div className="case-copy">
           <p>
@@ -177,10 +144,14 @@ export default function SamanthaCaseStudy({ onStart }: { onStart: () => void }) 
       <section className="case-design shell">
         <div className="case-section-heading case-reveal">
           <p className="eyebrow">{tr("02 / DESIGN & READING")}</p>
-          <h2>
-            {tr("A sense of discovery.")}
+          <h2
+            aria-label={`${tr("A sense of discovery.")} ${tr("Room for the substance.")}`}
+          >
+            <CaseWords text={tr("A sense of discovery.")} />
             <br />
-            <span>{tr("Room for the substance.")}</span>
+            <span className="case-muted-line">
+              <CaseWords text={tr("Room for the substance.")} />
+            </span>
           </h2>
           <p>
             {tr(
@@ -189,15 +160,17 @@ export default function SamanthaCaseStudy({ onStart }: { onStart: () => void }) 
           </p>
         </div>
         <figure className="case-journal case-reveal">
-          <img
-            src={asset("samantha-journal.webp")}
-            alt={tr(
-              "Research journal page showing the portfolio’s typography and content structure",
-            )}
-            width="1280"
-            height="850"
-            loading="lazy"
-          />
+          <div className="case-journal-window">
+            <img
+              src={asset("samantha-journal.webp")}
+              alt={tr(
+                "Research journal page showing the portfolio’s typography and content structure",
+              )}
+              width="1280"
+              height="850"
+              loading="lazy"
+            />
+          </div>
           <figcaption>
             {tr("A real view of the research journal, within the same visual identity.")}
           </figcaption>
@@ -208,7 +181,9 @@ export default function SamanthaCaseStudy({ onStart }: { onStart: () => void }) 
         <div className="shell">
           <div className="case-section-heading case-reveal">
             <p className="eyebrow">{tr("03 / INTERACTION IN CONTEXT")}</p>
-            <h2>{tr("Motion you can explore.")}</h2>
+            <h2 aria-label={tr("Motion you can explore.")}>
+              <CaseWords text={tr("Motion you can explore.")} />
+            </h2>
             <p>
               {tr(
                 "The portfolio connects scientific explanations with interactive demonstrations. This recording shows the elliptical-orbit demo and its eccentricity control in use.",
@@ -267,10 +242,12 @@ export default function SamanthaCaseStudy({ onStart }: { onStart: () => void }) 
       <section className="case-mobile shell">
         <div className="case-mobile-copy case-reveal">
           <p className="eyebrow">{tr("04 / SMALLER SCREEN, SAME CARE")}</p>
-          <h2>
-            {tr("A complete portfolio.")}
+          <h2 aria-label={`${tr("A complete portfolio.")} ${tr("In your hand.")}`}>
+            <CaseWords text={tr("A complete portfolio.")} />
             <br />
-            <span>{tr("In your hand.")}</span>
+            <span className="case-muted-line">
+              <CaseWords text={tr("In your hand.")} />
+            </span>
           </h2>
           <p>
             {tr(
@@ -298,8 +275,11 @@ export default function SamanthaCaseStudy({ onStart }: { onStart: () => void }) 
       <section className="case-contact">
         <div className="shell case-reveal">
           <p className="eyebrow">{tr("YOUR OWN NEXT CHAPTER")}</p>
-          <h2>
-            {tr("Your expertise deserves")} <em>{tr("its own space.")}</em>
+          <h2 aria-label={`${tr("Your expertise deserves")} ${tr("its own space.")}`}>
+            <CaseWords text={tr("Your expertise deserves")} />{" "}
+            <em>
+              <CaseWords text={tr("its own space.")} />
+            </em>
           </h2>
           <p>
             {tr(

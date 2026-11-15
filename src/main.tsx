@@ -44,6 +44,7 @@ import ProjectStories from "./ProjectStories";
 import { useGlassMotion } from "./useGlassMotion";
 import "./glass-theme.scss";
 import LanguageSwitch from "./LanguageSwitch";
+import HeroWorkTransition from "./HeroWorkTransition";
 
 function Mark({ className = "" }: { className?: string }) {
   return (
@@ -96,11 +97,23 @@ function App() {
       ?.setAttribute("content", document.title);
   }, [workspace, i18n.resolvedLanguage]);
   useEffect(() => {
-    if (!workspace && location.hash) {
-      requestAnimationFrame(() =>
-        document.getElementById(location.hash.slice(1))?.scrollIntoView(),
-      );
-    }
+    if (workspace || !location.hash) return;
+    const anchor = location.hash;
+    let cancelled = false;
+    // Les refresh initiaux de ScrollTrigger peuvent interrompre un scroll animé.
+    // À l’ouverture d’une ancre, attendre les polices puis rejoindre directement
+    // la cible ; les clics suivants conservent le défilement natif du navigateur.
+    document.fonts.ready.then(() => {
+      requestAnimationFrame(() => {
+        if (!cancelled && location.hash === anchor)
+          document
+            .getElementById(anchor.slice(1))
+            ?.scrollIntoView({ behavior: "instant" });
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [workspace]);
   useEffect(() => {
     const escape = (e: KeyboardEvent) => {
@@ -339,6 +352,7 @@ function App() {
           </section>
         ) : (
           <>
+            <HeroWorkTransition preview={preview} />
             <section className="hero shell" id="top">
               <div className="studio-backdrop" aria-hidden="true">
                 <div className="studio-glow glow-one" />

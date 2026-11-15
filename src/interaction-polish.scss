@@ -120,3 +120,31 @@
     transform: rotate(-22deg);
   }
 }
+
+/* Lien de contact final : même accent glacier au survol et au clavier. */
+.closing-section .closing-bottom > a {
+  transition:
+    color 0.2s,
+    border-color 0.2s;
+  svg {
+    transition: transform 0.2s;
+  }
+  &:is(:hover, :focus-visible) {
+    color: #a6dbe9;
+    border-color: #a6dbe9;
+    svg {
+      transform: translate(2px, -2px);
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .closing-section .closing-bottom > a {
+    transition: none;
+    svg {
+      transition: none;
+    }
+    &:is(:hover, :focus-visible) svg {
+      transform: none;
+    }
+  }
+}

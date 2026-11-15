@@ -23,7 +23,7 @@ export default function SamanthaCaseStudy({ onStart }: { onStart: () => void }) 
   const playDemo = () => {
     const element = video.current;
     if (!element) return;
-    element.src = asset("samantha-orbital-demo.mp4");
+    element.src = asset("samantha-reference-frames-demo.mp4");
     setDemoReady(true);
     setDemoError(false);
     element.play().catch(() => setDemoError(true));
@@ -172,7 +172,7 @@ export default function SamanthaCaseStudy({ onStart }: { onStart: () => void }) 
             </h2>
             <p>
               {tr(
-                "The portfolio connects scientific explanations with interactive demonstrations. This recording shows the elliptical-orbit demo and its eccentricity control in use.",
+                "The portfolio connects scientific explanations with interactive demonstrations. This recording shows the reference-frame demonstration in motion.",
               )}
             </p>
           </div>
@@ -186,9 +186,9 @@ export default function SamanthaCaseStudy({ onStart }: { onStart: () => void }) 
                 playsInline
                 loop
                 preload="none"
-                poster={asset("samantha-demo-poster.webp")}
+                poster={asset("samantha-reference-frames-poster.webp")}
                 aria-label={tr(
-                  "Recorded demonstration of the portfolio’s elliptical-orbit interaction",
+                  "Recorded demonstration of the portfolio’s reference-frame animation",
                 )}
               >
                 {tr(
@@ -216,7 +216,7 @@ export default function SamanthaCaseStudy({ onStart }: { onStart: () => void }) 
           </figure>
           <a
             className="case-live-link"
-            href="https://samantharamsey.github.io/portfolio_samantha/simulations/#ellipse"
+            href="https://samantharamsey.github.io/portfolio_samantha/simulations/#frames"
             target="_blank"
             rel="noreferrer"
           >

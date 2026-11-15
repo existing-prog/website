@@ -307,8 +307,6 @@
   "A real view of the research journal, within the same visual identity.": "Une capture réelle du journal de recherche, dans la même identité visuelle.",
   "03 / INTERACTION IN CONTEXT": "03 / L’INTERACTION EN CONTEXTE",
   "Motion you can explore.": "Le mouvement à explorer.",
-  "The portfolio connects scientific explanations with interactive demonstrations. This recording shows the elliptical-orbit demo and its eccentricity control in use.": "Le portfolio relie les explications scientifiques à des démonstrations interactives. Cette capture montre la démonstration d’orbite elliptique et son réglage d’excentricité en action.",
-  "Recorded demonstration of the portfolio’s elliptical-orbit interaction": "Capture vidéo de la démonstration d’orbite elliptique du portfolio",
   "Your browser cannot play this recording. You can explore the live portfolio instead.": "Votre navigateur ne peut pas lire cette vidéo. Vous pouvez consulter la démonstration sur le portfolio.",
   "Recorded from the real portfolio. Play or pause the demonstration using the video controls.": "Capture du portfolio réel. Lancez ou mettez en pause la démonstration avec les commandes vidéo.",
   "Try the original demonstration": "Essayer la démonstration originale",
@@ -420,5 +418,7 @@
   "a little more care.": "un peu plus d’attention.",
   "Already have a website? Let’s identify the frontend updates, accessibility fixes or performance improvements that would make a difference.": "Vous avez déjà un site ? Identifions les mises à jour frontend, les corrections d’accessibilité ou les optimisations qui pourraient l’améliorer.",
   "Discuss website improvements": "Parlons de votre site existant",
-  "View the project code": "Voir le code du projet"
+  "View the project code": "Voir le code du projet",
+  "The portfolio connects scientific explanations with interactive demonstrations. This recording shows the reference-frame demonstration in motion.": "Le portfolio relie les explications scientifiques à des démonstrations interactives. Cette vidéo montre l’animation consacrée aux référentiels.",
+  "Recorded demonstration of the portfolio’s reference-frame animation": "Capture vidéo de l’animation des référentiels du portfolio"
 }

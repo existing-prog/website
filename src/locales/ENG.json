@@ -307,8 +307,6 @@
   "A real view of the research journal, within the same visual identity.": "A real view of the research journal, within the same visual identity.",
   "03 / INTERACTION IN CONTEXT": "03 / INTERACTION IN CONTEXT",
   "Motion you can explore.": "Motion you can explore.",
-  "The portfolio connects scientific explanations with interactive demonstrations. This recording shows the elliptical-orbit demo and its eccentricity control in use.": "The portfolio connects scientific explanations with interactive demonstrations. This recording shows the elliptical-orbit demo and its eccentricity control in use.",
-  "Recorded demonstration of the portfolio’s elliptical-orbit interaction": "Recorded demonstration of the portfolio’s elliptical-orbit interaction",
   "Your browser cannot play this recording. You can explore the live portfolio instead.": "Your browser cannot play this recording. You can explore the live portfolio instead.",
   "Recorded from the real portfolio. Play or pause the demonstration using the video controls.": "Recorded from the real portfolio. Play or pause the demonstration using the video controls.",
   "Try the original demonstration": "Try the original demonstration",
@@ -420,5 +418,7 @@
   "a little more care.": "a little more care.",
   "Already have a website? Let’s identify the frontend updates, accessibility fixes or performance improvements that would make a difference.": "Already have a website? Let’s identify the frontend updates, accessibility fixes or performance improvements that would make a difference.",
   "Discuss website improvements": "Discuss website improvements",
-  "View the project code": "View the project code"
+  "View the project code": "View the project code",
+  "The portfolio connects scientific explanations with interactive demonstrations. This recording shows the reference-frame demonstration in motion.": "The portfolio connects scientific explanations with interactive demonstrations. This recording shows the reference-frame demonstration in motion.",
+  "Recorded demonstration of the portfolio’s reference-frame animation": "Recorded demonstration of the portfolio’s reference-frame animation"
 }

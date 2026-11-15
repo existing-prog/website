@@ -34,8 +34,8 @@ export default function HeroWorkTransition() {
             "--orbit-rise": "0px",
             "--orbit-light": 0.6,
             "--card-roll": "0deg",
-            "--card-pitch": "0deg",
-            "--card-yaw": "0deg",
+            "--card-pitch": desktop ? "14deg" : "4deg",
+            "--card-yaw": desktop ? "-18deg" : "-5deg",
           },
           {
             "--orbit-turn": "65deg",
@@ -43,14 +43,14 @@ export default function HeroWorkTransition() {
             "--orbit-light": 1,
             // Angles de la carte séparés du pointeur ; amplitude réduite sur téléphone.
             "--card-roll": desktop ? "13deg" : "5deg",
-            "--card-pitch": desktop ? "10deg" : "4deg",
-            "--card-yaw": desktop ? "-28deg" : "-12deg",
+            "--card-pitch": desktop ? "-12deg" : "-4deg",
+            "--card-yaw": desktop ? "26deg" : "8deg",
             ease: "none",
             scrollTrigger: {
               trigger: hero,
               start: "top top",
               end: "bottom 35%",
-              scrub: 0.6,
+              scrub: 0.85,
             },
           },
         );

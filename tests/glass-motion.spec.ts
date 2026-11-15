@@ -11,7 +11,7 @@ test("glass light follows a mouse and clears when motion is reduced", async ({
   await expect
     .poll(() => card.evaluate((el) => el.style.getPropertyValue("--light-x")))
     .not.toBe("");
-  await page.mouse.move(5, 100);
+  await page.mouse.move(5, 20);
   await expect
     .poll(() => card.evaluate((el) => el.style.getPropertyValue("--light-x")))
     .toBe("");

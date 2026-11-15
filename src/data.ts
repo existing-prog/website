@@ -65,7 +65,7 @@ export const projects = [
     caption: "Research with a sense of discovery.",
     description:
       "I designed and developed a responsive academic portfolio, bringing research, publications and interactive orbital mechanics together in one distinctive experience.",
-    image: "samantha.webp",
+    image: "samantha-current.webp",
     url: "https://samantharamsey.github.io/portfolio_samantha/",
     tags: ["Academic portfolio", "Interactive experience"],
     color: "violet",

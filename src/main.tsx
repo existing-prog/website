@@ -45,6 +45,8 @@ import { useGlassMotion } from "./useGlassMotion";
 import "./glass-theme.scss";
 import LanguageSwitch from "./LanguageSwitch";
 import HeroWorkTransition from "./HeroWorkTransition";
+import { useScrollHeader } from "./useScrollHeader";
+import "./interaction-polish.scss";
 
 function Mark({ className = "" }: { className?: string }) {
   return (
@@ -72,6 +74,7 @@ function App() {
   useGlassMotion();
   const [menu, setMenu] = useState(false);
   const [workspace, setWorkspace] = useState(location.hash === "#workspace");
+  useScrollHeader(menu, workspace);
   const [drafts, setDrafts] = useState<Draft[]>(loadDrafts);
   const [editing, setEditing] = useState<Draft | null>(null);
   const [notice, setNotice] = useState("");

@@ -109,6 +109,8 @@ Le contrôle de formatage fait aussi partie du déploiement GitHub Actions. Les 
 - `src/styles.scss` : dimensions, typographie, dispositions et points de rupture. Les règles de parité FR/ENG du hero sont regroupées en fin de fichier.
 - `src/glass-theme.scss` : palette anthracite/argent, surfaces dépolies, bordures et lumières. Importé après les styles structurels ; éviter d’y changer les dimensions du hero.
 - `src/HeroWorkTransition.tsx` et `src/hero-work-transition.scss` : léger mouvement local de l’aperçu pendant le défilement. Aucun agrandissement plein écran ni calque superposé. Le contexte GSAP restaure les styles lors du démontage ou du passage en mode mouvement réduit.
+- `src/useScrollHeader.ts` : navigation sticky selon le sens du défilement, avec seuils anti-tremblement et maintien du focus clavier.
+- `src/interaction-polish.scss` : états de navigation, couleurs au survol/focus et finition lumineuse des orbites.
 - `src/useGlassMotion.ts` : reflets au pointeur et légère inclinaison du cadre. Une mise à jour par frame, aucune sur écran tactile ou en mode mouvement réduit.
 - `src/ProjectStories.tsx` et `src/project-stories.scss` : chronologies GSAP, correspondance projet/service et dessin de chaque scène.
 - `src/ProjectBuilder.tsx` et `src/data.ts` : étapes, validation, stockage local et exports. Ne pas traduire les identifiants enregistrés.

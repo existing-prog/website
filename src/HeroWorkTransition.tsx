@@ -17,6 +17,24 @@ export default function HeroWorkTransition() {
     if (!hero || !stage) return;
     const media = gsap.matchMedia();
     media.add("(prefers-reduced-motion: no-preference)", () => {
+      // Les orbites et la lumière créent la profondeur autour du vrai aperçu.
+      // Le cadre et ses boutons gardent leur taille et leur zone de clic.
+      gsap.fromTo(
+        stage,
+        { "--orbit-turn": "0deg", "--orbit-rise": "0px", "--orbit-light": 0.6 },
+        {
+          "--orbit-turn": "65deg",
+          "--orbit-rise": "-36px",
+          "--orbit-light": 1,
+          ease: "none",
+          scrollTrigger: {
+            trigger: hero,
+            start: "top top",
+            end: "bottom top",
+            scrub: 0.6,
+          },
+        },
+      );
       gsap.fromTo(
         stage,
         { "--arrival-lift": "0px" },

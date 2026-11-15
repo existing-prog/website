@@ -352,7 +352,7 @@ function App() {
           </section>
         ) : (
           <>
-            <HeroWorkTransition preview={preview} />
+            <HeroWorkTransition />
             <section className="hero shell" id="top">
               <div className="studio-backdrop" aria-hidden="true">
                 <div className="studio-glow glow-one" />

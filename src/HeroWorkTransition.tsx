@@ -19,10 +19,9 @@ export default function HeroWorkTransition() {
     media.add("(prefers-reduced-motion: no-preference)", () => {
       gsap.fromTo(
         stage,
-        { "--arrival-lift": "0px", "--arrival-scale": 1 },
+        { "--arrival-lift": "0px" },
         {
           "--arrival-lift": "-24px",
-          "--arrival-scale": 0.98,
           ease: "none",
           scrollTrigger: {
             trigger: stage,

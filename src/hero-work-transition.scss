@@ -2,7 +2,7 @@
  * Le cadre enfant conserve ses propres transformations au pointeur.
  */
 .hero-stage {
-  transform: translateY(var(--arrival-lift, 0px)) scale(var(--arrival-scale, 1));
+  transform: translateY(var(--arrival-lift, 0px));
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -5,6 +5,7 @@ for (const width of [390, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("");
     const header = page.locator(".site-header");
+    await expect(header).toHaveAttribute("data-hidden", "false");
     await page.evaluate(() => document.fonts.ready);
     await page.evaluate(() => scrollTo({ top: 700, behavior: "instant" }));
     await page.mouse.move(5, 200);

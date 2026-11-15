@@ -120,3 +120,11 @@ Le contrôle de formatage fait aussi partie du déploiement GitHub Actions. Les 
 ### Direction visuelle
 
 Le thème emploie les principes généraux du verre dépoli (translucidité, bordures lumineuses et profondeur), avec une composition et du code propres à ce site. Aucun code, modèle 3D, carte de paiement, visuel ou texte de la référence T.RICKS/Webflow n’a été intégré. Les aperçus restent ceux des projets de Lucas. Le flou est limité aux panneaux ; le contenu et les actions restent nets et utilisables sans animation.
+
+## Étude de cas Samantha
+
+La route `#project/samantha` affiche une vraie page intégrée et partageable, compatible avec GitHub Pages sans règle de réécriture. L’accueil et les réalisations utilisent `projectHref` dans `src/data.ts`. Les autres projets conservent leur destination actuelle.
+
+`src/SamanthaCaseStudy.tsx` et son SCSS sont chargés à la demande. Les textes viennent des deux catalogues existants. Le formulaire reste géré par `App` ; le CTA de l’étude sélectionne le service `portfolio`. Les effets GSAP sont retirés au démontage et en mode mouvement réduit. Le titre reçoit le focus à l’ouverture, et les liens de retour rejoignent les réalisations.
+
+Les captures `samantha-journal.webp` et `samantha-mobile.webp` proviennent des pages réelles du portfolio de Samantha, consultées le 15 novembre 2026. `samantha-orbital-demo.mp4` est une capture silencieuse de huit secondes de la démonstration d’orbite elliptique, avec changement d’excentricité. La vidéo et son poster sont locaux ; la source n’est affectée qu’après un clic et la lecture reste manuelle (`preload="none"`), sans iframe ni requête vers le portfolio pendant la consultation de l’étude. Le lien « Essayer la démonstration originale » ouvre le vrai site sur demande.

@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { asset, projects, ServiceId } from "./data";
+import { asset, projects, projectHref, ServiceId } from "./data";
 import "./project-stories.scss";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -435,8 +435,8 @@ export default function ProjectStories({
                   <span> / 03</span>
                 </span>
                 <a
-                  href={project.url}
-                  target="_blank"
+                  href={projectHref(project)}
+                  target={project.id === "samantha" ? undefined : "_blank"}
                   rel="noreferrer"
                   className={`story-card project-card ${project.color} ${project.id === "samantha" ? "featured" : ""}`}
                   aria-labelledby={`project-${project.id}-title`}
@@ -451,6 +451,11 @@ export default function ProjectStories({
                       <p id={`project-${project.id}-description`}>
                         {tr(project.description)}
                       </p>
+                      {project.id === "samantha" && (
+                        <span className="case-study-link-label">
+                          {tr("Read the case study")} <ArrowRight size={15} />
+                        </span>
+                      )}
                     </div>
                     <div className="project-tags">
                       {project.tags.map((tag) => (

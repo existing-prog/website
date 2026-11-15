@@ -1,0 +1,349 @@
+/* Étude de cas : lecture éditoriale et captures réelles. Styles limités à cette
+ * vue, chargés avec son composant ; aucune modification de la géométrie du hero.
+ */
+.case-study {
+  --case-muted: #b8c3d5;
+  --case-accent: #cbc2ef;
+  color: #eef2fa;
+  background: #0b0f17;
+  h2 {
+    font-size: clamp(32px, 4vw, 58px);
+    line-height: 1.15;
+    letter-spacing: -2px;
+    font-weight: 400;
+  }
+  h2 span {
+    color: #aab7cc;
+  }
+  p {
+    line-height: 1.85;
+  }
+  .eyebrow {
+    font-size: 10px;
+    letter-spacing: 1.3px;
+    color: var(--case-accent);
+    margin-bottom: 22px;
+  }
+  figure {
+    margin: 0;
+  }
+  figcaption {
+    margin-top: 18px;
+    color: var(--case-muted);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  em {
+    font-family: Georgia, serif;
+    font-weight: 400;
+    color: var(--case-accent);
+  }
+}
+.case-hero {
+  padding-top: 38px;
+}
+.case-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #b6c6df;
+  padding-block: 8px;
+  &:hover {
+    color: #a6dbe9;
+  }
+}
+.case-hero > .eyebrow {
+  display: block;
+  margin-top: 48px;
+}
+.case-title {
+  font-size: clamp(44px, 7.4vw, 104px);
+  line-height: 1.06;
+  letter-spacing: -4px;
+  font-weight: 400;
+  max-width: 1100px;
+  &:focus {
+    outline: none;
+  }
+}
+.case-lead {
+  font-size: 19px;
+  max-width: 680px;
+  margin-top: 30px;
+  color: var(--case-muted);
+}
+.case-meta {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr 1.4fr;
+  gap: 30px;
+  margin-top: 46px;
+  max-width: 1000px;
+  > div {
+    border-top: 1px solid #ccdafa30;
+    padding-top: 14px;
+  }
+  dt {
+    font: 10px monospace;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #aab7cc;
+    margin-bottom: 10px;
+  }
+  dd {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+}
+.case-study .case-hero-art {
+  margin-top: 66px;
+  padding: 0 10px;
+  perspective: 1400px;
+}
+.case-hero-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  border: 1px solid #c3d5f045;
+  box-shadow: 0 24px 55px #0005;
+  transform-origin: center;
+}
+.case-overview {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 90px;
+  padding-block: 110px;
+  border-bottom: 1px solid #b6c5e226;
+}
+.case-copy > p {
+  font-size: 17px;
+  color: var(--case-muted);
+  & + p {
+    margin-top: 22px;
+  }
+}
+.case-checks {
+  list-style: none;
+  margin-top: 28px;
+  display: grid;
+  gap: 17px;
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  svg {
+    color: var(--case-accent);
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+}
+.case-design {
+  padding-block: 100px;
+}
+.case-section-heading {
+  max-width: 800px;
+  margin-bottom: 44px;
+  > p:not(.eyebrow) {
+    margin-top: 26px;
+    color: var(--case-muted);
+    font-size: 17px;
+    max-width: 680px;
+  }
+}
+.case-journal {
+  max-width: 1100px;
+  margin-inline: auto !important;
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid #b7c9e53b;
+    border-radius: 10px;
+  }
+}
+.case-demo {
+  padding-block: 100px;
+  background: #e9edf3;
+  color: #182334;
+  .eyebrow {
+    color: #5b526e;
+  }
+  .case-section-heading > p:not(.eyebrow),
+  figcaption {
+    color: #46526a;
+  }
+  video {
+    width: 100%;
+    display: block;
+    aspect-ratio: 3/2;
+    border-radius: 10px;
+    background: #090b1b;
+  }
+}
+.case-live-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding-block: 12px;
+  margin-top: 18px;
+  color: #3f436a;
+  border-bottom: 1px solid #9daac1;
+  font-size: 14px;
+  &:hover {
+    color: #655f9f;
+    border-color: currentColor;
+  }
+}
+.case-mobile {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 100px;
+  align-items: center;
+  padding-block: 110px;
+}
+.case-mobile-copy p:not(.eyebrow) {
+  max-width: 500px;
+  margin-top: 26px;
+  font-size: 17px;
+  color: var(--case-muted);
+}
+.case-phone {
+  width: min(100%, 290px);
+  justify-self: center;
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 8px solid #253047;
+    border-radius: 24px;
+    box-shadow: 0 28px 60px #0005;
+  }
+  figcaption {
+    text-align: center;
+  }
+}
+.case-contact {
+  padding-block: 95px;
+  background: linear-gradient(130deg, #182337, #0e1420 80%);
+  border-block: 1px solid #c5d6ee26;
+  h2 {
+    max-width: 1000px;
+    font-size: clamp(38px, 5.7vw, 78px);
+  }
+  p:not(.eyebrow) {
+    color: var(--case-muted);
+    max-width: 590px;
+    font-size: 17px;
+    margin-top: 28px;
+  }
+}
+.case-contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  align-items: center;
+  margin-top: 34px;
+}
+.case-back-bottom {
+  margin-top: 48px;
+}
+@media (max-width: 900px) {
+  .case-overview {
+    gap: 42px;
+  }
+  .case-mobile {
+    gap: 45px;
+  }
+  .case-title {
+    letter-spacing: -2px;
+  }
+}
+@media (max-width: 760px) {
+  .case-study h2 {
+    letter-spacing: -1px;
+  }
+  .case-hero {
+    padding-top: 22px;
+  }
+  .case-hero > .eyebrow {
+    margin-top: 42px;
+  }
+  .case-title {
+    font-size: clamp(42px, 11.5vw, 64px);
+  }
+  .case-lead {
+    font-size: 17px;
+  }
+  .case-meta {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    margin-top: 30px;
+  }
+  .case-study .case-hero-art {
+    margin-top: 38px;
+    padding: 0;
+  }
+  .case-overview,
+  .case-mobile {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding-block: 66px;
+  }
+  .case-design,
+  .case-demo,
+  .case-contact {
+    padding-block: 66px;
+  }
+  .case-section-heading {
+    margin-bottom: 30px;
+  }
+  .case-mobile-copy p:not(.eyebrow),
+  .case-section-heading > p:not(.eyebrow),
+  .case-copy > p {
+    font-size: 16px;
+  }
+  .case-contact-actions {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 25px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .case-hero-image {
+    transform: none;
+  }
+}
+
+/* La source vidéo n’existe qu’après une activation explicite du visiteur. */
+.case-video-wrap {
+  position: relative;
+}
+.case-demo-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: calc(100% - 32px);
+  gap: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  box-shadow: 0 6px 30px #0004;
+}
+.case-media-error {
+  margin-top: 18px;
+  color: #46526a;
+  font-size: 14px;
+}
+
+/* Le bouton superposé garde son centrage au survol : le mouvement global des
+ * boutons ne doit pas déplacer sa zone de clic au-dessus de la vidéo. */
+.case-demo-play.button,
+.case-demo-play.button:hover {
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}

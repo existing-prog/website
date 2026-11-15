@@ -820,3 +820,13 @@
     min-height: 44px;
   }
 }
+
+/* Accès à l’étude interne, nommé par le titre du projet pour le lecteur d’écran. */
+.story-card .case-study-link-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 16px;
+  font-size: 14px;
+  color: #43516d;
+}

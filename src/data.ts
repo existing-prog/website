@@ -95,6 +95,10 @@ export const projects = [
     color: "sage",
   },
 ];
+/** Un seul point pour les liens de projet : étude interne ou site externe. */
+export const projectHref = (project: (typeof projects)[number]) =>
+  project.id === "samantha" ? "#project/samantha" : project.url;
+
 /** Brouillon local uniquement : aucun état « payé » ou « reçu » n’est simulé. */
 export interface Draft {
   id: string;

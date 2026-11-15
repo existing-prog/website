@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { tr, dateLocale } from "./i18n";
-import React, { useEffect, useRef, useState } from "react";
+import React, { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   ArrowUpRight,
@@ -34,6 +34,7 @@ import {
   emptyDraft,
   loadDrafts,
   projects,
+  projectHref,
   serviceName,
   services,
   ServiceId,
@@ -48,6 +49,8 @@ import HeroWorkTransition from "./HeroWorkTransition";
 import { useScrollHeader } from "./useScrollHeader";
 import "./interaction-polish.scss";
 import HeroProjectBackdrop from "./HeroProjectBackdrop";
+
+const SamanthaCaseStudy = lazy(() => import("./SamanthaCaseStudy"));
 
 function Mark({ className = "" }: { className?: string }) {
   return (
@@ -74,8 +77,11 @@ function App() {
   const { i18n } = useTranslation();
   useGlassMotion();
   const [menu, setMenu] = useState(false);
-  const [workspace, setWorkspace] = useState(location.hash === "#workspace");
-  useScrollHeader(menu, workspace);
+  // Routes en hash : liens partageables et rechargements compatibles GitHub Pages.
+  const [route, setRoute] = useState(location.hash);
+  const workspace = route === "#workspace";
+  const caseStudy = route === "#project/samantha";
+  useScrollHeader(menu, workspace || caseStudy);
   const [drafts, setDrafts] = useState<Draft[]>(loadDrafts);
   const [editing, setEditing] = useState<Draft | null>(null);
   const [notice, setNotice] = useState("");
@@ -84,9 +90,10 @@ function App() {
   // Conserver les ancres partageables et prendre en compte un hash chargé très tôt.
   useEffect(() => {
     const change = () => {
-      setWorkspace(location.hash === "#workspace");
+      setRoute(location.hash);
       setMenu(false);
-      if (location.hash === "#workspace") window.scrollTo({ top: 0 });
+      if (["#workspace", "#project/samantha"].includes(location.hash))
+        window.scrollTo({ top: 0, behavior: "instant" });
     };
     change();
     window.addEventListener("hashchange", change);
@@ -95,13 +102,26 @@ function App() {
   useEffect(() => {
     document.title = workspace
       ? tr("Project desk — Lucas Berdy")
-      : tr("Lucas Berdy — Your next chapter, online.");
+      : caseStudy
+        ? tr("Samantha Ramsey — Case study · Lucas Berdy")
+        : tr("Lucas Berdy — Your next chapter, online.");
     document
       .querySelector('meta[property="og:title"]')
       ?.setAttribute("content", document.title);
-  }, [workspace, i18n.resolvedLanguage]);
+    const description = caseStudy
+      ? tr(
+          "A scientific portfolio designed and developed by Lucas Berdy: visual identity, responsive interface and orbital demonstrations.",
+        )
+      : tr("meta.description");
+    document
+      .querySelector('meta[name="description"]')
+      ?.setAttribute("content", description);
+    document
+      .querySelector('meta[property="og:description"]')
+      ?.setAttribute("content", description);
+  }, [workspace, caseStudy, i18n.resolvedLanguage]);
   useEffect(() => {
-    if (workspace || !location.hash) return;
+    if (workspace || caseStudy || !location.hash) return;
     const anchor = location.hash;
     let cancelled = false;
     // Les refresh initiaux de ScrollTrigger peuvent interrompre un scroll animé.
@@ -118,7 +138,7 @@ function App() {
     return () => {
       cancelled = true;
     };
-  }, [workspace]);
+  }, [workspace, caseStudy]);
   useEffect(() => {
     const escape = (e: KeyboardEvent) => {
       if (e.key === "Escape") setMenu(false);
@@ -134,7 +154,7 @@ function App() {
   // Révéler une seule fois les sections visibles, sans imposer de mouvement.
   // Le nettoyage évite de conserver des observateurs après un changement de vue.
   useEffect(() => {
-    if (workspace) return;
+    if (workspace || caseStudy) return;
     const nodes = document.querySelectorAll<HTMLElement>(".reveal");
     if (
       !("IntersectionObserver" in window) ||
@@ -159,7 +179,7 @@ function App() {
       observer.disconnect();
       nodes.forEach((n) => n.classList.remove("pending"));
     };
-  }, [workspace]);
+  }, [workspace, caseStudy]);
   const start = (service: ServiceId = "website") => {
     previousFocus.current = document.activeElement as HTMLElement;
     setEditing(emptyDraft(service));
@@ -210,7 +230,7 @@ function App() {
   const showDesk = () => {
     close();
     location.hash = "workspace";
-    setWorkspace(true);
+    setRoute("#workspace");
     window.scrollTo({ top: 0 });
   };
   return (
@@ -354,6 +374,16 @@ function App() {
               {tr("Back to the services")} <ArrowRight size={16} />
             </a>
           </section>
+        ) : caseStudy ? (
+          <Suspense
+            fallback={
+              <section className="shell section" role="status">
+                {tr("Loading project…")}
+              </section>
+            }
+          >
+            <SamanthaCaseStudy onStart={() => start("portfolio")} />
+          </Suspense>
         ) : (
           <>
             <HeroWorkTransition />
@@ -430,8 +460,8 @@ function App() {
                     </div>
                     <a
                       className={`showcase-image ${projects[preview].color}`}
-                      href={projects[preview].url}
-                      target="_blank"
+                      href={projectHref(projects[preview])}
+                      target={projects[preview].id === "samantha" ? undefined : "_blank"}
                       rel="noreferrer"
                       aria-label={tr("Explore {{name}}", {
                         name: projects[preview].name,

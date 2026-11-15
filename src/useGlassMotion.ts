@@ -36,8 +36,10 @@ export function useGlassMotion() {
         py = Math.max(0, Math.min(1, (y - r.top) / r.height));
       active.style.setProperty("--light-x", `${px * 100}%`);
       active.style.setProperty("--light-y", `${py * 100}%`);
-      active.style.setProperty("--tilt-x", `${(0.5 - py) * 5}deg`);
-      active.style.setProperty("--tilt-y", `${(px - 0.5) * 6}deg`);
+      // Amplifier uniquement l’aperçu principal, pas les autres cartes du site.
+      const preview = active.classList.contains("showcase-window");
+      active.style.setProperty("--tilt-x", `${(0.5 - py) * (preview ? 12 : 5)}deg`);
+      active.style.setProperty("--tilt-y", `${(px - 0.5) * (preview ? 20 : 6)}deg`);
     };
     const move = (event: PointerEvent) => {
       if (!media.matches || event.pointerType === "touch") return;

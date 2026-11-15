@@ -5,6 +5,22 @@
   transform: translateY(var(--arrival-lift, 0px));
 }
 
+/* Le scroll et le pointeur composent leurs angles sur le cadre, sans toucher
+ * aux contrôles numérotés. GSAP amortit déjà le scroll : pas de double transition.
+ */
+.hero .showcase-window,
+.hero .hero-stage:hover .showcase-window {
+  transform: rotateZ(calc(-5deg + var(--card-roll, 0deg)))
+    rotateX(calc(var(--card-pitch, 0deg) + var(--tilt-x, 0deg)))
+    rotateY(calc(var(--card-yaw, 0deg) + var(--tilt-y, 0deg)));
+  transition:
+    border-color 0.4s,
+    box-shadow 0.4s;
+}
+.hero .hero-stage .showcase-window:focus-within {
+  transform: rotate(-2deg);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero-stage {
     transform: none;

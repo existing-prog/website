@@ -293,3 +293,112 @@ for (const width of [390, 1440]) {
         ).toBeGreaterThanOrEqual(14);
   });
 }
+
+test("desktop project sequence follows scroll and preselects the right services", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("");
+  const story = page.locator(".project-stories");
+  await expect(story).toHaveAttribute("data-enhanced", "true");
+  const cases = [
+    ["samantha", "Samantha Ramsey", "Portfolio"],
+    ["kasa", "Kasa", "Business website"],
+    ["nina", "Nina Carducci", "Website care"],
+  ];
+  for (const [id, name, service] of cases) {
+    await page
+      .locator(`#chapter-${id}`)
+      .evaluate((e) =>
+        e.scrollIntoView({ block: "center", behavior: "instant" }),
+      );
+    await expect(story).toHaveAttribute("data-active", id);
+    await expect(
+      page.locator(`.story-stage [data-scene="${id}"]`),
+    ).toBeVisible();
+    await page
+      .getByRole("button", {
+        name: `Start a project like ${name}`,
+        exact: true,
+      })
+      .click();
+    await expect(page.locator(".service-option.chosen strong")).toHaveText(
+      service,
+    );
+    await page.getByRole("button", { name: "Close project planner" }).click();
+  }
+  await page
+    .getByRole("button", { name: "Show Samantha Ramsey", exact: true })
+    .click();
+  await expect(story).toHaveAttribute("data-active", "samantha");
+  await page
+    .getByRole("button", { name: "Frontend & performance", exact: true })
+    .click();
+  await expect(page.locator(".project-chapter")).toHaveCount(2);
+  await expect(story).toHaveAttribute("data-active", "kasa");
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(story).toHaveAttribute("data-enhanced", "false");
+  await expect(page.locator(".story-stage")).toBeHidden();
+});
+
+test("phone project animations remain inline and allow skipping to services", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("");
+  await expect(page.locator(".project-stories")).toHaveAttribute(
+    "data-enhanced",
+    "false",
+  );
+  for (const id of ["samantha", "kasa", "nina"]) {
+    const chapter = page.locator(`#chapter-${id}`);
+    await chapter.evaluate((e) =>
+      e.scrollIntoView({ block: "center", behavior: "instant" }),
+    );
+    await expect(chapter.locator(".chapter-visual")).toBeVisible();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth - innerWidth,
+      ),
+    ).toBeLessThanOrEqual(1);
+  }
+  await page
+    .getByRole("link", { name: "Skip to services", exact: true })
+    .click();
+  await expect(page.locator("#services")).toBeInViewport();
+});
+
+test("reduced motion shows every project without a sticky animation", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("");
+  await expect(page.locator(".project-stories")).toHaveAttribute(
+    "data-reduced-motion",
+    "true",
+  );
+  await expect(page.locator(".project-stories")).toHaveAttribute(
+    "data-enhanced",
+    "false",
+  );
+  await expect(page.locator(".story-stage")).toBeHidden();
+  for (const id of ["samantha", "kasa", "nina"]) {
+    const visual = page.locator(`#chapter-${id} .chapter-visual`);
+    await expect(visual).toBeVisible();
+    expect(
+      await visual
+        .locator(".story-browser")
+        .evaluate((e) => getComputedStyle(e).opacity),
+    ).toBe("1");
+  }
+  await page
+    .getByRole("button", {
+      name: "Start a project like Nina Carducci",
+      exact: true,
+    })
+    .click();
+  await expect(page.locator(".service-option.chosen strong")).toHaveText(
+    "Website care",
+  );
+});

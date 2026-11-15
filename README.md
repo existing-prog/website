@@ -61,6 +61,7 @@ Settings → Pages must use **GitHub Actions**. Pushes to `main` install depende
 
 - `src/main.tsx`: storefront, navigation and project desk.
 - `src/ProjectBuilder.tsx`: accessible native-dialog project planner.
+- `src/ProjectStories.tsx` and `src/project-stories.scss`: scroll-driven project sequence, per-case artwork, filters and service-matched quote buttons.
 - `src/data.ts`: service and project definitions, draft types and storage loading.
 - `src/styles.scss`: responsive styles, motion and locally hosted font declarations.
 - `public/assets/`: optimized preview images and favicon.
@@ -72,3 +73,11 @@ Samantha Ramsey’s portfolio is a featured project. Kasa and Nina Carducci are 
 ## Pricing basis (15 November 2026)
 
 The owner requested rates appropriate for a new frontend freelancer based in France. [Malt’s French frontend rate barometer](https://www.malt.fr/t/barometre-tarifs/tech/developpeur-frontend) lists **€300/day** for 0–2 years of experience on the date checked. This is a marketplace benchmark, not an affiliation with Malt. The portfolio range assumes a focused 2–4 development-day scope; the small business site assumes 4–8 days. The €45/hour care guide rounds a seven-hour-day equivalent of that daily basis. These effort assumptions are our suggested offer structure, not figures reported by the benchmark. Larger scopes and selected options do not produce an automatic total; they require a tailored quote.
+
+## Project sequence
+
+GSAP ScrollTrigger drives three illustrative scenes: Neptune and drawn orbital paths for Samantha, assembling interface previews and a real mobile screenshot for Kasa, and a contact-sheet reveal for Nina. At widths of at least 1024px and heights of at least 650px, with motion permitted, a CSS sticky stage follows the three chapters. Scrolling stays native; there is no scroll locking or required hover interaction.
+
+Smaller screens use independent inline scenes. Reduced-motion mode uses static visuals and disables the sticky stage. Filters, skip-to-services, project links and quote buttons work in every mode. MatchMedia listeners, timelines, image listeners and ScrollTriggers are cleaned up on filter changes, viewport changes and unmount.
+
+The Kasa phone preview is optimized from Lucas’s portfolio screenshot at `/projects/kasa-mobile.png`. The three Nina photo thumbnails come from the existing training site at `https://existing-prog.github.io/projet-4/`, retaining its Unsplash images: Aaron Paul (`wnX-fXzB6Cw`), Hannah Busing (`RvF2R_qMpRk`) and Nino van Prattenburg (`-443cl1uR_8`). The Neptune backdrop is a decorative CSS illustration, not a scientific simulation.

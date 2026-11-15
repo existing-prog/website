@@ -38,6 +38,7 @@ import {
 } from "./data";
 import "./styles.scss";
 import ProjectBuilder from "./ProjectBuilder";
+import ProjectStories from "./ProjectStories";
 
 function Mark({ className = "" }: { className?: string }) {
   return (
@@ -63,7 +64,6 @@ function App() {
   const [editing, setEditing] = useState<Draft | null>(null);
   const [notice, setNotice] = useState("");
   const [preview, setPreview] = useState(0);
-  const [filter, setFilter] = useState("All work");
   const previousFocus = useRef<HTMLElement | null>(null);
   useEffect(() => {
     const change = () => {
@@ -137,7 +137,7 @@ function App() {
   };
   const close = () => {
     setEditing(null);
-    requestAnimationFrame(() => previousFocus.current?.focus());
+    requestAnimationFrame(() => previousFocus.current?.focus({ preventScroll: true }));
   };
   const persist = (next: Draft[]) => {
     setDrafts(next);
@@ -466,68 +466,7 @@ function App() {
                     Explore my full portfolio <ArrowUpRight size={17} />
                   </a>
                 </div>
-                <div
-                  className="work-filters"
-                  aria-label="Filter selected projects"
-                >
-                  {["All work", "Portfolios", "Frontend & performance"].map(
-                    (f) => (
-                      <button
-                        key={f}
-                        className={filter === f ? "active" : ""}
-                        aria-pressed={filter === f}
-                        onClick={() => setFilter(f)}
-                      >
-                        {f}
-                      </button>
-                    ),
-                  )}
-                </div>
-                <div className="project-grid">
-                  {projects
-                    .filter(
-                      (_, i) =>
-                        filter === "All work" ||
-                        (filter === "Portfolios" ? i === 0 : i !== 0),
-                    )
-                    .map((p) => (
-                      <a
-                        href={p.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        key={p.name}
-                        aria-labelledby={`project-${p.id}-title`}
-                        className={`project-card ${p.color} ${p.name === "Samantha Ramsey" ? "featured" : ""}`}
-                      >
-                        <div className="project-visual">
-                          <img
-                            src={asset(p.image)}
-                            alt={`${p.name} website preview`}
-                            loading="lazy"
-                            width="1200"
-                            height={p.image === "samantha.webp" ? 630 : 750}
-                          />
-                          <span className="visit-project">
-                            <ArrowUpRight size={22} />
-                          </span>
-                        </div>
-                        <div className="project-details">
-                          <div>
-                            <span className="eyebrow">{p.kind}</span>
-                            <h3 id={`project-${p.id}-title`}>{p.name}</h3>
-                            <p id={`project-${p.id}-description`}>
-                              {p.description}
-                            </p>
-                          </div>
-                          <div className="project-tags">
-                            {p.tags.map((t) => (
-                              <span key={t}>{t}</span>
-                            ))}
-                          </div>
-                        </div>
-                      </a>
-                    ))}
-                </div>
+                <ProjectStories onStart={start} />
               </div>
             </section>
             <div

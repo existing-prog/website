@@ -3221,9 +3221,7 @@ p {
   max-width: 100%;
   text-align: center;
 }
-html[lang="fr"] .hero-copy h1 {
-  font-size: clamp(58px, 6.3vw, 92px);
-}
+
 @media (max-width: 1000px) {
   .header-inner {
     position: relative;
@@ -3283,10 +3281,6 @@ html[lang="fr"] .hero-copy h1 {
   }
 }
 @media (max-width: 760px) {
-  html[lang="fr"] .hero-copy h1 {
-    font-size: clamp(51px, 12.8vw, 80px);
-    letter-spacing: -3px;
-  }
   .header-inner .language-switch {
     margin-left: auto;
   }
@@ -3326,10 +3320,6 @@ html[lang="fr"] .hero-copy h1 {
   }
 }
 @media (max-width: 380px) {
-  html[lang="fr"] .hero-copy h1 {
-    font-size: clamp(46px, 12.8vw, 50px);
-    letter-spacing: -2.5px;
-  }
   .builder-topbar {
     padding-inline: 14px;
   }
@@ -3340,6 +3330,89 @@ html[lang="fr"] .hero-copy h1 {
 
 @media (max-width: 1280px) {
   .site-header .brand-label {
+    display: none;
+  }
+}
+
+/* Shared three-line hero: locale changes must not shift the next section. */
+.hero {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100svh - 92px);
+}
+.hero-kicker {
+  flex-shrink: 0;
+}
+.hero-grid {
+  flex: 1;
+  width: 100%;
+}
+.hero-copy {
+  container-type: inline-size;
+  min-width: 0;
+}
+.hero-copy h1 {
+  font-size: clamp(38px, 14cqi, 96px);
+  letter-spacing: -0.055em;
+  line-height: 1.02;
+}
+.hero-copy h1 .hero-line {
+  display: block;
+  white-space: nowrap;
+  color: inherit;
+}
+.hero-copy h1 .hero-accent {
+  color: #d6f478;
+}
+.hero-copy > p {
+  min-block-size: 5.4em;
+}
+.closing-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 85px;
+  align-items: center;
+  gap: 36px;
+  margin-top: 29px;
+}
+.closing-section .closing-heading h2 {
+  margin-top: 0;
+  max-width: none;
+  min-width: 0;
+}
+.closing-heading > .star-mark {
+  position: static;
+  display: block;
+  width: 85px;
+  height: 85px;
+  font-size: 85px;
+  justify-self: end;
+}
+@media (max-width: 1100px) {
+  .closing-heading {
+    grid-template-columns: minmax(0, 1fr) 64px;
+    gap: 24px;
+  }
+  .closing-heading > .star-mark {
+    width: 64px;
+    height: 64px;
+    font-size: 64px;
+  }
+}
+@media (max-width: 760px) {
+  .hero {
+    min-height: calc(100svh - 77px);
+  }
+  .hero-actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  .closing-heading {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    margin-top: 25px;
+  }
+  .closing-heading > .star-mark {
     display: none;
   }
 }

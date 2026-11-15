@@ -348,22 +348,22 @@ function App() {
               </div>
               <div className="hero-grid">
                 <div className="hero-copy">
-                  <h1>
-                    {tr("Your business.")}
-                    <br />
-                    {tr("Impossible")}
-                    <br />
-                    {tr("to")}{" "}
-                    <span>
-                      {tr("ignore")}
-                      <svg
-                        viewBox="0 0 340 22"
-                        preserveAspectRatio="none"
-                        aria-hidden="true"
-                      >
-                        <path d="M4 14Q160-7 333 9M15 21Q180 4 326 15" />
-                      </svg>
-                      .
+                  <h1 aria-label={tr("Your business. Impossible to ignore.")}>
+                    <span className="hero-line">{tr("Your business.")}</span>
+                    <span className="hero-line">{tr("Impossible")}</span>
+                    <span className="hero-line">
+                      {tr("to")}{" "}
+                      <span className="hero-accent">
+                        {tr("ignore")}
+                        <svg
+                          viewBox="0 0 340 22"
+                          preserveAspectRatio="none"
+                          aria-hidden="true"
+                        >
+                          <path d="M4 14Q160-7 333 9M15 21Q180 4 326 15" />
+                        </svg>
+                        .
+                      </span>
                     </span>
                   </h1>
                   <p>
@@ -768,12 +768,14 @@ function App() {
                   <span className="status-dot" />{" "}
                   {tr("YOUR NEXT CHAPTER STARTS HERE")}
                 </span>
-                <h2>
-                  {tr("Let’s make your")}
-                  <br />
-                  {tr("next move a")} <em>{tr("good one.")}</em>
+                <div className="closing-heading">
+                  <h2>
+                    {tr("Let’s make your")}
+                    <br />
+                    {tr("next move a")} <em>{tr("good one.")}</em>
+                  </h2>
                   <Mark />
-                </h2>
+                </div>
                 <div className="closing-bottom">
                   <p>
                     {tr("Bring the idea. I’ll bring the care,")}

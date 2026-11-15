@@ -220,6 +220,17 @@ export default function ProjectStories({
             scrub: desktop ? 0.65 : 0.35,
           },
         });
+        // Le texte partage le temps du visuel : numéro, titre, détails puis action.
+        // L’opacité reste lisible au début ; le contexte restaure tout sans mouvement.
+        const content = chapter.querySelector(".chapter-content")!;
+        tl.fromTo(
+          content.querySelectorAll(
+            ".chapter-number, .project-details > div:first-child, .project-tags, .chapter-outcome, .chapter-cta",
+          ),
+          { y: 28, opacity: 0.25 },
+          { y: 0, opacity: 1, duration: 0.5, stagger: 0.06, ease: "power2.out" },
+          0.12,
+        );
         const browser = scene.querySelector(".story-browser");
         // Chaque univers possède sa propre chronologie ; les durées sont relatives.
         if (project.id === "samantha") {

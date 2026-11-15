@@ -509,21 +509,6 @@ function App() {
                 <ProjectStories onStart={start} />
               </div>
             </section>
-            <div
-              className="service-ribbon"
-              aria-label={tr("Portfolios, business websites and website care")}
-            >
-              <div>
-                <span>{tr("PERSONAL PORTFOLIOS")}</span>
-                <Mark />
-                <span>{tr("BUSINESS WEBSITES")}</span>
-                <Mark />
-                <span>{tr("ONGOING WEBSITE CARE")}</span>
-                <Mark />
-                <span>{tr("YOUR NEXT CHAPTER, ONLINE")}</span>
-                <Mark />
-              </div>
-            </div>
             <section className="section shell services-section" id="services">
               <div className="section-heading reveal">
                 <div>

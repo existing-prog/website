@@ -145,7 +145,6 @@
   "So I know who I’m speaking to and where to reply.": "So I know who I’m speaking to and where to reply.",
   "Check your brief, then email it to me to start the conversation. Nothing has been submitted yet.": "Check your brief, then email it to me to start the conversation. Nothing has been submitted yet.",
   "Choose a service": "Choose a service",
-  "· indicative": "· indicative",
   "Budgets are guides, not fixed totals. You receive a written quote with the scope, final price and timing to approve before any work begins.": "Budgets are guides, not fixed totals. You receive a written quote with the scope, final price and timing to approve before any work begins.",
   "Amount of work": "Amount of work",
   "How many pages?": "How many pages?",
@@ -183,7 +182,6 @@
   "Interested in": "Interested in",
   "Core service": "Core service",
   "Contact": "Contact",
-  "Indicative service guide": "Indicative service guide",
   ". Your selected scope and options may change the price. The written quote confirms the full total, any taxes and external costs.": ". Your selected scope and options may change the price. The written quote confirms the full total, any taxes and external costs.",
   "Final project total": "Final project total",
   "Written quote to approve": "Written quote to approve",
@@ -275,5 +273,7 @@
   "meta.description": "Distinctive portfolios, business websites and ongoing care. Work directly with frontend developer Lucas Berdy. Explore the work and plan your next website.",
   "export.filename": "lucas-berdy-project-brief.txt",
   "export.body": "PROJECT REQUEST — {{service}}\n\nName: {{name}}\nEmail: {{email}}\nBusiness: {{company}}\nExisting website: {{website}}\nPages / scope: {{pages}}\nInterested in: {{extras}}\nPreferred timeline: {{timeline}}\n\nPROJECT BRIEF\n{{brief}}\n\nINDICATIVE SERVICE BUDGET GUIDE\n{{budget}} — a starter-scope guide, not a quote or a confirmed total. Larger scopes, optional features, applicable taxes and external costs are confirmed in the written quote.\n\nPlease review my requirements and send a tailored quote. I understand that scope, price and dates need to be agreed before work starts.",
-  "Your business. Impossible to ignore.": "Your business. Impossible to ignore."
+  "Your business. Impossible to ignore.": "Your business. Impossible to ignore.",
+  "· estimate": "· estimate",
+  "Service estimate": "Service estimate"
 }

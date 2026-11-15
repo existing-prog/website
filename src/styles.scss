@@ -563,35 +563,6 @@ p {
   }
 }
 
-.service-ribbon {
-  height: 60px;
-  display: flex;
-  align-items: center;
-  background: $accent;
-  color: $ink;
-  overflow: hidden;
-  contain: inline-size;
-  > div {
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    flex: 0 0 auto;
-    min-width: 100%;
-    gap: 30px;
-    padding-inline: 30px;
-    white-space: nowrap;
-    font:
-      500 14px "Space Grotesk",
-      Arial,
-      sans-serif;
-    letter-spacing: -0.1px;
-  }
-  .star-mark {
-    width: 19px;
-    height: 19px;
-    flex: 0 0 19px;
-  }
-}
 .section-heading {
   display: flex;
   align-items: flex-end;
@@ -2370,21 +2341,6 @@ p {
     }
   }
 
-  .service-ribbon {
-    height: 46px;
-    > div {
-      font-size: 11px;
-      gap: 24px;
-      justify-content: flex-start;
-      padding-inline: 24px;
-      animation: ribbon-slide 28s linear infinite;
-    }
-    .star-mark {
-      width: 14px;
-      height: 14px;
-      flex-basis: 14px;
-    }
-  }
   .section-heading {
     display: block;
     margin-bottom: 32px;
@@ -3021,19 +2977,6 @@ p {
   .reveal.pending {
     opacity: 1;
     transform: none;
-  }
-}
-@keyframes ribbon-slide {
-  0%,
-  15% {
-    transform: translateX(0);
-  }
-  65%,
-  80% {
-    transform: translateX(calc(-100% + 100vw));
-  }
-  100% {
-    transform: translateX(0);
   }
 }
 

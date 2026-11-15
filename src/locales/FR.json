@@ -145,7 +145,6 @@
   "So I know who I’m speaking to and where to reply.": "Pour savoir avec qui j’échange et où vous répondre.",
   "Check your brief, then email it to me to start the conversation. Nothing has been submitted yet.": "Vérifiez votre brief, puis envoyez-le-moi par e-mail pour commencer notre échange. Rien n’a encore été envoyé.",
   "Choose a service": "Choisir un service",
-  "· indicative": "· indicatif",
   "Budgets are guides, not fixed totals. You receive a written quote with the scope, final price and timing to approve before any work begins.": "Ces budgets sont des repères, pas des totaux fixes. Vous recevez un devis écrit précisant le périmètre, le prix final et le calendrier, à valider avant de commencer.",
   "Amount of work": "Volume de travail",
   "How many pages?": "Combien de pages ?",
@@ -183,7 +182,6 @@
   "Interested in": "Options souhaitées",
   "Core service": "Service de base",
   "Contact": "Contact",
-  "Indicative service guide": "Repère budgétaire indicatif",
   ". Your selected scope and options may change the price. The written quote confirms the full total, any taxes and external costs.": ". Votre périmètre et vos options peuvent modifier le prix. Le devis écrit confirme le total, les taxes éventuelles et les frais externes.",
   "Final project total": "Total final du projet",
   "Written quote to approve": "Devis écrit à valider",
@@ -275,5 +273,7 @@
   "meta.description": "Des portfolios singuliers, des sites professionnels et un accompagnement durable. Échangez directement avec Lucas Berdy, développeur frontend. Découvrez ses réalisations et préparez votre prochain site.",
   "export.filename": "lucas-berdy-brief-projet.txt",
   "export.body": "DEMANDE DE PROJET — {{service}}\n\nNom : {{name}}\nE-mail : {{email}}\nEntreprise : {{company}}\nSite existant : {{website}}\nPages / périmètre : {{pages}}\nOptions souhaitées : {{extras}}\nCalendrier souhaité : {{timeline}}\n\nBRIEF DU PROJET\n{{brief}}\n\nREPÈRE BUDGÉTAIRE INDICATIF\n{{budget}} — un repère pour un périmètre de départ, pas un devis ni un total confirmé. Les projets plus importants, les options, les taxes éventuelles et les frais externes sont précisés dans le devis écrit.\n\nMerci d’étudier ma demande et de me proposer un devis personnalisé. Je comprends que le périmètre, le prix et les dates doivent être convenus avant le début du travail.",
-  "Your business. Impossible to ignore.": "Votre activité. Impossible à ignorer."
+  "Your business. Impossible to ignore.": "Votre activité. Impossible à ignorer.",
+  "· estimate": "· estimation",
+  "Service estimate": "Estimation du service"
 }

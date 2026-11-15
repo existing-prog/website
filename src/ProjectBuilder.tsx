@@ -248,7 +248,7 @@ export default function ProjectBuilder({
                           <strong>{tr(s.short)}</strong>
                           <small>{tr(s.tagline)}</small>
                           <small className="option-budget">
-                            {tr(s.budget)} <span>{tr("· indicative")}</span>
+                            {tr(s.budget)} <span>{tr("· estimate")}</span>
                           </small>
                         </span>
                         <span className="radio-circle">
@@ -466,7 +466,7 @@ export default function ProjectBuilder({
                       <p>{draft.brief}</p>
                     </div>
                     <div className="review-budget">
-                      <span>{tr("Indicative service guide")}</span>
+                      <span>{tr("Service estimate")}</span>
                       <strong>{budgetGuide(draft.service)}</strong>
                       <p>
                         {tr(

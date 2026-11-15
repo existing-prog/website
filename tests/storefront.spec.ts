@@ -12,10 +12,9 @@ for (const width of [320, 360, 375, 390, 430, 768, 1024, 1440, 1920]) {
     const dimensions = await page.evaluate(() => ({
       scroll: document.documentElement.scrollWidth,
       client: document.documentElement.clientWidth,
-      ribbon: document.querySelector(".service-ribbon")!.getBoundingClientRect().height,
     }));
     expect(dimensions.scroll).toBeLessThanOrEqual(dimensions.client + 1);
-    expect(dimensions.ribbon).toBeLessThanOrEqual(60);
+    await expect(page.locator(".service-ribbon")).toHaveCount(0);
     await expect(page.locator(".project-card")).toHaveCount(3);
     await expect(page.locator(".service-budget")).toHaveText([
       "€600–€1,200",

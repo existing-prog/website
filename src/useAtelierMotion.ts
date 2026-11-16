@@ -90,8 +90,8 @@ export function useAtelierMotion(
           );
           timeline.fromTo(
             page.querySelector(".atelier-reveal-copy"),
-            { autoAlpha: 0, y: 30 },
-            { autoAlpha: 1, y: 0, duration: 0.35 },
+            { opacity: 0, y: 30 },
+            { opacity: 1, y: 0, duration: 0.35 },
             0.55,
           );
           timeline.to(

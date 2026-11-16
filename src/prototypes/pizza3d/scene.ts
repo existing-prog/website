@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { createPizza } from "./pizza";
 import { createHand } from "./hand";
+import { easeRange, mealPose } from "./choreography";
 
 export type PizzaScene = {
   setProgress: (progress: number) => void;
@@ -10,12 +11,6 @@ export type PizzaScene = {
 
 const clamp = THREE.MathUtils.clamp;
 const mix = THREE.MathUtils.lerp;
-/** Interpolation déterministe : chaque pose dépend uniquement du scroll. */
-function easeRange(progress: number, from: number, to: number) {
-  const t = clamp((progress - from) / (to - from), 0, 1);
-  return t * t * (3 - 2 * t);
-}
-
 /**
  * Scène volontairement séparée du site : aucun asset 3D tiers ni modèle à installer.
  * La pizza réutilise sa texture existante ; seuls lumière, géométrie et geste changent.
@@ -96,21 +91,24 @@ export async function createScene(
   plate.receiveShadow = true;
   scene.add(plate);
 
-  // Quelques miettes géométriques, calculées avec la même progression que la part.
-  // Pas de particules physiques ni de tirage aléatoire pendant le défilement.
-  const crumbGeometry = new THREE.TetrahedronGeometry(0.032);
-  const crumbMaterial = new THREE.MeshStandardMaterial({
-    color: "#b67832",
-    roughness: 1,
-  });
-  const crumbs = Array.from({ length: 9 }, (_, index) => {
-    const crumb = new THREE.Mesh(crumbGeometry, crumbMaterial);
-    crumb.scale.setScalar(0.65 + (index % 3) * 0.28);
-    crumb.visible = false;
-    scene.add(crumb);
-    return crumb;
-  });
-  const biteTimes = [0.7, 0.745, 0.79, 0.835, 0.88];
+  // La boîte de la part entière reste le repère même après les bouchées.
+  // Utiliser sa taille maximale garantit la sortie de toute la nourriture.
+  const fullSliceBounds = new THREE.Box3().setFromObject(pizza.slice);
+  const corners = Array.from(
+    { length: 8 },
+    (_, index) =>
+      new THREE.Vector3(
+        index & 1 ? fullSliceBounds.max.x : fullSliceBounds.min.x,
+        index & 2 ? fullSliceBounds.max.y : fullSliceBounds.min.y,
+        index & 4 ? fullSliceBounds.max.z : fullSliceBounds.min.z,
+      ),
+  );
+  const right = new THREE.Vector3();
+  const up = new THREE.Vector3();
+  const point = new THREE.Vector3();
+  const projected = new THREE.Vector3();
+  const screenBounds = new THREE.Box2();
+  const tangent = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
   let progress = 0;
   let frame = 0;
   let disposed = false;
@@ -128,38 +126,19 @@ export async function createScene(
     const enter = easeRange(progress, 0.13, 0.31);
     const grip = easeRange(progress, 0.29, 0.4);
     const lift = easeRange(progress, 0.41, 0.61);
-    const exit = easeRange(progress, 0.9, 0.97);
+    const meal = mealPose(progress);
     const sideView = easeRange(progress, 0.44, 0.64);
     // Conserver une largeur de plateau constante, même sur un téléphone de 320 px.
     const phoneDistance =
       5 / (2 * Math.tan(THREE.MathUtils.degToRad(17)) * camera.aspect);
     const sideScale = (phoneDistance / 17.8) * 1.08;
-    const bite = biteTimes.filter((time) => progress >= time).length;
-    pizza.setBite(bite);
-    hand.setGrip(grip);
+    pizza.setBite(meal.bite);
+    hand.setGrip(grip * (1 - meal.release * 0.55));
     hand.group.position.set(mix(8, 2.65, enter), 0.5, 0);
     hand.group.rotation.z = mix(-0.06, 0, grip);
-    hand.group.visible = progress > 0.12 && progress < 0.98;
-    held.position.set(lift * 0.3 + exit * 6, lift * 1.35 + exit * 0.9, lift * -0.1);
-    held.rotation.z = lift * 0.075;
-
-    // Un petit recul à chaque bouchée suggère le croc hors champ, sans bouche.
-    const lastBite = biteTimes[Math.max(0, bite - 1)];
-    const recoil = bite > 0 ? Math.max(0, 1 - (progress - lastBite) / 0.033) : 0;
-    held.position.x += recoil * 0.11;
-    held.position.y += recoil * 0.055;
-    const crumbPhase = bite > 0 ? (progress - lastBite) / 0.045 : 2;
-    crumbs.forEach((crumb, index) => {
-      crumb.visible = crumbPhase >= 0 && crumbPhase < 1;
-      if (!crumb.visible) return;
-      const fan = (index - 4) * 0.12;
-      crumb.position.set(
-        held.position.x + 0.3 + bite * 0.26 + fan * crumbPhase,
-        held.position.y + 0.18 - crumbPhase * crumbPhase * 1.1,
-        held.position.z + fan * 0.45 + (index % 2 ? 1 : -1) * crumbPhase * 0.18,
-      );
-      crumb.rotation.set(index + crumbPhase * 3, crumbPhase * 4, index * 0.6);
-    });
+    hand.group.visible = progress > 0.12;
+    held.position.set(lift * 0.3, lift * 1.35, lift * -0.1);
+    held.rotation.set(0, meal.twist, lift * 0.075 + meal.roll);
 
     // L’angle de caméra change, pas la forme de la pizza. Le modèle reste volumique.
     const target = new THREE.Vector3(
@@ -173,7 +152,48 @@ export async function createScene(
       mix(phone ? -1.15 : 0.05, phone ? 13.2 * sideScale : 8.0, sideView),
     );
     camera.lookAt(target);
-    canvas.dataset.bite = String(bite);
+    camera.updateMatrixWorld();
+    held.updateMatrixWorld(true);
+
+    // Le hors-champ est mesuré dans le repère de la caméra, pas en X monde.
+    // Ainsi la part sort aussi complètement sur un écran très large ou étroit.
+    // Sa gauche doit dépasser le bord droit de 12 % avant toute bouchée.
+    right.setFromMatrixColumn(camera.matrixWorld, 0);
+    up.setFromMatrixColumn(camera.matrixWorld, 1);
+    let distanceRight = 0;
+    let distanceUp = 0;
+    for (const corner of corners) {
+      point
+        .copy(corner)
+        .applyMatrix4(pizza.slice.matrixWorld)
+        .applyMatrix4(camera.matrixWorldInverse);
+      const depth = Math.max(0.1, -point.z);
+      distanceRight = Math.max(
+        distanceRight,
+        1.12 * depth * tangent * camera.aspect - point.x,
+      );
+      distanceUp = Math.max(distanceUp, depth * tangent * 0.28);
+    }
+    held.position.addScaledVector(right, distanceRight * meal.travel);
+    held.position.addScaledVector(up, distanceUp * meal.travel);
+    held.updateMatrixWorld(true);
+
+    // Bornes projetées conservatrices : utiles pour vérifier en maintenance
+    // que chaque changement de géométrie se produit réellement hors du cadre.
+    screenBounds.makeEmpty();
+    for (const corner of corners) {
+      projected.copy(corner).applyMatrix4(pizza.slice.matrixWorld).project(camera);
+      screenBounds.expandByPoint(new THREE.Vector2(projected.x, projected.y));
+    }
+    canvas.dataset.fullSliceBounds = JSON.stringify([
+      screenBounds.min.x,
+      screenBounds.min.y,
+      screenBounds.max.x,
+      screenBounds.max.y,
+    ]);
+    canvas.dataset.bite = String(meal.bite);
+    canvas.dataset.handPhase = meal.phase;
+    canvas.dataset.mealTrip = String(meal.trip);
     canvas.dataset.view = sideView > 0.95 ? "side" : sideView < 0.05 ? "top" : "turning";
     requestRender();
   }
@@ -202,12 +222,8 @@ export async function createScene(
       pizza.dispose();
       hand.dispose();
       texture.dispose();
-      [floorGeometry, plateGeometry, crumbGeometry].forEach((geometry) =>
-        geometry.dispose(),
-      );
-      [floorMaterial, plateMaterial, crumbMaterial].forEach((material) =>
-        material.dispose(),
-      );
+      [floorGeometry, plateGeometry].forEach((geometry) => geometry.dispose());
+      [floorMaterial, plateMaterial].forEach((material) => material.dispose());
       renderer.dispose();
     },
   };

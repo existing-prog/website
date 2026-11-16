@@ -66,15 +66,21 @@ async function seekScene(page: Page, value: number) {
   }, value);
 }
 
-test("pizza lab follows native scroll through six bite states and reverses", async ({
+test("pizza lab follows three offscreen bites with native scroll and reverses", async ({
   gpuPage: page,
 }) => {
   await openScene(page);
   const canvas = page.locator("#pizza-canvas");
-  for (const [bite, progress] of [0, 0.715, 0.76, 0.805, 0.85, 0.9].entries()) {
+  for (const [progress, bite] of [
+    [0, 0],
+    [0.75, 2],
+    [0.855, 4],
+    [0.95, 5],
+  ]) {
     await scrollScene(page, progress);
     await expect(canvas).toHaveAttribute("data-bite", String(bite));
   }
+  await expect(canvas).toHaveAttribute("data-hand-phase", "empty");
   await expect(canvas).toHaveAttribute("data-view", "side");
   await scrollScene(page, 1);
   await expect(page.locator(".outro-copy")).toHaveAttribute("aria-hidden", "false");
@@ -117,8 +123,8 @@ test("mobile layouts and reduced motion allow deliberate poses without a long tr
   await openScene(page);
   for (const width of [320, 390]) {
     await page.setViewportSize({ width, height: 844 });
-    await seekScene(page, 80);
-    await expect(page.locator("#pizza-canvas")).toHaveAttribute("data-bite", "3");
+    await seekScene(page, 85);
+    await expect(page.locator("#pizza-canvas")).toHaveAttribute("data-bite", "4");
     await expect(page.locator("#scene-progress")).toBeInViewport();
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth - innerWidth),
@@ -131,10 +137,10 @@ test("mobile layouts and reduced motion allow deliberate poses without a long tr
     await page.locator(".experiment").evaluate((section) => section.clientHeight),
   ).toBeLessThanOrEqual(845);
   await expect(page.locator("#pizza-canvas")).toHaveAttribute("data-bite", "0");
-  await seekScene(page, 80);
-  await expect(page.locator("#pizza-canvas")).toHaveAttribute("data-bite", "3");
+  await seekScene(page, 85);
+  await expect(page.locator("#pizza-canvas")).toHaveAttribute("data-bite", "4");
   await page.evaluate(() => scrollTo({ top: 0, behavior: "instant" }));
-  await expect(page.locator("#pizza-canvas")).toHaveAttribute("data-bite", "3");
+  await expect(page.locator("#pizza-canvas")).toHaveAttribute("data-bite", "4");
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await expect(page.locator("body")).toHaveAttribute("data-reduced", "false");
   await expect(page.locator("#play")).toBeVisible();
@@ -179,3 +185,92 @@ test("the storefront does not load the 3D laboratory", async ({ page }) => {
   expect(labRequests).toEqual([]);
   await expect(page.locator('a[href*="lab/pizza-3d"]')).toHaveCount(0);
 });
+
+for (const viewport of [
+  { width: 320, height: 844 },
+  { width: 390, height: 844 },
+  { width: 1440, height: 1000 },
+  { width: 1920, height: 1080 },
+]) {
+  test(`bite geometry changes beyond the canvas at ${viewport.width}px, forward and backward`, async ({
+    gpuPage: page,
+  }) => {
+    await page.setViewportSize(viewport);
+    await openScene(page);
+    const canvas = page.locator("#pizza-canvas");
+    const snapshots: Array<{
+      progress: number;
+      bite: number;
+      phase: string;
+      bounds: number[];
+    }> = [];
+
+    // Les bornes utilisent la part entière, y compris après une bouchée.
+    // On teste le cadre visible (-1..1), pas le booléen interne « hors champ ».
+    for (const [before, after, bite, returned] of [
+      [0.692, 0.698, 2, 0.75],
+      [0.797, 0.803, 4, 0.855],
+      [0.902, 0.908, 5, 0.955],
+    ]) {
+      for (const [progress, expectedBite] of [
+        [before, bite === 2 ? 0 : bite === 4 ? 2 : 4],
+        [after, bite],
+      ]) {
+        await scrollScene(page, progress);
+        await expect(page.locator(".studio")).toHaveAttribute(
+          "data-progress",
+          progress.toFixed(3),
+        );
+        await expect(canvas).toHaveAttribute("data-bite", String(expectedBite));
+        await expect(canvas).toHaveAttribute("data-hand-phase", "outside");
+        const bounds = JSON.parse(
+          (await canvas.getAttribute("data-full-slice-bounds"))!,
+        ) as number[];
+        expect(bounds.every(Number.isFinite)).toBe(true);
+        expect(bounds[0]).toBeGreaterThan(1);
+        snapshots.push({
+          progress,
+          bite: expectedBite,
+          phase: "outside",
+          bounds,
+        });
+      }
+      await scrollScene(page, returned);
+      await expect(page.locator(".studio")).toHaveAttribute(
+        "data-progress",
+        returned.toFixed(3),
+      );
+      await expect(canvas).toHaveAttribute("data-bite", String(bite));
+      await expect(canvas).toHaveAttribute(
+        "data-hand-phase",
+        bite === 5 ? "empty" : "presenting",
+      );
+      if (bite < 5) {
+        const bounds = JSON.parse(
+          (await canvas.getAttribute("data-full-slice-bounds"))!,
+        ) as number[];
+        // Les deux retours montrent à nouveau la part dans le cadre.
+        expect(bounds[0]).toBeLessThan(1);
+        expect(bounds[2]).toBeGreaterThan(-1);
+        expect(bounds[1]).toBeLessThan(1);
+        expect(bounds[3]).toBeGreaterThan(-1);
+      }
+    }
+
+    // Revenir sur les changements conserve les mêmes poses et la même protection.
+    for (const pose of snapshots.reverse()) {
+      await scrollScene(page, pose.progress);
+      await expect(page.locator(".studio")).toHaveAttribute(
+        "data-progress",
+        pose.progress.toFixed(3),
+      );
+      await expect(canvas).toHaveAttribute("data-bite", String(pose.bite));
+      await expect(canvas).toHaveAttribute("data-hand-phase", pose.phase);
+      const bounds = JSON.parse(
+        (await canvas.getAttribute("data-full-slice-bounds"))!,
+      ) as number[];
+      expect(bounds[0]).toBeGreaterThan(1);
+      bounds.forEach((value, index) => expect(value).toBeCloseTo(pose.bounds[index], 3));
+    }
+  });
+}

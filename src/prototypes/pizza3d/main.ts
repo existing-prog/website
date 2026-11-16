@@ -40,10 +40,10 @@ const phases = [
   {
     at: 0.68,
     title: "Une bouchée après l’autre.",
-    detail: "Le mouvement laisse progressivement place au contenu.",
+    detail: "La main s’éclipse. La part diminue à chaque retour.",
   },
   {
-    at: 0.94,
+    at: 0.98,
     title: "À vous la suite.",
     detail: "Une belle entrée en matière. Puis l’essentiel.",
   },
@@ -66,7 +66,8 @@ function update(value: number) {
   const introOpacity = 1 - gsap.utils.clamp(0, 1, (progress - 0.04) / 0.13);
   intro.style.opacity = String(introOpacity);
   intro.style.transform = `translateY(${-18 * (1 - introOpacity)}px)`;
-  const endOpacity = gsap.utils.clamp(0, 1, (progress - 0.93) / 0.06);
+  // Le dernier retour montre la main vide avant de laisser entrer la conclusion.
+  const endOpacity = gsap.utils.clamp(0, 1, (progress - 0.978) / 0.022);
   outro.style.opacity = String(endOpacity);
   outro.style.visibility = endOpacity > 0 ? "visible" : "hidden";
   outro.inert = endOpacity < 0.8;
@@ -186,7 +187,7 @@ playButton.addEventListener(
       "Lecture en cours. Défiler ou toucher l’écran interrompt la lecture.";
     playback = gsap.to(driver, {
       progress: 1,
-      duration: 11,
+      duration: 16,
       ease: "none",
       onUpdate: () => {
         if (!trigger) return;

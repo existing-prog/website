@@ -9,6 +9,7 @@ Cette entrée Vite est une expérimentation à examiner avec Lucas avant toute i
 - `index.html` : structure, textes et commandes accessibles du prototype.
 - `src/prototypes/pizza3d/main.ts` : commandes, ScrollTrigger, mouvement réduit, repli et nettoyage.
 - `src/prototypes/pizza3d/scene.ts` : lumière, caméra, prise commune main/part et rendu à la demande.
+- `src/prototypes/pizza3d/choreography.ts` : progression partagée des sorties hors champ, des bouchées et des retours.
 - `src/prototypes/pizza3d/pizza.ts` : parts extrudées, croûte et contours successifs des bouchées.
 - `src/prototypes/pizza3d/hand.ts` : main stylisée, articulations et interpolation de la prise.
 - `src/prototypes/pizza3d/style.scss` : présentation indépendante ; aucun import dans le site React.
@@ -16,9 +17,21 @@ Cette entrée Vite est une expérimentation à examiner avec Lucas avant toute i
 
 ## Réglages du mouvement
 
-La progression `0…1` est la source unique de la pose. Les intervalles de `scene.ts` règlent l’entrée de la main, la prise, le soulèvement et le changement de caméra. `biteTimes` donne les cinq moments où la géométrie de la part change. Les états sont préconstruits : aucun modèle n’est reconstruit au scroll, et revenir en arrière restitue la même pose.
+La progression `0…1` est la source unique de la pose. Les intervalles de `scene.ts` règlent l’entrée de la main, la prise, le soulèvement et le changement de caméra. La caméra s’arrête avant les bouchées. La version 2 remplace les changements de géométrie visibles par trois courts allers-retours de la main vers le haut à droite, hors du cadre.
 
-La page utilise un sticky CSS et le défilement natif. Le curseur et les boutons pilotent la même progression. La lecture automatique n’a lieu que sur demande, s’arrête au toucher, au scroll, au clavier ou lorsque l’onglet est masqué. Le bouton Pause reste visible dans la scène.
+Les fenêtres de `choreography.ts` centralisent le départ, la pause hors champ, le changement d’état de la part et son retour :
+
+| Trajet    | Départ | Hors champ | Changement de part | Début du retour | Retour au repos |
+| --------- | ------ | ---------- | ------------------ | --------------- | --------------- |
+| Premier   | 0,650  | 0,685      | 0,695 → état 2     | 0,710           | 0,745           |
+| Deuxième  | 0,755  | 0,790      | 0,800 → état 4     | 0,815           | 0,850           |
+| Troisième | 0,860  | 0,895      | 0,905 → état 5     | 0,920           | 0,950           |
+
+Chaque pause laisse comprendre que la part est mangée hors champ ; sa silhouette ne change jamais à l’écran. Les deux premiers retours montrent une part plus petite. Au troisième, la main revient vide, reste brièvement visible jusqu’à `0,960`, puis sort définitivement jusqu’à `0,985`. Le texte commence à apparaître à `0,978` et devient entièrement visible à `1`.
+
+Les états de bouchées restent préconstruits : aucun modèle n’est reconstruit au scroll. Toute la séquence est déterministe : revenir en arrière restitue le même trajet et la même part.
+
+La page utilise un sticky CSS et le défilement natif. Le curseur et les boutons pilotent la même progression. La lecture automatique dure 16 secondes, n’a lieu que sur demande et s’arrête au toucher, au scroll, au clavier ou lorsque l’onglet est masqué. Le bouton Pause reste visible dans la scène.
 
 En mouvement réduit, la longue piste est supprimée et la scène reste fixe. Les commandes permettent de choisir volontairement une pose. Sans WebGL ou après perte de contexte, une illustration et un lien vers le projet original restent disponibles.
 

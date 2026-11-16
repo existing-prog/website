@@ -33,7 +33,7 @@ De `progress = 0,86` à `0,96`, la caméra revient au-dessus de l’assiette. La
 
 Les états de bouchées restent préconstruits : aucun modèle n’est reconstruit au scroll. Toute la séquence est déterministe : revenir en arrière restitue le même trajet et la même part.
 
-La piste mesure 340 svh sur ordinateur et 300 svh sur téléphone, soit environ 30 % de défilement en moins que la version précédente. La page utilise un sticky CSS et le défilement natif. Le curseur et les boutons pilotent la même progression. La lecture automatique dure 13 secondes, n’a lieu que sur demande et s’arrête au toucher, au scroll, au clavier ou lorsque l’onglet est masqué. Le bouton Pause reste visible dans la scène.
+La piste mesure 340 svh sur ordinateur et 300 svh sur téléphone, soit environ 30 % de défilement en moins que la version précédente. La page utilise un sticky CSS et le défilement natif. Le curseur et les boutons pilotent la même progression. La lecture automatique dure 13 secondes, n’a lieu que sur demande et s’arrête au toucher, au scroll, au clavier ou lorsque l’onglet est masqué. Le bouton Pause reste visible dans la scène. La lecture se calcule avec `performance.now()` : des images perdues ne rallongent pas sa durée. Sa boucle RAF n’est active que pendant cette lecture volontaire et elle est annulée à chaque arrêt.
 
 En mouvement réduit, la longue piste est supprimée et la scène reste fixe. Les commandes permettent de choisir volontairement une pose. Sans WebGL ou après perte de contexte, une illustration et un lien vers le projet original restent disponibles.
 

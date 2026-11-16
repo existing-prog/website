@@ -350,3 +350,20 @@ for (const viewport of [
     ).toBeLessThanOrEqual(1);
   });
 }
+
+test("optional playback finishes after elapsed time even when frames are skipped", async ({
+  gpuPage: page,
+}) => {
+  // Un saut d’horloge ne délivre pas toutes les images intermédiaires : cela
+  // reproduit le problème qui étirait la lecture sur un navigateur ralenti.
+  await page.clock.install();
+  await openScene(page);
+  await page.getByRole("button", { name: "Lire la séquence", exact: true }).click();
+  await expect(page.locator("#play")).toHaveAttribute("aria-pressed", "true");
+  await page.clock.fastForward(14_000);
+  await expect(page.locator("#play")).toHaveAttribute("aria-pressed", "false");
+  await expect(page.locator(".studio")).toHaveAttribute("data-progress", "1.000");
+  await expect(page.locator(".scene-status")).toContainText("Séquence terminée");
+  await expect(page.locator("#pizza-canvas")).toHaveAttribute("data-view", "top");
+  await expect(page.locator("#pizza-canvas")).toHaveAttribute("data-crumbs", "12");
+});

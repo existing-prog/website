@@ -51,7 +51,8 @@ const phases = [
 ];
 let scene: PizzaScene | undefined;
 let trigger: ScrollTrigger | undefined;
-let playback: gsap.core.Tween | undefined;
+const PLAYBACK_DURATION_MS = 13_000;
+let playback: number | undefined;
 let progress = 0;
 let currentPhase = -1;
 let ready = false;
@@ -97,7 +98,7 @@ function update(value: number) {
 }
 
 function stop() {
-  playback?.kill();
+  if (playback !== undefined) cancelAnimationFrame(playback);
   playback = undefined;
   playButton.setAttribute("aria-label", "Lire la séquence");
   playButton.innerHTML = 'Lire la séquence <span aria-hidden="true">▷</span>';
@@ -178,36 +179,38 @@ chapters.forEach((button) =>
 playButton.addEventListener(
   "click",
   () => {
-    if (playback) {
+    if (playback !== undefined) {
       stop();
       return;
     }
     if (!ready || !trigger) return;
-    const driver = { progress: 0 };
     seek(0, true);
     playButton.setAttribute("aria-label", "Mettre en pause");
     playButton.innerHTML = 'Mettre en pause <span aria-hidden="true">Ⅱ</span>';
     playButton.setAttribute("aria-pressed", "true");
     status.textContent =
       "Lecture en cours. Défiler ou toucher l’écran interrompt la lecture.";
-    playback = gsap.to(driver, {
-      progress: 1,
-      duration: 13,
-      ease: "none",
-      onUpdate: () => {
-        if (!trigger) return;
-        window.scrollTo({
-          top: trigger.start + (trigger.end - trigger.start) * driver.progress,
-          behavior: "instant",
-        });
-        update(driver.progress);
-      },
-      onComplete: () => {
+    // Le temps réel prime sur le nombre d’images rendues. Le lissage temporel
+    // de GSAP allongeait la lecture sur les appareils qui perdent des images.
+    // Cette boucle n’existe que pendant la lecture volontaire et reste annulable.
+    const startedAt = performance.now();
+    const playFrame = (now: number) => {
+      if (playback === undefined || !trigger) return;
+      const position = gsap.utils.clamp(0, 1, (now - startedAt) / PLAYBACK_DURATION_MS);
+      window.scrollTo({
+        top: trigger.start + (trigger.end - trigger.start) * position,
+        behavior: "instant",
+      });
+      update(position);
+      if (position >= 1) {
         stop();
         status.textContent =
           "Séquence terminée. Vous pouvez la rejouer ou revenir sur une étape.";
-      },
-    });
+      } else {
+        playback = requestAnimationFrame(playFrame);
+      }
+    };
+    playback = requestAnimationFrame(playFrame);
   },
   { signal: listeners.signal },
 );
@@ -217,7 +220,7 @@ for (const event of ["wheel", "touchstart", "pointerdown"] as const) {
     event,
     (e) => {
       if (e.target instanceof Node && playButton.contains(e.target)) return;
-      if (playback) {
+      if (playback !== undefined) {
         stop();
         status.textContent = "Lecture en pause.";
       }

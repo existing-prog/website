@@ -41,6 +41,11 @@ test("the pizza slice is eaten with native scroll and comes back on reverse", as
     );
     await page.mouse.move(20 + index, 30);
     await expect.poll(frame).toBe(String(index));
+    if (index === 1)
+      await expect(page.locator('.atelier-crumb-burst[data-burst="0"]')).toHaveCSS(
+        "opacity",
+        "1",
+      );
     await expect(page.locator(`.atelier-slice-frame[data-frame="${index}"]`)).toHaveCSS(
       "visibility",
       "visible",
@@ -61,6 +66,8 @@ test("the pizza slice is eaten with native scroll and comes back on reverse", as
     /full|light/,
   );
   await expect(page.locator(".atelier-reveal-copy")).toHaveCSS("visibility", "visible");
+  for (const crumbs of await page.locator(".atelier-crumb-burst").all())
+    await expect(crumbs).toHaveCSS("opacity", "0");
   await expect(page.locator(".atelier-pizza-stage")).not.toHaveCSS("position", "sticky");
 });
 test("personal project opens internally, video is click-to-load, and quote selects business website", async ({
@@ -88,7 +95,10 @@ test("personal project opens internally, video is click-to-load, and quote selec
     .locator(".atelier-demo-media video")
     .evaluate((el: HTMLVideoElement) => el.pause());
   await page
-    .getByRole("button", { name: "Discuss an editable website", exact: true })
+    .getByRole("button", {
+      name: "Let’s talk about your restaurant website",
+      exact: true,
+    })
     .click();
   await expect(page.locator(".service-option.chosen strong")).toHaveText(
     "Business website",
@@ -98,4 +108,54 @@ test("personal project opens internally, video is click-to-load, and quote selec
   await expect(page.locator(".atelier-study")).toBeVisible();
   await page.locator(".case-back").first().click();
   await expect(page.locator("#work .section-heading h2")).toBeInViewport();
+});
+
+test("guided captures compare three real updates and keep their state when translated", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("#project/atelier-pizza");
+  const demo = page.locator(".atelier-guided-demo");
+  for (const [id, label, result] of [
+    ["price", "Change a price", "€10.50"],
+    ["visibility", "Hide a pizza", "La Reine is hidden"],
+    ["closure", "Announce a closure", "closure announcement appears"],
+  ]) {
+    await demo.getByRole("button", { name: new RegExp(label) }).click();
+    await expect(demo).toHaveAttribute("data-action", id);
+    await expect(demo).toHaveAttribute("data-state", "before");
+    await demo.getByRole("button", { name: "See the saved result", exact: true }).click();
+    await expect(demo).toHaveAttribute("data-state", "after");
+    await expect(demo.locator(".atelier-demo-result")).toContainText(result);
+    await expect(demo.locator(".atelier-capture-link[data-active=true]")).toHaveCount(2);
+    await expect
+      .poll(() =>
+        demo
+          .locator(".atelier-capture-link[data-active=true] img")
+          .evaluateAll((images) =>
+            images.every((image) => (image as HTMLImageElement).naturalWidth > 0),
+          ),
+      )
+      .toBe(true);
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth - innerWidth),
+    ).toBeLessThanOrEqual(1);
+  }
+  await page
+    .locator("header")
+    .getByRole("button", { name: "Français", exact: true })
+    .click();
+  await expect(demo).toHaveAttribute("data-state", "after");
+  await expect(demo.locator(".atelier-demo-result")).toContainText(
+    "L’annonce de fermeture",
+  );
+  await demo.getByRole("button", { name: "Rejouer cet exemple", exact: true }).click();
+  await expect(demo).toHaveAttribute("data-state", "before");
+  await expect(
+    page.getByRole("button", {
+      name: "Parlons du site de votre restaurant",
+      exact: true,
+    }),
+  ).toBeVisible();
 });

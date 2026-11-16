@@ -1,3 +1,4 @@
+import AtelierGuidedDemo from "./AtelierGuidedDemo";
 import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft, ArrowUpRight, Check, PlayCircle } from "lucide-react";
@@ -92,6 +93,21 @@ function PizzaIllustration() {
             />
           ))}
         </g>
+        {[
+          { x: 610, y: 555 },
+          { x: 710, y: 600 },
+          { x: 815, y: 655 },
+          { x: 930, y: 695 },
+          { x: 970, y: 710 },
+        ].map((point, index) => (
+          <g key={index} transform={`translate(${point.x} ${point.y})`}>
+            <g className="atelier-crumb-burst" data-burst={index} opacity="0">
+              <path d="M-15 0 -9 -3 -5 2 -9 7 -15 5Z" fill="#cf963e" />
+              <path d="M3 4 9 0 14 4 11 10 5 9Z" fill="#9c6228" />
+              <path d="M-2 17 2 13 7 18 3 23 -2 21Z" fill="#e0b45a" />
+            </g>
+          </g>
+        ))}
       </g>
     </svg>
   );
@@ -249,6 +265,7 @@ export default function AtelierPizzaCaseStudy({ onStart }: { onStart: () => void
               )}
             </p>
           </div>
+          <AtelierGuidedDemo />
           <div className="atelier-demo-media atelier-reveal">
             <video
               ref={video}
@@ -316,17 +333,17 @@ export default function AtelierPizzaCaseStudy({ onStart }: { onStart: () => void
       <section className="case-contact atelier-contact">
         <div className="shell atelier-reveal">
           <p className="eyebrow">{tr("A WEBSITE YOU CAN KEEP UP TO DATE")}</p>
-          <h2 aria-label={tr("Give your business room to grow.")}>
-            <CaseWords text={tr("Give your business room to grow.")} />
+          <h2 aria-label={tr("Your menu evolves. Your website follows.")}>
+            <CaseWords text={tr("Your menu evolves. Your website follows.")} />
           </h2>
           <p>
             {tr(
-              "Let’s define the pages and content you need to manage, then choose an editing solution that fits your business. Hosting, training and maintenance are scoped in the quote.",
+              "A new price, a seasonal recipe, an exceptional closure: keep control of your restaurant’s information. Let’s define the right website and editing tools for your business.",
             )}
           </p>
           <div className="case-contact-actions">
             <button className="button primary" onClick={onStart}>
-              {tr("Discuss an editable website")} <ArrowUpRight size={18} />
+              {tr("Let’s talk about your restaurant website")} <ArrowUpRight size={18} />
             </button>
             <a className="understated-link" href="#work">
               {tr("Back to selected work")} <ArrowLeft size={16} />

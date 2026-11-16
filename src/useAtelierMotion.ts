@@ -75,6 +75,17 @@ export function useAtelierMotion(
             timeline.set(frames, { visibility: "hidden" }, time);
             timeline.set(frames[i + 1], { visibility: "visible" }, time);
             timeline.set(slice, { attr: { "data-bite-frame": i + 1 } }, time);
+            // Trois miettes discrètes suivent la même progression que la bouchée.
+            // Elles restent invisibles sans animation ou en mouvement réduit.
+            const crumbs = page.querySelector(`[data-burst="${i}"]`);
+            timeline.set(crumbs, { opacity: 1 }, time);
+            timeline.fromTo(
+              crumbs,
+              { x: 0, y: 0 },
+              { x: 15, y: 65, duration: 0.105, ease: "power1.in" },
+              time,
+            );
+            timeline.to(crumbs, { opacity: 0, duration: 0.035 }, time + 0.07);
             timeline.to(
               slice,
               { x: 55, y: 23, duration: 0.035, ease: "power1.in" },

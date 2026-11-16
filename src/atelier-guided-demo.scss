@@ -1,0 +1,268 @@
+/* Deux captures alignées sur un même état enregistré. Les images sont consultables
+ * en grand ; l’interface indique qu’elle ne publie aucune modification réelle.
+ */
+.atelier-guided-demo {
+  margin-block: 42px 50px;
+  border: 1px solid #b6cbbb36;
+  border-radius: 13px;
+  background: #101916;
+  padding: 28px;
+}
+.atelier-demo-label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #b7cdbb;
+  font: 10px/1.7 monospace;
+  letter-spacing: 1px;
+  span {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #c2d5b9;
+  }
+}
+.atelier-action-options {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-block: 24px 28px;
+  button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 48px;
+    padding: 12px 17px;
+    border: 1px solid #a9c1ad52;
+    border-radius: 6px;
+    background: transparent;
+    color: #d5e1d8;
+    font-size: 14px;
+    text-align: left;
+    transition:
+      background 0.2s,
+      border-color 0.2s;
+    span {
+      font: 11px monospace;
+      color: #a3bca9;
+    }
+    &:hover {
+      border-color: #c4d7bc;
+      background: #c4d7bc0c;
+    }
+    &[aria-pressed="true"] {
+      background: #dce7d4;
+      color: #233024;
+      border-color: #dce7d4;
+      span {
+        color: #455a43;
+      }
+    }
+  }
+}
+.atelier-comparison {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 26px;
+}
+.atelier-comparison-pane {
+  border: 1px solid #b5cbbb3d;
+  border-radius: 9px;
+  overflow: hidden;
+  min-width: 0;
+  .atelier-pane-heading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 18px;
+    background: #1b2922;
+    color: #dce8df;
+    min-height: 54px;
+    > span {
+      font: 11px monospace;
+      color: #a5bda9;
+    }
+    strong {
+      font-size: 15px;
+      font-weight: 500;
+    }
+    svg {
+      margin-left: auto;
+      color: #bbd1a7;
+    }
+  }
+  figcaption {
+    padding: 14px 17px;
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.65;
+    color: #bccfc0;
+  }
+}
+.atelier-capture-pair {
+  position: relative;
+  aspect-ratio: 1.85;
+  background: #f0f2ee;
+}
+.atelier-capture-link {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s;
+  &[data-active="true"] {
+    opacity: 1;
+    visibility: visible;
+  }
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+  &:hover .atelier-zoom-label,
+  &:focus-visible .atelier-zoom-label {
+    opacity: 1;
+  }
+}
+.atelier-zoom-label {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  font-size: 11px;
+  background: #14241ee6;
+  color: #eef5ec;
+  padding: 7px 10px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.atelier-comparison-arrow {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  border: 1px solid #b5cbbb50;
+  background: #14251d;
+  color: #d7e4cc;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.atelier-demo-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-top: 24px;
+}
+.atelier-phase-options {
+  display: flex;
+  border: 1px solid #b5cbbb50;
+  border-radius: 6px;
+  overflow: hidden;
+  button {
+    min-height: 44px;
+    padding: 11px 20px;
+    border: 0;
+    background: transparent;
+    color: #c3d3c7;
+    font-size: 13px;
+    &[aria-pressed="true"] {
+      color: #18291b;
+      background: #d5e2cb;
+    }
+  }
+}
+.atelier-result-button.button {
+  background: #d5e2cb;
+  border: 1px solid #d5e2cb;
+  color: #18291b;
+  min-height: 46px;
+  font-size: 14px;
+  &:hover {
+    background: #ebe5cb;
+    border-color: #ebe5cb;
+  }
+}
+.atelier-demo-result {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #dce8df;
+  font-size: 16px;
+  margin-top: 25px;
+  min-height: 36px;
+  > span {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 29px;
+    height: 29px;
+    border: 1px solid #a6bca74a;
+    border-radius: 50%;
+    color: #b8cdb7;
+  }
+  > span.is-saved {
+    background: #d5e2cb;
+    color: #203522;
+  }
+}
+.atelier-demo-disclosure {
+  color: #aebfb3;
+  font-size: 14px;
+  margin-top: 18px;
+  max-width: 850px;
+}
+@media (max-width: 760px) {
+  .atelier-guided-demo {
+    padding: 20px;
+    margin-block: 30px;
+  }
+  .atelier-action-options {
+    flex-direction: column;
+    gap: 8px;
+    button {
+      width: 100%;
+    }
+  }
+  .atelier-comparison {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .atelier-comparison-arrow {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(90deg);
+    width: 32px;
+    height: 32px;
+  }
+  .atelier-demo-controls {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 15px;
+  }
+  .atelier-phase-options {
+    align-self: start;
+  }
+  .atelier-result-button.button {
+    justify-content: center;
+  }
+  .atelier-demo-result {
+    align-items: start;
+  }
+  .atelier-capture-pair {
+    aspect-ratio: 1.55;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .atelier-action-options button,
+  .atelier-capture-link,
+  .atelier-zoom-label {
+    transition: none;
+  }
+}

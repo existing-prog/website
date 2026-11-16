@@ -1,0 +1,28 @@
+// Les deux essais utilisent les mêmes matériaux et la même présentation.
+// Seuls la piste de scroll et les éléments de comparaison appartiennent à B.
+@use "../pizza3d/style";
+
+.experiment {
+  height: 280svh;
+}
+.variant-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+  .project-link {
+    font-size: 12px;
+  }
+}
+@media (max-width: 760px) {
+  .experiment {
+    height: 250svh;
+  }
+}
+// Respecter le repli statique même si la piste de la variante est déclarée après.
+body[data-reduced="true"],
+body[data-renderer="fallback"] {
+  .experiment {
+    height: auto;
+  }
+}

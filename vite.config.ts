@@ -10,6 +10,7 @@ export default defineConfig({
       input: {
         main: "index.html",
         pizzaLab: "lab/pizza-3d/index.html",
+        pizzaGesture: "lab/pizza-gesture/index.html",
       },
     },
   },

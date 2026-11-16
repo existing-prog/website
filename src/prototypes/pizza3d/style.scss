@@ -1,0 +1,587 @@
+@font-face {
+  font-family: "DM Sans";
+  src: url("/fonts/dm-sans.ttf") format("truetype");
+  font-display: swap;
+}
+:root {
+  font-family: "DM Sans", sans-serif;
+  color: #302d28;
+  background: #f3efe6;
+  font-synthesis: none;
+  --ink: #302d28;
+  --muted: #736b60;
+  --line: #c3b9a965;
+  --accent: #954b34;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button,
+input {
+  font: inherit;
+}
+button,
+a,
+input {
+  -webkit-tap-highlight-color: transparent;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 5px;
+}
+[hidden] {
+  display: none !important;
+}
+.skip-link {
+  position: fixed;
+  top: -100px;
+  left: 20px;
+  z-index: 10;
+  background: var(--ink);
+  color: white;
+  padding: 16px;
+  &:focus {
+    top: 10px;
+  }
+}
+.lab-header {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 4vw;
+  gap: 20px;
+}
+.lab-brand {
+  font-size: 39px;
+  font-weight: 600;
+  letter-spacing: -4px;
+  line-height: 1;
+  span {
+    color: var(--accent);
+  }
+}
+.lab-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font: 10px monospace;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  > span {
+    color: var(--muted);
+  }
+}
+.back-link {
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  span {
+    font-size: 20px;
+    transition: transform 0.25s;
+  }
+  &:hover {
+    color: var(--accent);
+    span {
+      transform: translate(2px, -2px);
+    }
+  }
+}
+.experiment {
+  height: 450svh;
+}
+.studio {
+  height: 100svh;
+  min-height: 590px;
+  position: sticky;
+  top: 0;
+  overflow: hidden;
+  isolation: isolate;
+}
+.scene {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.2s;
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
+.scene-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 30%, #e5ddcc35);
+}
+.intro-copy {
+  position: absolute;
+  top: 23%;
+  left: 7vw;
+  max-width: 400px;
+  pointer-events: none;
+}
+.eyebrow {
+  text-transform: uppercase;
+  font: 10px monospace;
+  letter-spacing: 1.5px;
+  line-height: 1.7;
+  color: var(--accent);
+  margin: 0 0 22px;
+}
+h1,
+h2 {
+  font:
+    400 clamp(48px, 5.5vw, 86px)/1.04 Georgia,
+    serif;
+  letter-spacing: -3px;
+  margin: 0;
+}
+h1 em,
+h2 em {
+  font-weight: 400;
+  color: var(--accent);
+}
+.intro-detail {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.8;
+  margin-top: 26px;
+}
+.scene-caption {
+  position: absolute;
+  left: 7vw;
+  bottom: 19%;
+  display: flex;
+  gap: 16px;
+  align-items: start;
+  pointer-events: none;
+}
+.caption-number {
+  font:
+    italic 30px Georgia,
+    serif;
+  color: #a18b6f;
+}
+.caption-title {
+  display: block;
+  font-size: 15px;
+  margin: 0 0 7px;
+}
+.caption-detail {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.loading {
+  position: absolute;
+  left: 50%;
+  top: 55%;
+  transform: translate(-50%, -50%);
+  font: 12px monospace;
+  color: var(--muted);
+}
+.fallback {
+  position: absolute;
+  inset: 100px 10% 90px;
+  text-align: center;
+  img {
+    height: 65%;
+    max-width: 100%;
+    object-fit: contain;
+  }
+  p {
+    max-width: 400px;
+    margin: 20px auto;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+}
+/* Les commandes suivent la scène : le curseur et Pause restent accessibles
+ * pendant leur utilisation, y compris lorsque la lecture déplace le scroll.
+ */
+.studio-footer {
+  position: absolute;
+  inset: auto 4vw 30px;
+  display: block;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+  gap: 20px;
+}
+.footer-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 7px;
+}
+.scene-controls {
+  display: grid;
+  grid-template-columns: 160px 1fr auto;
+  align-items: center;
+  gap: 22px;
+  .control-heading {
+    font-size: 11px;
+    gap: 12px;
+  }
+  #scene-progress {
+    margin: 0;
+  }
+  .play-controls {
+    margin: 0;
+    gap: 8px;
+    button {
+      padding: 11px 13px;
+      min-height: 44px;
+      font-size: 11px;
+      gap: 12px;
+    }
+  }
+}
+.scroll-hint {
+  font-size: 11px;
+  margin: 0;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  > span {
+    font-size: 22px;
+  }
+}
+.edition {
+  font: 10px monospace;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  margin: 0;
+  span {
+    margin-left: 20px;
+    color: var(--ink);
+  }
+}
+.outro-copy {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -45%);
+  width: min(90%, 700px);
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  h2 {
+    font-size: clamp(55px, 6vw, 88px);
+  }
+  > p:not(.eyebrow) {
+    color: var(--muted);
+    line-height: 1.8;
+    font-size: 15px;
+    margin: 26px 0;
+  }
+}
+.project-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 24px;
+  font-size: 13px;
+  padding: 16px 22px;
+  border: 1px solid #302d2835;
+  border-radius: 3px;
+  transition:
+    background 0.25s,
+    color 0.25s;
+  &:hover {
+    color: #fffaf2;
+    background: var(--ink);
+  }
+}
+.review {
+  padding: 110px 7vw 100px;
+  background: #e7e0d4;
+  border-top: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12vw;
+  h2 {
+    font-size: clamp(42px, 4.2vw, 62px);
+    letter-spacing: -2px;
+  }
+}
+.review-copy > p:not(.eyebrow) {
+  font-size: 14px;
+  line-height: 1.9;
+  color: #675f54;
+  max-width: 480px;
+  margin-top: 27px;
+}
+.review-controls {
+  padding-top: 10px;
+  h3 {
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0 0 24px;
+  }
+}
+.control-heading {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  gap: 20px;
+  output {
+    font: 12px monospace;
+    color: var(--muted);
+  }
+}
+#scene-progress {
+  width: 100%;
+  accent-color: var(--accent);
+  margin: 24px 0;
+  cursor: pointer;
+  min-height: 30px;
+}
+.chapter-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  button {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    border: 1px solid #736b6045;
+    background: transparent;
+    padding: 14px 12px;
+    font: 11px monospace;
+    color: #6b6050;
+    border-radius: 3px;
+    min-height: 46px;
+    span {
+      font:
+        12px "DM Sans",
+        sans-serif;
+      color: var(--ink);
+    }
+    &:hover {
+      background: #f3efe6;
+      border-color: var(--accent);
+    }
+    &[aria-current="step"] {
+      background: #f3efe6;
+      border-color: var(--accent);
+    }
+  }
+}
+.play-controls {
+  display: flex;
+  gap: 16px;
+  margin-top: 23px;
+  flex-wrap: wrap;
+  button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    font-size: 12px;
+    border-radius: 3px;
+    padding: 15px 18px;
+    min-height: 47px;
+    transition:
+      background 0.2s,
+      color 0.2s;
+  }
+}
+.play-button {
+  background: var(--ink);
+  color: #fffaf2;
+  border: 1px solid var(--ink);
+  &:hover {
+    background: var(--accent);
+  }
+}
+.reset-button {
+  background: transparent;
+  border: 1px solid #736b6045;
+  color: var(--ink);
+  &:hover {
+    background: #f3efe6;
+  }
+}
+#motion-note,
+.scene-status {
+  font-size: 12px;
+  color: #675f54;
+  line-height: 1.7;
+  margin: 20px 0 0;
+}
+.lab-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 26px 4vw;
+  font: 10px monospace;
+  color: var(--muted);
+}
+/* Sans WebGL ou avec mouvement réduit, pas de longue piste vide.
+ * Le curseur reste une commande volontaire pour examiner les poses en 3D.
+ */
+body[data-reduced="true"],
+body[data-renderer="fallback"] {
+  .experiment {
+    height: auto;
+  }
+  .studio {
+    position: relative;
+  }
+  .scroll-hint {
+    visibility: hidden;
+  }
+}
+body[data-renderer="fallback"] {
+  .intro-copy,
+  .scene-caption,
+  .outro-copy {
+    display: none;
+  }
+}
+@media (min-width: 1600px) {
+  .intro-copy {
+    left: 10vw;
+  }
+  .scene-caption {
+    left: 10vw;
+  }
+}
+@media (max-width: 760px) {
+  .lab-header {
+    padding: 22px 6vw;
+  }
+  .lab-label {
+    font-size: 9px;
+    letter-spacing: 0.5px;
+    > span {
+      display: none;
+    }
+  }
+  .back-link {
+    font-size: 0;
+    gap: 0;
+    span {
+      font-size: 23px;
+    }
+  }
+  .experiment {
+    height: 370svh;
+  }
+  .studio {
+    min-height: 560px;
+  }
+  .intro-copy {
+    top: 17%;
+    left: 7vw;
+    max-width: 86vw;
+  }
+  h1 {
+    font-size: clamp(34px, 9vw, 42px);
+    letter-spacing: -2px;
+  }
+  .intro-detail {
+    font-size: 12px;
+    margin-top: 18px;
+  }
+  .eyebrow {
+    font-size: 9px;
+    margin-bottom: 17px;
+  }
+  .scene-caption {
+    top: 20%;
+    bottom: auto;
+    max-width: 85%;
+  }
+  .caption-title {
+    font-size: 13px;
+  }
+  .caption-detail {
+    font-size: 11px;
+  }
+  .studio-footer {
+    bottom: 14px;
+    inset-inline: 6vw;
+  }
+  .footer-heading {
+    margin-bottom: 8px;
+  }
+  .scene-controls {
+    grid-template-columns: 1fr auto;
+    gap: 0 12px;
+    .control-heading {
+      grid-column: 1/-1;
+      margin-bottom: 4px;
+      font-size: 10px;
+    }
+    .play-controls {
+      flex-wrap: nowrap;
+      button {
+        font-size: 0;
+        padding: 9px 12px;
+        min-width: 44px;
+        span {
+          font-size: 18px;
+        }
+      }
+    }
+  }
+  .edition {
+    font-size: 0;
+    span {
+      font-size: 10px;
+    }
+  }
+  .scroll-hint {
+    font-size: 10px;
+    gap: 10px;
+  }
+  .review {
+    grid-template-columns: 1fr;
+    gap: 35px;
+    padding: 65px 7vw;
+  }
+  .lab-footer {
+    flex-direction: column;
+    gap: 10px;
+    padding: 25px 7vw;
+  }
+  .outro-copy h2 {
+    font-size: 51px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}

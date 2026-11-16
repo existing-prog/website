@@ -1,3 +1,16 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-export default defineConfig({ plugins: [react()], base: "/website/" });
+// Entrée indépendante : Three.js ne se charge que dans le laboratoire 3D.
+// Le site commercial conserve son parcours et son animation de production.
+export default defineConfig({
+  plugins: [react()],
+  base: "/website/",
+  build: {
+    rollupOptions: {
+      input: {
+        main: "index.html",
+        pizzaLab: "lab/pizza-3d/index.html",
+      },
+    },
+  },
+});

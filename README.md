@@ -157,9 +157,9 @@ La section `#approach` décrit quatre étapes : échange, devis, réalisation av
 
 ## Activer l’envoi direct des demandes
 
-**État actuel : envoi par messagerie conservé.** Aucun compte Formspree ni destinataire validé n’a été fourni. Le site n’affiche donc pas de confirmation de réception et continue d’ouvrir la messagerie du visiteur avec le brief prérempli.
+**État actuel : envoi direct configuré en production.** Lucas a fourni le formulaire public `https://formspree.io/f/xbgogapg` le 16 novembre 2026. Le workflow utilise cet identifiant par défaut pour la compilation publiée ; une variable de dépôt `FORMSPREE_FORM_ID` peut le remplacer. La validation du destinataire et la réception effective restent à vérifier depuis le compte Formspree. Aucun message réel n’est envoyé par les tests automatiques. Sans configuration lors d’une compilation locale, la messagerie reste le mode de secours.
 
-Le branchement optionnel est prêt dans `src/requestDelivery.ts`. Il utilise uniquement l’identifiant public d’un formulaire Formspree, sans clé secrète côté navigateur. Pour l’activer :
+Le branchement est défini dans `src/requestDelivery.ts`. Il utilise uniquement l’identifiant public d’un formulaire Formspree, sans clé secrète côté navigateur. Pour l’activer :
 
 1. Créer un formulaire sur https://formspree.io/ avec la boîte de réception souhaitée et valider cette adresse chez le prestataire. Vérifier ses paramètres de protection antispam, ses limites et le traitement des données avant lancement commercial.
 2. Copier l’identifiant à la fin de l’URL publique `https://formspree.io/f/IDENTIFIANT`.
@@ -169,4 +169,4 @@ Le branchement optionnel est prêt dans `src/requestDelivery.ts`. Il utilise uni
 
 Pendant l’envoi, le bouton est désactivé et les retours d’étape sont bloqués. Seule une réponse HTTP réussie avec `ok: true` affiche l’acceptation ; les erreurs, réponses invalides et délais de 15 secondes conservent le brief et proposent la messagerie en secours. Un brouillon sauvegardé reste un brouillon local. Le formulaire explique le transfert à Formspree lorsqu’il est configuré. La future politique de confidentialité devra refléter le service effectivement choisi et les modalités de conservation de l’activité.
 
-Pour désactiver l’envoi direct, supprimer la variable puis reconstruire le site. Les tests courants vérifient le parcours par messagerie ; pour vérifier le mode connecté localement, construire avec `VITE_FORMSPREE_FORM_ID=testform` puis exécuter `TEST_DIRECT_DELIVERY=1 npm test -- tests/request-delivery.spec.ts` contre ce build. Les requêtes sont interceptées et ne quittent pas le navigateur de test.
+Pour désactiver l’envoi direct en production, retirer la valeur par défaut `xbgogapg` du workflow et supprimer la variable de dépôt éventuelle, puis reconstruire le site. Les tests courants vérifient le parcours par messagerie ; pour vérifier le mode connecté localement, construire avec `VITE_FORMSPREE_FORM_ID=testform` puis exécuter `TEST_DIRECT_DELIVERY=1 npm test -- tests/request-delivery.spec.ts` contre ce build. Les requêtes sont interceptées et ne quittent pas le navigateur de test.

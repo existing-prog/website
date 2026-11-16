@@ -32,12 +32,11 @@ jobs:
       - name: Browser regression checks
         run: npm test
       - name: Build configured contact form
-        if: vars.FORMSPREE_FORM_ID != ''
         env:
-          VITE_FORMSPREE_FORM_ID: ${{ vars.FORMSPREE_FORM_ID }}
+          # Identifiant public fourni par Lucas ; une variable de dépôt peut le remplacer.
+          VITE_FORMSPREE_FORM_ID: ${{ vars.FORMSPREE_FORM_ID || 'xbgogapg' }}
         run: npm run build
       - name: Check configured contact form without sending messages
-        if: vars.FORMSPREE_FORM_ID != ''
         env:
           TEST_DIRECT_DELIVERY: "1"
         run: npm test -- tests/request-delivery.spec.ts

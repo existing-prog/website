@@ -33,13 +33,15 @@ De `progress = 0,86` à `0,96`, la caméra revient au-dessus de l’assiette. La
 
 Les états de bouchées restent préconstruits : aucun modèle n’est reconstruit au scroll. Toute la séquence est déterministe : revenir en arrière restitue le même trajet et la même part.
 
-La page utilise un sticky CSS et le défilement natif. Le curseur et les boutons pilotent la même progression. La lecture automatique dure 18 secondes, n’a lieu que sur demande et s’arrête au toucher, au scroll, au clavier ou lorsque l’onglet est masqué. Le bouton Pause reste visible dans la scène.
+La piste mesure 340 svh sur ordinateur et 300 svh sur téléphone, soit environ 30 % de défilement en moins que la version précédente. La page utilise un sticky CSS et le défilement natif. Le curseur et les boutons pilotent la même progression. La lecture automatique dure 13 secondes, n’a lieu que sur demande et s’arrête au toucher, au scroll, au clavier ou lorsque l’onglet est masqué. Le bouton Pause reste visible dans la scène.
 
 En mouvement réduit, la longue piste est supprimée et la scène reste fixe. Les commandes permettent de choisir volontairement une pose. Sans WebGL ou après perte de contexte, une illustration et un lien vers le projet original restent disponibles.
 
 ## Modèles, coût et limites
 
-Les géométries sont créées en code avec Three.js, sans modèle 3D distant ni fichier sous licence à acheter. La pizza réutilise l’illustration existante `public/assets/atelier-pizza-whole.webp`. La croûte utilise une texture de pain générée localement. Le dos de la pizza, la mie et la main sont stylisés ; il ne s’agit pas d’une simulation anatomique ou physique de la nourriture.
+Les géométries sont créées en code avec Three.js, sans modèle 3D distant ni fichier sous licence à acheter. La main utilise une enveloppe continue pour la paume et le poignet, ainsi que des doigts dont les buffers de sommets et de normales sont déformés en place. La prise est mise en cache : quand sa valeur reste identique, aucun sommet n’est recalculé. De fines textures générées localement donnent un grain mat à la main et un tissage discret à la manche.
+
+La pizza réutilise l’illustration existante `public/assets/atelier-pizza-whole.webp`. Ses dessus subdivisés portent un relief léger guidé par les couleurs de la garniture. Les croûtes fermées ont un profil irrégulier et une dorure de cuisson ; leurs faces coupées et les tranches utilisent une matière de mie pâle et alvéolée. Les géométries de toutes les bouchées sont préconstruites avant le premier rendu, sans subdivision pendant le scroll. Le dos de la pizza, la mie et la main restent stylisés ; il ne s’agit pas d’une simulation anatomique ou physique de la nourriture.
 
 Three.js n’est chargé que dans l’entrée `pizzaLab`. Le moteur ne fait pas partie du module partagé avec le site commercial. Le rendu est demandé lors d’un changement de pose ou de taille, sans boucle permanente au repos. La densité de pixels est plafonnée, les ombres utilisent une seule carte de 1024 px, les ressources sont libérées à la sortie de la page.
 
@@ -50,6 +52,6 @@ npm run build
 CHROMIUM_PATH=/usr/bin/chromium npm test -- tests/pizza-lab.spec.ts
 ```
 
-Les modèles géométriques restent inchangés dans cette version : la priorité est de valider l’enchaînement et l’émotion de la conclusion. La main, le contact avec la croûte et les matières pourront être affinés après cette validation.
+La version 4 conserve cet enchaînement et affine les volumes de la main, le contact avec la croûte et les matières de la pizza. Les modèles restent procéduraux et stylisés ; ils doivent être jugés dans la scène et sur des appareils réels.
 
 Le rendu doit encore être apprécié sur des appareils réels avant de décider d’une intégration. Le rythme des sorties hors champ, le retour à la vue du dessus et la place laissée au texte sont les principaux points de discussion de cette version.

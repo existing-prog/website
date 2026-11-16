@@ -46,6 +46,16 @@ async function openScene(page: Page) {
   await page.evaluate(() => document.fonts.ready);
 }
 
+/** La séquence reste courte sans dépendre d’une valeur CSS précise. */
+async function expectCompactTravel(page: Page) {
+  const viewportTravel = await page.evaluate(() => {
+    const experiment = document.querySelector<HTMLElement>(".experiment")!;
+    const studio = document.querySelector<HTMLElement>(".studio")!;
+    return (experiment.clientHeight - studio.clientHeight) / innerHeight;
+  });
+  expect(viewportTravel).toBeLessThanOrEqual(2.5);
+}
+
 async function scrollScene(page: Page, progress: number) {
   await page.locator(".experiment").evaluate((section, p) => {
     scrollTo({
@@ -70,6 +80,7 @@ test("pizza lab follows three offscreen bites with native scroll and reverses", 
   gpuPage: page,
 }) => {
   await openScene(page);
+  await expectCompactTravel(page);
   const canvas = page.locator("#pizza-canvas");
   for (const [progress, bite] of [
     [0, 0],
@@ -130,6 +141,7 @@ test("mobile layouts and reduced motion allow deliberate poses without a long tr
   await openScene(page);
   for (const width of [320, 390]) {
     await page.setViewportSize({ width, height: 844 });
+    await expectCompactTravel(page);
     await seekScene(page, 73.5);
     await expect(page.locator("#pizza-canvas")).toHaveAttribute("data-bite", "4");
     await expect(page.locator("#scene-progress")).toBeInViewport();

@@ -192,7 +192,7 @@ playButton.addEventListener(
       "Lecture en cours. Défiler ou toucher l’écran interrompt la lecture.";
     playback = gsap.to(driver, {
       progress: 1,
-      duration: 18,
+      duration: 13,
       ease: "none",
       onUpdate: () => {
         if (!trigger) return;

@@ -1,3 +1,4 @@
+import ProjectQuestions from "./ProjectQuestions";
 import { useTranslation } from "react-i18next";
 import { tr, dateLocale } from "./i18n";
 import React, { Suspense, lazy, useEffect, useRef, useState } from "react";
@@ -670,18 +671,23 @@ function App() {
                 {[
                   {
                     n: "01",
-                    title: "Make it yours.",
-                    text: "Choose a service and put your ideas into a brief. Save it to your project desk if you need a little more thinking time.",
+                    title: "Start with a conversation.",
+                    text: "Tell me what you do, who your website is for and what you want it to achieve. We’ll clarify the priorities and the content you already have.",
                   },
                   {
                     n: "02",
-                    title: "Get a clear plan.",
-                    text: "Send your brief. We’ll discuss the details, then agree on the scope, quote and timeline before any work starts.",
+                    title: "Agree on a clear scope.",
+                    text: "You receive a written quote covering the deliverables, review stages, price and timeline. Work begins after the scope and terms have been agreed.",
                   },
                   {
                     n: "03",
-                    title: "Watch it take shape.",
-                    text: "I build, you stay involved. We refine the details together, check across screens and get your website ready to launch.",
+                    title: "Build, review, refine.",
+                    text: "I develop the website and share progress at the agreed stages. Your feedback helps refine the details, with checks across screens before final validation.",
+                  },
+                  {
+                    n: "04",
+                    title: "Launch with a clear handover.",
+                    text: "We validate the agreed work, prepare the launch and organise your access and handover. If you need ongoing updates, we can define a separate maintenance scope.",
                   },
                 ].map((s) => (
                   <article className="step reveal" key={s.n}>
@@ -693,6 +699,17 @@ function App() {
                     <p>{tr(s.text)}</p>
                   </article>
                 ))}
+              </div>
+              <div className="project-preparation reveal">
+                <h3>{tr("What to bring to our first exchange")}</h3>
+                <p>
+                  {tr(
+                    "Your goals, a few references, and any existing text, logo or photos. If something is missing, we’ll identify it together and clarify the responsibilities in your quote.",
+                  )}
+                </p>
+                <a href="#questions">
+                  {tr("Questions about content, hosting or revisions?")}
+                </a>
               </div>
               <div className="process-banner glass-interactive">
                 <div>
@@ -709,6 +726,7 @@ function App() {
                 </a>
               </div>
             </section>
+            <ProjectQuestions onStart={() => start("website")} />
             <section className="about-section">
               <div className="shell about-grid">
                 <div className="identity-card glass-interactive reveal">

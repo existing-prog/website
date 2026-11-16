@@ -31,6 +31,16 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Browser regression checks
         run: npm test
+      - name: Build configured contact form
+        if: vars.FORMSPREE_FORM_ID != ''
+        env:
+          VITE_FORMSPREE_FORM_ID: ${{ vars.FORMSPREE_FORM_ID }}
+        run: npm run build
+      - name: Check configured contact form without sending messages
+        if: vars.FORMSPREE_FORM_ID != ''
+        env:
+          TEST_DIRECT_DELIVERY: "1"
+        run: npm test -- tests/request-delivery.spec.ts
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

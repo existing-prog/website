@@ -150,3 +150,23 @@ La route `#project/nina` charge `src/NinaCaseStudy.tsx` à la demande et présen
 Les fichiers locaux `nina-study-*.webp` proviennent de la démo https://existing-prog.github.io/projet-4/, consultée le 15 novembre 2026 (sources : https://github.com/existing-prog/projet-4). Les photographies Unsplash conservées sont celles de Ryoji Iwata (`wUZjnOv7t0g`), Aaron Paul (`wnX-fXzB6Cw`), Jakob Owens (`SiniLJkXhMc`) et Nino van Prattenburg (`-443cl1uR_8`). Les captures montrent le site réellement déployé ; aucune page cliente n’est reconstruite pour les aperçus.
 
 Les scores Lighthouse avant/après (performance 56/94, accessibilité 68/100, SEO 73/100) sont repris de l’étude publiée dans le portfolio personnel, avec un lien de source visible. Ils sont explicitement présentés comme des résultats d’audit documentés, pas comme un audit actuel ni une promesse de résultat. Les chiffres restent lisibles sans animation. Les tests `tests/nina-case-study.spec.ts` couvrent les langues et dimensions, le défilement dans les deux sens, le mouvement réduit, la navigation et la sélection du service de maintenance.
+
+## Parcours client et FAQ
+
+La section `#approach` décrit quatre étapes : échange, devis, réalisation avec retours, validation/livraison. Elle précise les éléments à préparer sans imposer un cahier des charges terminé. `src/ProjectQuestions.tsx` contient huit questions traduites dans les catalogues FR/ENG. Les accordéons utilisent `details`/`summary` natifs : clavier et lecture restent disponibles sans animation. Leur apparence et les quatre étapes sont définies dans `src/project-questions.scss`.
+
+## Activer l’envoi direct des demandes
+
+**État actuel : envoi par messagerie conservé.** Aucun compte Formspree ni destinataire validé n’a été fourni. Le site n’affiche donc pas de confirmation de réception et continue d’ouvrir la messagerie du visiteur avec le brief prérempli.
+
+Le branchement optionnel est prêt dans `src/requestDelivery.ts`. Il utilise uniquement l’identifiant public d’un formulaire Formspree, sans clé secrète côté navigateur. Pour l’activer :
+
+1. Créer un formulaire sur https://formspree.io/ avec la boîte de réception souhaitée et valider cette adresse chez le prestataire. Vérifier ses paramètres de protection antispam, ses limites et le traitement des données avant lancement commercial.
+2. Copier l’identifiant à la fin de l’URL publique `https://formspree.io/f/IDENTIFIANT`.
+3. Dans GitHub → Settings → Secrets and variables → Actions → Variables, créer la variable de dépôt `FORMSPREE_FORM_ID` avec cet identifiant. Ce n’est pas un secret. Pour un autre hébergeur, définir `VITE_FORMSPREE_FORM_ID` au moment de la compilation ; `.env.example` documente le format local.
+4. Relancer le workflow Pages via Actions → Run workflow. La compilation de production active alors le bouton d’envoi direct. Le workflow teste les réponses du prestataire avec des requêtes interceptées : aucun message de test n’est réellement envoyé par CI.
+5. Envoyer une demande manuelle avec ses propres coordonnées, puis vérifier sa présence dans Formspree et dans la boîte destinataire avant d’annoncer l’ouverture commerciale. L’acceptation du prestataire ne garantit pas à elle seule l’arrivée dans la boîte principale.
+
+Pendant l’envoi, le bouton est désactivé et les retours d’étape sont bloqués. Seule une réponse HTTP réussie avec `ok: true` affiche l’acceptation ; les erreurs, réponses invalides et délais de 15 secondes conservent le brief et proposent la messagerie en secours. Un brouillon sauvegardé reste un brouillon local. Le formulaire explique le transfert à Formspree lorsqu’il est configuré. La future politique de confidentialité devra refléter le service effectivement choisi et les modalités de conservation de l’activité.
+
+Pour désactiver l’envoi direct, supprimer la variable puis reconstruire le site. Les tests courants vérifient le parcours par messagerie ; pour vérifier le mode connecté localement, construire avec `VITE_FORMSPREE_FORM_ID=testform` puis exécuter `TEST_DIRECT_DELIVERY=1 npm test -- tests/request-delivery.spec.ts` contre ce build. Les requêtes sont interceptées et ne quittent pas le navigateur de test.

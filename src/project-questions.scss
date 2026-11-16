@@ -1,0 +1,157 @@
+/* Une FAQ sobre : détails natifs accessibles, lignes discrètes et lecture mobile. */
+.project-questions {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  align-items: start;
+  gap: 95px;
+  border-top: 1px solid #b6c5e226;
+}
+.questions-intro {
+  h2 {
+    font-size: clamp(32px, 3.5vw, 49px);
+    line-height: 1.12;
+    letter-spacing: -1.6px;
+  }
+  > p:not(.eyebrow) {
+    color: #b9c5d7;
+    font-size: 16px;
+    line-height: 1.8;
+    margin-top: 25px;
+  }
+  button {
+    margin-top: 28px;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+  }
+}
+.project-question {
+  border-bottom: 1px solid #b6c5e22e;
+  &:first-child {
+    border-top: 1px solid #b6c5e22e;
+  }
+  summary {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    list-style: none;
+    padding: 25px 4px;
+    cursor: pointer;
+    font-size: 17px;
+    line-height: 1.5;
+    color: #e9eef7;
+    transition: color 0.2s;
+    &::-webkit-details-marker {
+      display: none;
+    }
+    &:hover {
+      color: #bacaf4;
+    }
+    &:focus-visible {
+      outline: 2px solid #bacaf4;
+      outline-offset: 4px;
+      border-radius: 3px;
+    }
+    svg {
+      flex-shrink: 0;
+      margin-left: auto;
+      transition: transform 0.25s;
+    }
+  }
+  .question-number {
+    color: #9caec8;
+    font: 11px monospace;
+  }
+  > p {
+    color: #b9c5d7;
+    font-size: 16px;
+    line-height: 1.85;
+    padding: 0 35px 25px 37px;
+  }
+  &[open] summary {
+    color: #c9d8f6;
+    svg {
+      transform: rotate(45deg);
+    }
+  }
+}
+/* Le parcours existant passe à quatre étapes, avec un rythme 2 × 2 lisible. */
+.approach .steps {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 36px 65px;
+}
+.approach .step p {
+  font-size: 16px;
+  line-height: 1.8;
+}
+.project-preparation {
+  margin-top: 40px;
+  padding: 25px 28px;
+  border: 1px solid #b9c9e32c;
+  border-radius: 10px;
+  background: #b6cafa06;
+  h3 {
+    font-size: 20px;
+    margin-bottom: 12px;
+  }
+  p {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #b9c5d7;
+  }
+  a {
+    display: inline-flex;
+    margin-top: 15px;
+    font-size: 14px;
+    color: #d1ddf3;
+    padding-block: 8px;
+    text-decoration: underline;
+    text-underline-offset: 5px;
+  }
+}
+.request-delivery {
+  margin-top: 20px;
+  padding: 18px;
+  border-radius: 8px;
+  border: 1px solid #a8c4aa65;
+  background: #a8c4aa0c;
+  color: #dbe9dd;
+  font-size: 15px;
+  line-height: 1.7;
+}
+.request-delivery[data-status="error"] {
+  color: #ffdfd7;
+  border-color: #e6a39166;
+}
+@media (max-width: 1023px) {
+  .project-questions {
+    gap: 40px;
+    grid-template-columns: 1fr;
+  }
+  .questions-intro {
+    max-width: 650px;
+  }
+}
+@media (max-width: 760px) {
+  .approach .steps {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  .project-preparation {
+    padding: 22px;
+  }
+  .project-question summary {
+    font-size: 16px;
+    gap: 12px;
+  }
+  .project-question > p {
+    padding-left: 0;
+    padding-right: 12px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .project-question summary,
+  .project-question summary svg {
+    transition: none;
+  }
+}

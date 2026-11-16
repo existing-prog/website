@@ -1,3 +1,4 @@
+import { deliverRequest, directDeliveryEnabled } from "./requestDelivery";
 import LanguageSwitch from "./LanguageSwitch";
 import { useTranslation } from "react-i18next";
 import { tr } from "./i18n";
@@ -40,6 +41,9 @@ export default function ProjectBuilder({
   notice: string;
 }) {
   const { i18n } = useTranslation();
+  const [delivery, setDelivery] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const deliveryController = useRef<AbortController | null>(null);
+  useEffect(() => () => deliveryController.current?.abort(), []);
   const [draft, setDraft] = useState<Draft>(initial);
   const [step, setStep] = useState(0);
   const [copied, setCopied] = useState("");
@@ -70,6 +74,7 @@ export default function ProjectBuilder({
   }, [i18n.resolvedLanguage]);
   const update = <K extends keyof Draft>(key: K, value: Draft[K]) => {
     setDraft((d) => ({ ...d, [key]: value }));
+    setDelivery("idle");
     setSaved(false);
     setSaveAttempted(false);
     setCopied("");
@@ -116,7 +121,23 @@ export default function ProjectBuilder({
       setCopied("Clipboard access is unavailable. Use Download brief to keep a copy.");
     }
   };
-  // La messagerie du visiteur s’ouvre ; le site ne prétend jamais que l’e-mail est envoyé.
+  // Aucun succès optimiste : attendre l’acceptation explicite du prestataire.
+  const send = async () => {
+    if (delivery === "sending" || delivery === "sent") return;
+    const controller = new AbortController();
+    deliveryController.current = controller;
+    setDelivery("sending");
+    const timeout = window.setTimeout(() => controller.abort(), 15000);
+    try {
+      await deliverRequest(draft, controller.signal);
+      if (dialog.current?.open) setDelivery("sent");
+    } catch {
+      if (dialog.current?.open) setDelivery("error");
+    } finally {
+      window.clearTimeout(timeout);
+    }
+  };
+  // Secours sans prestataire : ouvrir un e-mail ne signifie pas qu’il est envoyé.
   const email = `mailto:lucasberdy@gmail.com?subject=${encodeURIComponent(tr("Project request — {{service}}", { service: serviceName(draft.service) }))}&body=${encodeURIComponent(briefText(draft))}`;
   return (
     <dialog
@@ -217,7 +238,9 @@ export default function ProjectBuilder({
                     "Choose the direction that’s closest to your idea. We can figure out the finer details together.",
                     "A rough idea is plenty. What should your website do, and who is it for?",
                     "So I know who I’m speaking to and where to reply.",
-                    "Check your brief, then email it to me to start the conversation. Nothing has been submitted yet.",
+                    directDeliveryEnabled
+                      ? "Check your brief before submitting your request. Sending it does not confirm a booking."
+                      : "Check your brief, then email it to me to start the conversation. Nothing has been submitted yet.",
                   ][step],
                 )}
               </p>
@@ -414,7 +437,9 @@ export default function ProjectBuilder({
                     <ShieldCheck size={20} />
                     <p>
                       {tr(
-                        "Your details are included in your project brief. If you save a draft, they stay in this browser until you delete it or clear its storage.",
+                        directDeliveryEnabled
+                          ? "Your details are used to reply to your enquiry. Submitting sends your brief through Formspree to Lucas. Optional saved drafts stay in this browser until you delete them or clear its storage."
+                          : "Your details are included in your project brief. If you save a draft, they stay in this browser until you delete it or clear its storage.",
                       )}
                     </p>
                   </div>
@@ -492,9 +517,33 @@ export default function ProjectBuilder({
                   </div>
                   <p className="email-note">
                     {tr(
-                      "Email opens your email app with the brief filled in. You’ll still need to press Send. No payment or booking is made here.",
+                      directDeliveryEnabled
+                        ? "Your brief is sent through Formspree so I can reply to your enquiry. No payment or booking is made here."
+                        : "Email opens your email app with the brief filled in. You’ll still need to press Send. No payment or booking is made here.",
                     )}
                   </p>
+                  {delivery !== "idle" && (
+                    <div
+                      className="request-delivery"
+                      data-status={delivery}
+                      role={delivery === "error" ? "alert" : "status"}
+                    >
+                      {tr(
+                        delivery === "sending"
+                          ? "Sending your request…"
+                          : delivery === "sent"
+                            ? "Your request has been accepted by the form service. I’ll review your brief and reply by email. No booking has been confirmed."
+                            : "Your request could not be confirmed. Your brief is still here. Try again, or send it using your email app.",
+                      )}
+                      {delivery === "error" && (
+                        <p>
+                          <a className="inline-link" href={email}>
+                            {tr("Email project request")}
+                          </a>
+                        </p>
+                      )}
+                    </div>
+                  )}
                   <p className="action-status" role="status">
                     {tr(copied || (saveAttempted ? notice : ""))}
                   </p>
@@ -507,6 +556,7 @@ export default function ProjectBuilder({
                   <button
                     type="button"
                     className="back-button"
+                    disabled={delivery === "sending"}
                     onClick={() => setStep((s) => s - 1)}
                   >
                     <ChevronLeft size={16} /> {tr("Back")}
@@ -525,9 +575,27 @@ export default function ProjectBuilder({
                     {saved ? <Check size={16} /> : <FolderOpen size={16} />}{" "}
                     {saved ? tr("Saved on this device") : tr("Save draft on this device")}
                   </button>
-                  <a className="button primary" href={email}>
-                    <Mail size={17} /> {tr("Email project request")}
-                  </a>
+                  {directDeliveryEnabled ? (
+                    <button
+                      className="button primary"
+                      type="button"
+                      onClick={send}
+                      disabled={delivery === "sending" || delivery === "sent"}
+                    >
+                      <Mail size={17} />{" "}
+                      {tr(
+                        delivery === "sending"
+                          ? "Sending…"
+                          : delivery === "sent"
+                            ? "Request submitted"
+                            : "Send project request",
+                      )}
+                    </button>
+                  ) : (
+                    <a className="button primary" href={email}>
+                      <Mail size={17} /> {tr("Email project request")}
+                    </a>
+                  )}
                 </div>
               )}
             </div>

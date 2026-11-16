@@ -1,0 +1,24 @@
+Hand skin material — source and license
+
+File: hand-skin-albedo.webp
+Author: jartur69 (MakeHuman community).
+Original material: jartur69_middleage_slavic_male_with_genitals_and_beard
+License: CC0 1.0 Universal (Public Domain Dedication).
+Catalog: https://static.makehumancommunity.org/assets/assetpacks/skins02.html
+Metadata source: https://files.makehumancommunity.org/asset_packs/skins02/skins02_cc0.zip
+Original catalog entry: http://www.makehumancommunity.org/node/1508
+License: https://creativecommons.org/publicdomain/zero/1.0/
+Downloaded: 2026-11-16
+
+Derivative: hand-only material atlas, lossily encoded as WebP.
+The original full-body atlas is NOT distributed with the website.
+Original atlas: 2048x2048 pixels.
+Hand atlas: 512x512 pixels, source origin (704,1536).
+UV remapping: repeat=(4,4), offset=(-1.375,-3), flipY=false.
+Bytes: 28340
+SHA-256: 960d2ffa52c187dc5d5498a2328b15f67a6e49f5d62f4c3785c827864e3c305c
+
+Official Skins02 metadata lists this material with author jartur69 and license CC0.
+The anatomical hand GLB itself references the same MakeHuman material name.
+CC0 permits commercial use, modification and redistribution, without attribution.
+This notice is retained for maintenance and provenance.

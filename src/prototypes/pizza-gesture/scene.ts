@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import { createPizza } from "../pizza3d/pizza";
-import { createHand } from "../pizza3d/hand";
+import { createPizza } from "./pizza";
+import { createHand } from "./hand";
 import { easeRange, takeawayPose } from "./choreography";
 
 export type PizzaScene = {
@@ -13,7 +13,7 @@ const clamp = THREE.MathUtils.clamp;
 const mix = THREE.MathUtils.lerp;
 /**
  * Scène volontairement séparée du site. La main CC0 est hébergée localement ;
- * la pizza réutilise sa texture existante. Aucune dépendance à un service 3D distant.
+ * la pizza possède de vrais ingrédients en volume. Aucune dépendance à un service 3D distant.
  * On ne rend une image que lorsqu’une pose ou la taille change (pas de boucle au repos).
  */
 export async function createScene(
@@ -25,7 +25,7 @@ export async function createScene(
   renderer.setClearColor("#f3efe6");
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.05;
+  renderer.toneMappingExposure = 1.0;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -33,9 +33,9 @@ export async function createScene(
   scene.background = new THREE.Color("#f3efe6");
   const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 80);
   const returnOrbit = new THREE.Spherical();
-  const sky = new THREE.HemisphereLight("#fff8e7", "#8d775b", 2.1);
+  const sky = new THREE.HemisphereLight("#fff8e7", "#8d775b", 1.35);
   scene.add(sky);
-  const key = new THREE.DirectionalLight("#fff7e7", 3.1);
+  const key = new THREE.DirectionalLight("#fff7e7", 2.6);
   key.position.set(-3, 8, 4);
   key.castShadow = true;
   key.shadow.mapSize.set(1024, 1024);
@@ -51,29 +51,17 @@ export async function createScene(
   key.shadow.bias = -0.0002;
   key.shadow.radius = 4;
   scene.add(key);
-  const fill = new THREE.DirectionalLight("#e2e8f0", 1.3);
+  const fill = new THREE.DirectionalLight("#e2e8f0", 0.8);
   fill.position.set(5, 4, -5);
   scene.add(fill);
 
-  // Deux fichiers locaux indépendants : texture de la pizza et main articulée.
-  // En cas d’échec, libérer aussi celui qui a déjà fini de charger.
-  const [imageResult, handResult] = await Promise.allSettled([
-    new THREE.TextureLoader().loadAsync(
-      `${import.meta.env.BASE_URL}assets/atelier-pizza-whole.webp`,
-    ),
-    createHand(),
-  ]);
-  if (imageResult.status === "rejected" || handResult.status === "rejected") {
-    if (imageResult.status === "fulfilled") imageResult.value.dispose();
-    if (handResult.status === "fulfilled") handResult.value.dispose();
+  // Le modèle et l’atlas de peau sont locaux. La pizza est entièrement en
+  // géométrie : aucun aplat photographique n’est chargé pour sa garniture.
+  const hand = await createHand().catch((error) => {
     renderer.dispose();
-    throw new Error("Impossible de charger les modèles du prototype.");
-  }
-  const texture = imageResult.value;
-  const hand = handResult.value;
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-  const pizza = createPizza(texture);
+    throw error;
+  });
+  const pizza = createPizza();
   scene.add(pizza.group);
   const held = new THREE.Group();
   held.name = "Prise commune — main et part montent ensemble";
@@ -200,7 +188,7 @@ export async function createScene(
     const sideScale = (phoneDistance / 17.8) * 1.08;
     pizza.setBite(pose.bite);
     hand.setGrip(grip);
-    hand.group.position.set(mix(8, 2.65, enter), 0.5, 0);
+    hand.group.position.set(mix(8, 2.65, enter), 0.09, 0.12);
     hand.group.rotation.z = mix(-0.06, 0, grip);
     // La main est entièrement sortie avant que la caméra ne revienne au-dessus.
     hand.group.visible = pose.handVisible;
@@ -338,7 +326,6 @@ export async function createScene(
       canvas.removeEventListener("webglcontextlost", contextLost);
       pizza.dispose();
       hand.dispose();
-      texture.dispose();
       crumbGeometry.dispose();
       crumbMaterials.forEach((material) => material.dispose());
       [floorGeometry, plateGeometry].forEach((geometry) => geometry.dispose());

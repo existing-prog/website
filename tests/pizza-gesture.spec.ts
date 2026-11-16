@@ -221,3 +221,20 @@ test("the shorter optional playback remains pausable and ends despite skipped fr
   await expect(page.locator("#pizza-canvas")).toHaveAttribute("data-view", "top");
   await expect(page.locator(".outro-copy")).toHaveAttribute("aria-hidden", "false");
 });
+
+test("a failed skin download shows a usable fallback without a loading loop", async ({
+  scenePage: page,
+}) => {
+  // Une ressource 3D manquante doit laisser une page utilisable, même lorsque
+  // le modèle anatomique lui-même a bien été téléchargé.
+  await page.route("**/assets/models/hand-skin-albedo.webp", (route) => route.abort());
+  await page.goto("lab/pizza-gesture/");
+  await expect(page.locator("body")).toHaveAttribute("data-renderer", "fallback");
+  await expect(page.locator(".fallback")).toBeVisible();
+  await expect(page.locator(".loading")).toBeHidden();
+  await expect(page.locator("#scene-progress")).toBeDisabled();
+  await expect(page.locator("#play")).toBeDisabled();
+  await expect(
+    page.getByRole("link", { name: "Retour au projet Atelier Pizza" }),
+  ).toBeVisible();
+});

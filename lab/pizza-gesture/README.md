@@ -4,7 +4,15 @@ Adresse : `/website/lab/pizza-gesture/`.
 
 L’ancien prototype `/website/lab/pizza-3d/` est conservé, avec sa séquence de trois sorties et trois retours. Cette variante dispose de sa propre entrée HTML, de ses commandes et de sa scène. Aucun fichier de l’ancien prototype n’est modifié pour la créer.
 
-Les modèles (`pizza3d/pizza.ts`, `pizza3d/hand.ts`), la licence de la main et la présentation de base sont partagés ; les deux scènes n’ont jamais de boucle commune ni d’état de lecture partagé. La variante possède son propre `choreography.ts` et ses propres réglages de caméra. Cette séparation permet de comparer les deux idées avant toute intégration au site commercial.
+La variante possède ses propres modèles (`pizza-gesture/pizza.ts`, `pizza-gesture/hand.ts`), sa chorégraphie et ses réglages de caméra. Seuls le GLB anatomique CC0 et la présentation de base restent partagés ; les deux scènes n’ont jamais de boucle commune ni d’état de lecture partagé. Les améliorations de matière et de géométrie de cette variante ne changent donc pas l’ancien prototype.
+
+## Modèles et matières
+
+La pizza est construite en volumes : pâte, sauce, fromage fondu, croûte, tomates et feuilles de basilic. Les tranches conservent leurs couches sur les faces de découpe. Les ingrédients sont répartis par part pour suivre le morceau soulevé et sont regroupés par matière pour limiter les appels de rendu. Il n’y a plus de photographie plane posée sur la pizza dans cette variante.
+
+La main utilise le squelette du GLB local, sans déformer ses proportions. Une texture de peau CC0 de jartur69, correspondant au modèle MakeHuman, apporte les ongles, les plis et les variations de couleur. Le fichier public ne contient que la région de la main : son origine dans l’atlas 2048 px est `(704, 1536)`, avec une taille de 512 px. Le recalage des UV utilise `repeat(4, 4)` et `offset(-1.375, -3)`, avec `flipY = false` comme pour les matériaux glTF. La carte de couleur reçoit un très léger relief ; ce n’est pas une carte de normales anatomique.
+
+Les sources, la licence CC0 et les transformations du fichier sont documentées dans `public/assets/models/HAND-SKIN-LICENSE.txt`. La main et sa texture sont chargées ensemble ; si l’une des ressources manque, le repli illustré prend le relais. Géométries, textures, matériaux et squelette sont libérés à la sortie de la page.
 
 ## Déroulement
 

@@ -160,7 +160,7 @@ function fallback() {
   resetButton.disabled = true;
   chapters.forEach((button) => (button.disabled = true));
   status.textContent =
-    "La scène 3D est indisponible. Vous pouvez revenir au projet avec le lien en haut de page.";
+    "La scène 3D est indisponible. Le lien sous l’illustration permet de revenir au projet.";
 }
 
 slider.addEventListener("input", () => seek(Number(slider.value) / 100, false), {

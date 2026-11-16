@@ -4,7 +4,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(ScrollTrigger);
 
 /** Le scroll reste natif. Le sticky est limité à la scène, sans pin plein écran.
- * Une seule chronologie synchronise déplacement, trois bouchées et révélation.
+ * Une seule chronologie synchronise déplacement, six états de bouchées et révélation.
  * matchMedia retire tous les styles/attributs lors d’un changement de mode.
  */
 export function useAtelierMotion(
@@ -63,31 +63,29 @@ export function useAtelierMotion(
             { xPercent: 0, rotation: 0, duration: 0.5, ease: "power2.inOut" },
             0,
           );
+          const slice = page.querySelector<SVGGElement>(".atelier-pizza-slice")!;
+          const frames = page.querySelectorAll<SVGImageElement>(".atelier-slice-frame");
           timeline.to(
-            page.querySelector(".atelier-pizza-slice"),
-            { x: 22, y: 15, svgOrigin: "500 500", rotation: 4, duration: 0.2 },
-            0.22,
+            slice,
+            { x: 48, y: 20, svgOrigin: "500 500", rotation: 6, duration: 0.22 },
+            0.15,
           );
-          timeline.to(
-            page.querySelector(".bite-one"),
-            { attr: { r: 110 }, duration: 0.15 },
-            0.42,
-          );
-          timeline.to(
-            page.querySelector(".bite-two"),
-            { attr: { r: 175 }, duration: 0.18 },
-            0.55,
-          );
-          timeline.to(
-            page.querySelector(".bite-three"),
-            { attr: { r: 290 }, duration: 0.2 },
-            0.72,
-          );
-          timeline.to(
-            page.querySelector(".atelier-pizza-slice"),
-            { opacity: 0, duration: 0.12 },
-            0.85,
-          );
+          // Les pauses entre états font lire les bouchées ; aucun fondu de texture.
+          [0.38, 0.51, 0.64, 0.77, 0.9].forEach((time, i) => {
+            timeline.set(frames, { visibility: "hidden" }, time);
+            timeline.set(frames[i + 1], { visibility: "visible" }, time);
+            timeline.set(slice, { attr: { "data-bite-frame": i + 1 } }, time);
+            timeline.to(
+              slice,
+              { x: 55, y: 23, duration: 0.035, ease: "power1.in" },
+              time - 0.035,
+            );
+            timeline.to(
+              slice,
+              { x: 48, y: 20, duration: 0.065, ease: "power2.out" },
+              time,
+            );
+          });
           timeline.fromTo(
             page.querySelector(".atelier-reveal-copy"),
             { opacity: 0, y: 30 },
@@ -116,6 +114,9 @@ export function useAtelierMotion(
         );
         return () => {
           delete page.dataset.motion;
+          page
+            .querySelector(".atelier-pizza-slice")
+            ?.setAttribute("data-bite-frame", "0");
         };
       },
     );

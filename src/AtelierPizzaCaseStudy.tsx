@@ -8,13 +8,19 @@ import { useAtelierMotion } from "./useAtelierMotion";
 import "./case-study.scss";
 import "./atelier-pizza.scss";
 
-/** Une seule image, deux zones : la pizza restante et sa part détachable.
- * Les cercles du masque SVG simulent trois bouchées sans modifier l’image source.
- * Les identifiants sont propres au composant pour éviter les collisions de masques.
+/** Six états alignés sur la même photo : part entière, quatre bouchées et fin.
+ * Les masques cumulent des découpes arrondies ; aucun fondu n’efface la part.
+ * Le scroll choisit un état net, avec retour possible à chaque bouchée.
  */
 function PizzaIllustration() {
   const id = useId().replace(/:/g, "");
   const wedge = "M500 500 L1000 500 A500 500 0 0 1 853.55 853.55 Z";
+  const bites = [
+    { x: 540, y: 520, r: 85 },
+    { x: 635, y: 555, r: 115 },
+    { x: 755, y: 610, r: 140 },
+    { x: 650, y: 560, r: 300 },
+  ];
   return (
     <svg className="atelier-pizza-art" viewBox="0 0 1000 1000" aria-hidden="true">
       <defs>
@@ -32,37 +38,38 @@ function PizzaIllustration() {
           <rect width="1000" height="1000" fill="white" />
           <path d={wedge} fill="black" />
         </mask>
-        <mask
-          id={`bites-${id}`}
-          maskUnits="userSpaceOnUse"
-          x="0"
-          y="0"
-          width="1000"
-          height="1000"
-        >
-          <rect width="1000" height="1000" fill="white" />
-          <circle
-            className="atelier-bite bite-one"
-            cx="535"
-            cy="525"
-            r="0"
-            fill="black"
-          />
-          <circle
-            className="atelier-bite bite-two"
-            cx="680"
-            cy="580"
-            r="0"
-            fill="black"
-          />
-          <circle
-            className="atelier-bite bite-three"
-            cx="865"
-            cy="665"
-            r="0"
-            fill="black"
-          />
-        </mask>
+        {[0, 1, 2, 3, 4, 5].map((frame) => (
+          <mask
+            key={frame}
+            id={`bite-frame-${frame}-${id}`}
+            maskUnits="userSpaceOnUse"
+            x="0"
+            y="0"
+            width="1000"
+            height="1000"
+          >
+            <rect width="1000" height="1000" fill={frame === 5 ? "black" : "white"} />
+            {bites.slice(0, frame).map((bite, i) => (
+              <g fill="black" key={i}>
+                <circle cx={bite.x} cy={bite.y} r={bite.r} />
+                {i < 3 && (
+                  <>
+                    <circle
+                      cx={bite.x + bite.r * 0.83}
+                      cy={bite.y - bite.r * 0.25}
+                      r={bite.r * 0.3}
+                    />
+                    <circle
+                      cx={bite.x + bite.r * 0.43}
+                      cy={bite.y + bite.r * 0.79}
+                      r={bite.r * 0.28}
+                    />
+                  </>
+                )}
+              </g>
+            ))}
+          </mask>
+        ))}
       </defs>
       <image
         href={asset("atelier-pizza-whole.webp")}
@@ -70,14 +77,20 @@ function PizzaIllustration() {
         height="1000"
         mask={`url(#rest-${id})`}
       />
-      <g className="atelier-pizza-slice">
+      <g className="atelier-pizza-slice" data-bite-frame="0">
         <g clipPath={`url(#slice-${id})`}>
-          <image
-            href={asset("atelier-pizza-whole.webp")}
-            width="1000"
-            height="1000"
-            mask={`url(#bites-${id})`}
-          />
+          {[0, 1, 2, 3, 4, 5].map((frame) => (
+            <image
+              className="atelier-slice-frame"
+              data-frame={frame}
+              key={frame}
+              href={asset("atelier-pizza-whole.webp")}
+              width="1000"
+              height="1000"
+              mask={`url(#bite-frame-${frame}-${id})`}
+              style={{ visibility: frame === 0 ? "visible" : "hidden" }}
+            />
+          ))}
         </g>
       </g>
     </svg>

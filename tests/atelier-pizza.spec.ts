@@ -23,21 +23,38 @@ test("the pizza slice is eaten with native scroll and comes back on reverse", as
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("#project/atelier-pizza");
   await expect(page.locator(".atelier-study")).toHaveAttribute("data-motion", "full");
-  const radius = () =>
-    page.locator(".bite-three").evaluate((el) => Number(el.getAttribute("r")));
-  expect(await radius()).toBe(0);
-  await page.locator(".atelier-unfold").evaluate((el) =>
-    scrollTo({
-      top: el.getBoundingClientRect().top + scrollY + el.clientHeight - innerHeight,
-      behavior: "instant",
-    }),
-  );
-  await page.mouse.move(20, 30);
-  await expect.poll(radius).toBeGreaterThan(280);
+  const frame = () =>
+    page.locator(".atelier-pizza-slice").getAttribute("data-bite-frame");
+  expect(await frame()).toBe("0");
+  for (const [index, progress] of [0, 0.44, 0.57, 0.7, 0.84, 1].entries()) {
+    await page.locator(".atelier-unfold").evaluate(
+      (el, p) =>
+        scrollTo({
+          top:
+            el.getBoundingClientRect().top +
+            scrollY -
+            110 +
+            (el.clientHeight - innerHeight + 110) * p,
+          behavior: "instant",
+        }),
+      progress,
+    );
+    await page.mouse.move(20 + index, 30);
+    await expect.poll(frame).toBe(String(index));
+    await expect(page.locator(`.atelier-slice-frame[data-frame="${index}"]`)).toHaveCSS(
+      "visibility",
+      "visible",
+    );
+    for (const other of [0, 1, 2, 3, 4, 5].filter((n) => n !== index))
+      await expect(page.locator(`.atelier-slice-frame[data-frame="${other}"]`)).toHaveCSS(
+        "visibility",
+        "hidden",
+      );
+  }
   await expect(page.locator(".atelier-reveal-copy")).toHaveCSS("opacity", "1");
   await page.evaluate(() => scrollTo({ top: 0, behavior: "instant" }));
   await page.mouse.move(21, 30);
-  await expect.poll(radius).toBeLessThan(1);
+  await expect.poll(frame).toBe("0");
   await page.emulateMedia({ reducedMotion: "reduce" });
   await expect(page.locator(".atelier-study")).not.toHaveAttribute(
     "data-motion",

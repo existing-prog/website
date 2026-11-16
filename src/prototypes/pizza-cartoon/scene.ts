@@ -24,7 +24,7 @@ export async function createScene(
   renderer.setPixelRatio(Math.min(devicePixelRatio, innerWidth <= 760 ? 1.5 : 2));
   renderer.setClearColor("#17211b");
   renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMapping = THREE.NoToneMapping;
   renderer.toneMappingExposure = 1.0;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -33,9 +33,9 @@ export async function createScene(
   scene.background = new THREE.Color("#17211b");
   const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 80);
   const returnOrbit = new THREE.Spherical();
-  const sky = new THREE.HemisphereLight("#fff8e7", "#4e624c", 0.9);
+  const sky = new THREE.HemisphereLight("#fff8e7", "#4e624c", 0.85);
   scene.add(sky);
-  const key = new THREE.DirectionalLight("#fff7e7", 1.8);
+  const key = new THREE.DirectionalLight("#fff7e7", 1.5);
   key.position.set(-3, 8, 4);
   key.castShadow = true;
   key.shadow.mapSize.set(1024, 1024);
@@ -51,7 +51,7 @@ export async function createScene(
   key.shadow.bias = -0.0002;
   key.shadow.radius = 4;
   scene.add(key);
-  const fill = new THREE.DirectionalLight("#e2e8f0", 0.6);
+  const fill = new THREE.DirectionalLight("#e2e8f0", 0.25);
   fill.position.set(5, 4, -5);
   scene.add(fill);
 

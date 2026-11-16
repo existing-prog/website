@@ -23,7 +23,7 @@ export async function createHand() {
     mesh.position.fromArray(position);
     mesh.scale.fromArray(scale);
     mesh.castShadow = true;
-    mesh.receiveShadow = true;
+    mesh.receiveShadow = false;
     group.add(mesh);
     return mesh;
   }
@@ -91,21 +91,34 @@ export async function createHand() {
       0.075,
     );
   });
-  // Le pouce contourne le bord de la part et vient sur sa face supérieure.
-  finger(
-    [
-      [0.12, -0.01, -0.3],
-      [0.12, 0.08, -0.57],
-      [-0.27, 0.14, -0.61],
-    ],
-    [
-      [0.12, -0.01, -0.3],
-      [-0.02, 0.16, -0.36],
-      [-0.27, 0.36, -0.22],
-      [-0.48, 0.4, -0.04],
-    ],
-    0.105,
+  // Deux phalanges courtes autour d’un vrai point d’articulation remplacent
+  // l’ancien tube courbé : le pouce ne dessine plus une anse au-dessus de la part.
+  const thumbOpen = [
+    new THREE.Vector3(0.08, 0.12, -0.28),
+    new THREE.Vector3(0.02, 0.27, -0.4),
+    new THREE.Vector3(-0.2, 0.3, -0.43),
+  ];
+  const thumbClosed = [
+    new THREE.Vector3(0.08, 0.2, -0.28),
+    new THREE.Vector3(-0.09, 0.42, -0.22),
+    new THREE.Vector3(-0.4, 0.46, -0.1),
+  ];
+  // La base charnue relie le pouce à la paume et adoucit la silhouette du joint.
+  add(new THREE.SphereGeometry(1, 24, 16), skin, [0.1, 0.08, -0.23], [0.22, 0.2, 0.19]);
+  const thumbPoints = thumbOpen.map((point) => point.clone());
+  const thumbJoints = [0.13, 0.105, 0.09].map((radius, index) =>
+    add(
+      new THREE.SphereGeometry(radius, 24, 16),
+      skin,
+      thumbOpen[index].toArray(),
+      [1, 1, 1],
+    ),
   );
+  const thumbSegments = [0.11, 0.095].map((radius) =>
+    add(new THREE.CylinderGeometry(radius, radius, 1, 20), skin, [0, 0, 0], [1, 1, 1]),
+  );
+  const vertical = new THREE.Vector3(0, 1, 0),
+    direction = new THREE.Vector3();
   let previous = -1;
   return {
     group,
@@ -127,6 +140,20 @@ export async function createHand() {
         position.needsUpdate = normal.needsUpdate = true;
       }
       tips.forEach((tip) => tip.mesh.position.lerpVectors(tip.open, tip.closed, t));
+      thumbPoints.forEach((point, index) => {
+        point.lerpVectors(thumbOpen[index], thumbClosed[index], t);
+        thumbJoints[index].position.copy(point);
+      });
+      thumbSegments.forEach((segment, index) => {
+        direction.subVectors(thumbPoints[index + 1], thumbPoints[index]);
+        const length = direction.length();
+        segment.position
+          .copy(thumbPoints[index])
+          .add(thumbPoints[index + 1])
+          .multiplyScalar(0.5);
+        segment.quaternion.setFromUnitVectors(vertical, direction.normalize());
+        segment.scale.y = length;
+      });
     },
     dispose() {
       geometries.forEach((g) => g.dispose());

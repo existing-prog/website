@@ -5,11 +5,12 @@ import * as THREE from "three";
  */
 export function cartoonMaterials() {
   const ramp = new THREE.DataTexture(
-    new Uint8Array([95, 165, 220, 255]),
-    4,
+    new Uint8Array([105, 190, 255]),
+    3,
     1,
     THREE.RedFormat,
   );
+  ramp.unpackAlignment = 1;
   ramp.minFilter = ramp.magFilter = THREE.NearestFilter;
   ramp.needsUpdate = true;
   const materials = new Set<THREE.Material>();

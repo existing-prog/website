@@ -1,0 +1,283 @@
+/* Étude indépendante : crème, tomate et sauge ; aucun style hors de cette vue. */
+.atelier-study {
+  --case-accent: #d9bfa5;
+}
+.atelier-intro {
+  padding-bottom: 65px;
+  .case-title {
+    max-width: 1020px;
+  }
+}
+.atelier-intro-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 45px;
+  margin-top: 35px;
+  > p {
+    max-width: 690px;
+    color: var(--case-muted);
+    font-size: 18px;
+  }
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 20px;
+    padding: 0;
+    list-style: none;
+    font: 12px monospace;
+    color: #d9bfa5;
+  }
+}
+.atelier-project-note {
+  font-size: 14px;
+  color: #aebcd1;
+  margin-top: 25px;
+  max-width: 850px;
+}
+.atelier-unfold {
+  background: #f6f0e5;
+  color: #2b251e;
+  position: relative;
+}
+.atelier-pizza-stage {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  align-items: center;
+  gap: 65px;
+  padding-block: 65px;
+}
+.atelier-pizza-visual {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+.atelier-pizza-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  filter: drop-shadow(0 18px 18px #33210c16);
+}
+.atelier-scroll-label {
+  display: block;
+  margin-top: 20px;
+  text-align: center;
+  font: 10px monospace;
+  letter-spacing: 1.2px;
+  color: #786956;
+}
+.atelier-reveal-copy {
+  .eyebrow {
+    color: #943729;
+  }
+  h2 {
+    font-family: Georgia, serif;
+    font-size: clamp(42px, 4.4vw, 65px);
+    letter-spacing: -2px;
+  }
+  h2 em {
+    color: #9c392c;
+  }
+  > p:not(.eyebrow) {
+    font-size: 17px;
+    color: #5b5247;
+    margin-top: 25px;
+  }
+}
+.atelier-menu-example {
+  margin-top: 28px;
+  padding: 23px 25px;
+  border: 1px solid #c8b69d;
+  border-radius: 8px;
+  background: #fffaf2;
+  > span {
+    display: block;
+    font: 9px monospace;
+    letter-spacing: 1px;
+    color: #705d48;
+  }
+  strong {
+    display: block;
+    margin-block: 14px;
+    font:
+      28px Georgia,
+      serif;
+  }
+  p {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: #675b4d;
+  }
+  b {
+    color: #30291f;
+    font-size: 16px;
+  }
+  small {
+    display: block;
+    font-size: 12px;
+    color: #6b6051;
+    margin-top: 12px;
+    line-height: 1.6;
+  }
+}
+.atelier-web {
+  padding-block: 100px;
+  > .understated-link {
+    margin-top: 25px;
+  }
+}
+.atelier-section-copy {
+  max-width: 850px;
+  margin-bottom: 40px;
+  > p:not(.eyebrow) {
+    max-width: 730px;
+    color: var(--case-muted);
+    font-size: 17px;
+    margin-top: 25px;
+  }
+}
+.atelier-site-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid #c5d6ed35;
+  border-radius: 10px;
+}
+.atelier-editing {
+  padding-block: 95px;
+  background: #151e1b;
+}
+.atelier-demo-media {
+  position: relative;
+  video {
+    width: 100%;
+    aspect-ratio: 1280/850;
+    display: block;
+    border: 1px solid #bad0c04a;
+    border-radius: 10px;
+    background: #101512;
+  }
+}
+.atelier-play.button,
+.atelier-play.button:hover {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: calc(100% - 30px);
+  z-index: 1;
+}
+.atelier-editor-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 55px;
+  align-items: center;
+  margin-top: 50px;
+  img {
+    width: 100%;
+    height: auto;
+    border-radius: 7px;
+  }
+}
+.atelier-checks {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 22px;
+  li {
+    display: flex;
+    gap: 13px;
+    font-size: 16px;
+    line-height: 1.7;
+    color: #dce5e1;
+  }
+  svg {
+    flex-shrink: 0;
+    margin-top: 4px;
+    color: #c0d6bb;
+  }
+}
+.atelier-media-error {
+  color: #f4d0c3;
+  font-size: 15px;
+  margin-top: 20px;
+}
+@media (min-width: 1024px) and (min-height: 700px) and (prefers-reduced-motion: no-preference) {
+  .atelier-unfold {
+    min-height: 170svh;
+  }
+  .atelier-pizza-stage {
+    position: sticky;
+    top: 110px;
+    height: calc(100svh - 145px);
+    padding-block: 30px;
+  }
+  .atelier-pizza-art {
+    max-height: calc(100svh - 215px);
+  }
+}
+@media (max-width: 1023px) {
+  .atelier-pizza-stage {
+    gap: 35px;
+  }
+  .atelier-intro-details {
+    align-items: start;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .atelier-editor-grid {
+    gap: 30px;
+  }
+}
+@media (max-width: 760px) {
+  .atelier-intro {
+    padding-bottom: 45px;
+  }
+  .atelier-intro-details > p {
+    font-size: 16px;
+  }
+  .atelier-pizza-stage {
+    grid-template-columns: 1fr;
+    gap: 25px;
+    padding-block: 40px 55px;
+  }
+  .atelier-pizza-visual {
+    width: min(100%, 360px);
+    margin-inline: auto;
+  }
+  .atelier-scroll-label {
+    display: none;
+  }
+  .atelier-reveal-copy h2 {
+    font-size: 46px;
+  }
+  .atelier-reveal-copy > p:not(.eyebrow) {
+    font-size: 16px;
+  }
+  .atelier-editor-grid {
+    grid-template-columns: 1fr;
+  }
+  .atelier-web,
+  .atelier-editing {
+    padding-block: 65px;
+  }
+  .atelier-project-note {
+    font-size: 14px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .atelier-pizza-visual,
+  .atelier-pizza-slice,
+  .atelier-reveal-copy {
+    transform: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+  .atelier-bite {
+    r: 0;
+  }
+}

@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { createPizza } from "./pizza";
 import { createHand } from "./hand";
-import { easeRange, mealPose } from "./choreography";
+import { easeRange, mealPose, storyProgress } from "./choreography";
 
 export type PizzaScene = {
   setProgress: (progress: number) => void;
@@ -32,6 +32,7 @@ export async function createScene(
   const scene = new THREE.Scene();
   scene.background = new THREE.Color("#f3efe6");
   const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 80);
+  const returnOrbit = new THREE.Spherical();
   const sky = new THREE.HemisphereLight("#fff8e7", "#8d775b", 2.1);
   scene.add(sky);
   const key = new THREE.DirectionalLight("#fff7e7", 3.1);
@@ -91,6 +92,61 @@ export async function createScene(
   plate.receiveShadow = true;
   scene.add(plate);
 
+  // Miettes posées dans l’empreinte de la part, sans simulation ni particules.
+  // Les positions sont fixes pour conserver le même dessin au scroll arrière.
+  const crumbGeometry = new THREE.DodecahedronGeometry(1, 0);
+  const crumbMaterials = [
+    new THREE.MeshStandardMaterial({
+      color: "#bd7b35",
+      roughness: 1,
+      transparent: true,
+      opacity: 0,
+    }),
+    new THREE.MeshStandardMaterial({
+      color: "#e0b56d",
+      roughness: 1,
+      transparent: true,
+      opacity: 0,
+    }),
+  ];
+  const crumbPositions = [
+    [1.57, 0.18, 0.032],
+    [1.63, 0.21, 0.022],
+    [1.52, 0.15, 0.015],
+    [1.69, 0.13, 0.04],
+    [1.61, 0.07, 0.016],
+    [1.45, -0.21, 0.031],
+    [1.5, -0.25, 0.019],
+    [1.36, -0.19, 0.014],
+    [1.12, 0.1, 0.02],
+    [0.93, -0.08, 0.014],
+    [0.64, 0.04, 0.012],
+    [1.83, -0.12, 0.024],
+  ];
+  const crumbs = new THREE.Group();
+  crumbs.name = "Miettes — trace de la part mangée sur l’assiette";
+  crumbPositions.forEach(([x, z, size], index) => {
+    const crumb = new THREE.Mesh(crumbGeometry, crumbMaterials[index % 2]);
+    crumb.scale.set(size, size * 0.48, size * 0.72);
+    crumb.position.set(x, -0.025 + size * 0.48, z);
+    crumb.rotation.y = index * 1.7;
+    crumb.receiveShadow = true;
+    crumbs.add(crumb);
+  });
+  scene.add(crumbs);
+  const finalPizzaBounds = new THREE.Box3()
+    .setFromObject(plate)
+    .union(new THREE.Box3().setFromObject(pizza.group));
+  const finalPizzaCorners = Array.from(
+    { length: 8 },
+    (_, index) =>
+      new THREE.Vector3(
+        index & 1 ? finalPizzaBounds.max.x : finalPizzaBounds.min.x,
+        index & 2 ? finalPizzaBounds.max.y : finalPizzaBounds.min.y,
+        index & 4 ? finalPizzaBounds.max.z : finalPizzaBounds.min.z,
+      ),
+  );
+
   // La boîte de la part entière reste le repère même après les bouchées.
   // Utiliser sa taille maximale garantit la sortie de toute la nourriture.
   const fullSliceBounds = new THREE.Box3().setFromObject(pizza.slice);
@@ -123,11 +179,13 @@ export async function createScene(
   function setProgress(value: number) {
     progress = clamp(value, 0, 1);
     const phone = canvas.clientWidth <= 760;
-    const enter = easeRange(progress, 0.13, 0.31);
-    const grip = easeRange(progress, 0.29, 0.4);
-    const lift = easeRange(progress, 0.41, 0.61);
-    const meal = mealPose(progress);
-    const sideView = easeRange(progress, 0.44, 0.64);
+    const story = storyProgress(progress);
+    const overhead = easeRange(progress, 0.86, 0.96);
+    const enter = easeRange(story, 0.13, 0.31);
+    const grip = easeRange(story, 0.29, 0.4);
+    const lift = easeRange(story, 0.41, 0.61);
+    const meal = mealPose(story);
+    const sideView = easeRange(story, 0.44, 0.64);
     // Conserver une largeur de plateau constante, même sur un téléphone de 320 px.
     const phoneDistance =
       5 / (2 * Math.tan(THREE.MathUtils.degToRad(17)) * camera.aspect);
@@ -136,7 +194,8 @@ export async function createScene(
     hand.setGrip(grip * (1 - meal.release * 0.55));
     hand.group.position.set(mix(8, 2.65, enter), 0.5, 0);
     hand.group.rotation.z = mix(-0.06, 0, grip);
-    hand.group.visible = progress > 0.12;
+    // La main est entièrement sortie avant que la caméra ne revienne au-dessus.
+    hand.group.visible = story > 0.12 && story < 0.995;
     held.position.set(lift * 0.3, lift * 1.35, lift * -0.1);
     held.rotation.set(0, meal.twist, lift * 0.075 + meal.roll);
 
@@ -151,6 +210,37 @@ export async function createScene(
       mix(phone ? phoneDistance : 10.2, phone ? 8.0 * sideScale : 5.2, sideView),
       mix(phone ? -1.15 : 0.05, phone ? 13.2 * sideScale : 8.0, sideView),
     );
+    // Le dernier cadrage réserve une vraie place au texte, au lieu de masquer
+    // la pizza. Sur téléphone, la pizza est au-dessus du bloc de conclusion.
+    const finalDistance = phone
+      ? 6 / (2 * tangent * camera.aspect)
+      : Math.max(10.2, 9.5 / (2 * tangent * camera.aspect));
+    const finalWidth = 2 * finalDistance * tangent * camera.aspect;
+    const finalHeight = 2 * finalDistance * tangent;
+    const finalTarget = new THREE.Vector3(
+      phone ? 0 : finalWidth * 0.23,
+      0,
+      phone ? finalHeight * 0.25 : 0,
+    );
+    if (overhead > 0) {
+      // Interpoler aussi l’azimut évite un petit tour sec en arrivant à la
+      // verticale : le mouvement décrit un arc doux jusqu’au cadrage final.
+      returnOrbit.setFromVector3(point.copy(camera.position).sub(target));
+      returnOrbit.radius = mix(
+        returnOrbit.radius,
+        Math.hypot(finalDistance, 0.05),
+        overhead,
+      );
+      returnOrbit.phi = mix(returnOrbit.phi, Math.atan2(0.05, finalDistance), overhead);
+      returnOrbit.theta = mix(returnOrbit.theta, 0, overhead);
+      target.lerp(finalTarget, overhead);
+      camera.position.setFromSpherical(returnOrbit).add(target);
+    }
+    const crumbOpacity = easeRange(progress, 0.86, 0.94);
+    crumbs.visible = crumbOpacity > 0;
+    crumbMaterials.forEach((material) => {
+      material.opacity = crumbOpacity;
+    });
     camera.lookAt(target);
     camera.updateMatrixWorld();
     held.updateMatrixWorld(true);
@@ -191,10 +281,28 @@ export async function createScene(
       screenBounds.max.x,
       screenBounds.max.y,
     ]);
+    screenBounds.makeEmpty();
+    for (const corner of finalPizzaCorners) {
+      projected.copy(corner).project(camera);
+      screenBounds.expandByPoint(new THREE.Vector2(projected.x, projected.y));
+    }
+    canvas.dataset.pizzaBounds = JSON.stringify([
+      screenBounds.min.x,
+      screenBounds.min.y,
+      screenBounds.max.x,
+      screenBounds.max.y,
+    ]);
+    canvas.dataset.crumbs = String(crumbs.visible ? crumbPositions.length : 0);
+    canvas.dataset.crumbOpacity = crumbOpacity.toFixed(3);
     canvas.dataset.bite = String(meal.bite);
     canvas.dataset.handPhase = meal.phase;
     canvas.dataset.mealTrip = String(meal.trip);
-    canvas.dataset.view = sideView > 0.95 ? "side" : sideView < 0.05 ? "top" : "turning";
+    canvas.dataset.view =
+      overhead > 0.95 || sideView < 0.05
+        ? "top"
+        : overhead > 0 || sideView < 0.95
+          ? "turning"
+          : "side";
     requestRender();
   }
 
@@ -222,6 +330,8 @@ export async function createScene(
       pizza.dispose();
       hand.dispose();
       texture.dispose();
+      crumbGeometry.dispose();
+      crumbMaterials.forEach((material) => material.dispose());
       [floorGeometry, plateGeometry].forEach((geometry) => geometry.dispose());
       [floorMaterial, plateMaterial].forEach((material) => material.dispose());
       renderer.dispose();

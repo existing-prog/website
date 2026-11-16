@@ -2,6 +2,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { createScene, type PizzaScene } from "./scene";
 import "./style.scss";
+import { storyProgress } from "./choreography";
 
 gsap.registerPlugin(ScrollTrigger);
 const element = <T extends HTMLElement>(selector: string) =>
@@ -28,24 +29,24 @@ const phases = [
     detail: "Une pizza. Un geste. Une autre perspective.",
   },
   {
-    at: 0.16,
+    at: 0.16 * 0.86,
     title: "Un geste familier.",
     detail: "La main s’approche, puis saisit la croûte.",
   },
   {
-    at: 0.42,
+    at: 0.42 * 0.86,
     title: "Changeons de perspective.",
     detail: "La part se soulève. La caméra accompagne le geste.",
   },
   {
-    at: 0.68,
+    at: 0.68 * 0.86,
     title: "Une bouchée après l’autre.",
     detail: "La main s’éclipse. La part diminue à chaque retour.",
   },
   {
-    at: 0.98,
-    title: "À vous la suite.",
-    detail: "Une belle entrée en matière. Puis l’essentiel.",
+    at: 0.86,
+    title: "Il reste une trace.",
+    detail: "Retour à la carte. À vous de prendre la suite.",
   },
 ];
 let scene: PizzaScene | undefined;
@@ -63,20 +64,23 @@ function update(value: number) {
   studio.dataset.progress = progress.toFixed(3);
   slider.value = String(progress * 100);
   output.value = `${Math.round(progress * 100)} %`;
-  const introOpacity = 1 - gsap.utils.clamp(0, 1, (progress - 0.04) / 0.13);
+  const introOpacity =
+    1 - gsap.utils.clamp(0, 1, (storyProgress(progress) - 0.04) / 0.13);
   intro.style.opacity = String(introOpacity);
   intro.style.transform = `translateY(${-18 * (1 - introOpacity)}px)`;
-  // Le dernier retour montre la main vide avant de laisser entrer la conclusion.
-  const endOpacity = gsap.utils.clamp(0, 1, (progress - 0.978) / 0.022);
+  // La pizza reste visible : le texte accompagne le retour au cadrage du dessus.
+  const endOpacity = gsap.utils.clamp(0, 1, (progress - 0.94) / 0.06);
   outro.style.opacity = String(endOpacity);
   outro.style.visibility = endOpacity > 0 ? "visible" : "hidden";
   outro.inert = endOpacity < 0.8;
   // Un seul contenu de conclusion accessible ; le titre initial reste dans le DOM.
   outro.setAttribute("aria-hidden", String(endOpacity < 0.8));
-  sceneLayer.style.opacity = String(1 - endOpacity);
+  sceneLayer.style.opacity = "1";
   caption.style.opacity = String(
-    (innerWidth <= 760 ? gsap.utils.clamp(0, 1, (progress - 0.14) / 0.06) : 1) *
-      (1 - endOpacity),
+    (innerWidth <= 760
+      ? gsap.utils.clamp(0, 1, (storyProgress(progress) - 0.14) / 0.06)
+      : 1) *
+      (1 - gsap.utils.clamp(0, 1, (progress - 0.86) / 0.06)),
   );
   const phase = phases.filter(({ at }) => progress >= at).length - 1;
   if (phase !== currentPhase) {
@@ -86,7 +90,8 @@ function update(value: number) {
     element(".caption-detail").textContent = phases[phase].detail;
   }
   chapters.forEach((button, index) => {
-    if (index === Math.min(phase, 3)) button.setAttribute("aria-current", "step");
+    if (index === Math.min(phase, chapters.length - 1))
+      button.setAttribute("aria-current", "step");
     else button.removeAttribute("aria-current");
   });
 }
@@ -187,7 +192,7 @@ playButton.addEventListener(
       "Lecture en cours. Défiler ou toucher l’écran interrompt la lecture.";
     playback = gsap.to(driver, {
       progress: 1,
-      duration: 16,
+      duration: 18,
       ease: "none",
       onUpdate: () => {
         if (!trigger) return;

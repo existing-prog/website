@@ -72,3 +72,9 @@ export function mealPose(progress: number) {
     phase,
   };
 }
+
+/** La fin de la piste accueille le retour au cadrage éditorial vu du dessus. */
+export const STORY_END = 0.86;
+export function storyProgress(progress: number) {
+  return Math.min(1, Math.max(0, progress / STORY_END));
+}

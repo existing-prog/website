@@ -17,9 +17,9 @@ Cette entrée Vite est une expérimentation à examiner avec Lucas avant toute i
 
 ## Réglages du mouvement
 
-La progression `0…1` est la source unique de la pose. Les intervalles de `scene.ts` règlent l’entrée de la main, la prise, le soulèvement et le changement de caméra. La caméra s’arrête avant les bouchées. La version 2 remplace les changements de géométrie visibles par trois courts allers-retours de la main vers le haut à droite, hors du cadre.
+La progression globale `0…1` est la source unique de la pose. Dans la version 3, le geste occupe les premiers 86 % de la scène : `storyProgress = Math.min(progress / 0.86, 1)`. Les intervalles de `scene.ts` règlent l’entrée de la main, la prise, le soulèvement et le changement de caméra. La caméra s’arrête avant les trois courts allers-retours de la main vers le haut à droite, hors du cadre.
 
-Les fenêtres de `choreography.ts` centralisent le départ, la pause hors champ, le changement d’état de la part et son retour :
+Les fenêtres de `choreography.ts` centralisent le départ, la pause hors champ, le changement d’état de la part et son retour. Les valeurs du tableau utilisent `storyProgress`, pas la progression globale de la page :
 
 | Trajet    | Départ | Hors champ | Changement de part | Début du retour | Retour au repos |
 | --------- | ------ | ---------- | ------------------ | --------------- | --------------- |
@@ -27,7 +27,9 @@ Les fenêtres de `choreography.ts` centralisent le départ, la pause hors champ,
 | Deuxième  | 0,755  | 0,790      | 0,800 → état 4     | 0,815           | 0,850           |
 | Troisième | 0,860  | 0,895      | 0,905 → état 5     | 0,920           | 0,950           |
 
-Chaque pause laisse comprendre que la part est mangée hors champ ; sa silhouette ne change jamais à l’écran. Les deux premiers retours montrent une part plus petite. Au troisième, la main revient vide, reste brièvement visible jusqu’à `0,960`, puis sort définitivement jusqu’à `0,985`. Le texte commence à apparaître à `0,978` et devient entièrement visible à `1`.
+Chaque pause laisse comprendre que la part est mangée hors champ ; sa silhouette ne change jamais à l’écran. Les deux premiers retours montrent une part plus petite. Au troisième, la main revient vide, reste brièvement visible jusqu’à `storyProgress = 0,960`, puis sort définitivement à `0,985`. Sa sortie se termine donc à la progression globale `0,8471`, avant le retour de caméra.
+
+De `progress = 0,86` à `0,96`, la caméra revient au-dessus de l’assiette. La pizza garde sa part manquante. Quelques petites miettes fixes apparaissent sur l’assiette entre `0,86` et `0,94` : elles ne flottent pas dans l’air. Le texte arrive à côté de la pizza de `0,94` à `1`, dans une composition proche de la page Atelier Pizza actuelle. Le canvas reste visible pendant cette conclusion ; la scène ne disparaît plus derrière un écran de texte.
 
 Les états de bouchées restent préconstruits : aucun modèle n’est reconstruit au scroll. Toute la séquence est déterministe : revenir en arrière restitue le même trajet et la même part.
 
@@ -48,4 +50,6 @@ npm run build
 CHROMIUM_PATH=/usr/bin/chromium npm test -- tests/pizza-lab.spec.ts
 ```
 
-Le rendu doit encore être apprécié sur des appareils réels avant de décider d’une intégration. La direction de la main, le contact avec la croûte, la matière et le rythme sont les principaux points de discussion de cette première version.
+Les modèles géométriques restent inchangés dans cette version : la priorité est de valider l’enchaînement et l’émotion de la conclusion. La main, le contact avec la croûte et les matières pourront être affinés après cette validation.
+
+Le rendu doit encore être apprécié sur des appareils réels avant de décider d’une intégration. Le rythme des sorties hors champ, le retour à la vue du dessus et la place laissée au texte sont les principaux points de discussion de cette version.

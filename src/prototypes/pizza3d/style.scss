@@ -287,14 +287,14 @@ h2 em {
 .outro-copy {
   position: absolute;
   top: 50%;
-  left: 50%;
-  transform: translate(-50%, -45%);
-  width: min(90%, 700px);
-  text-align: center;
+  left: 57%;
+  transform: translateY(-50%);
+  width: 36%;
+  text-align: left;
   opacity: 0;
   visibility: hidden;
   h2 {
-    font-size: clamp(55px, 6vw, 88px);
+    font-size: clamp(44px, 4.6vw, 72px);
   }
   > p:not(.eyebrow) {
     color: var(--muted);
@@ -573,8 +573,25 @@ body[data-renderer="fallback"] {
     gap: 10px;
     padding: 25px 7vw;
   }
-  .outro-copy h2 {
-    font-size: 51px;
+  // La conclusion conserve la pizza au-dessus et les commandes en dessous.
+  .outro-copy {
+    top: 46%;
+    left: 7vw;
+    width: 86vw;
+    transform: none;
+    h2 {
+      font-size: clamp(36px, 10vw, 42px);
+      letter-spacing: -1.5px;
+    }
+    > p:not(.eyebrow) {
+      font-size: 13px;
+      line-height: 1.65;
+      margin: 12px 0;
+    }
+    .project-link {
+      font-size: 12px;
+      padding: 13px 16px;
+    }
   }
 }
 @media (prefers-reduced-motion: reduce) {

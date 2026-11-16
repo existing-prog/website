@@ -183,11 +183,13 @@ export default function AtelierPizzaCaseStudy({ onStart }: { onStart: () => void
 
       <section className="atelier-unfold" aria-labelledby="atelier-menu-title">
         <div className="atelier-pizza-stage shell">
-          <div className="atelier-pizza-visual">
-            <PizzaIllustration />
-            <span className="atelier-scroll-label" aria-hidden="true">
-              {tr("SCROLL FOR A TASTE")}
-            </span>
+          <div className="atelier-pizza-track">
+            <div className="atelier-pizza-visual">
+              <PizzaIllustration />
+              <span className="atelier-scroll-label" aria-hidden="true">
+                {tr("SCROLL FOR A TASTE")}
+              </span>
+            </div>
           </div>
           <div className="atelier-reveal-copy">
             <p className="eyebrow">{tr("01 / A MENU THAT MOVES WITH YOU")}</p>

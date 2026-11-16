@@ -206,3 +206,75 @@ test("editorial titles and capture reveal follow scroll and clean up in reduced 
     await page.evaluate(() => document.documentElement.scrollWidth - innerWidth),
   ).toBeLessThanOrEqual(1);
 });
+
+for (const width of [320, 390]) {
+  test(`mobile pizza bites follow native scroll at ${width}px and reset safely`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto("#project/atelier-pizza");
+    await expect(page.locator(".atelier-study")).toHaveAttribute("data-motion", "light");
+    const frame = () =>
+      page.locator(".atelier-pizza-slice").getAttribute("data-bite-frame");
+    const scrollScene = async (progress: number) => {
+      await page.locator(".atelier-pizza-track").evaluate((track, p) => {
+        const visual = track.querySelector<HTMLElement>(".atelier-pizza-visual")!;
+        scrollTo({
+          top:
+            track.getBoundingClientRect().top +
+            scrollY -
+            80 +
+            ((track as HTMLElement).offsetHeight - visual.offsetHeight) * p,
+          behavior: "instant",
+        });
+      }, progress);
+      await page.mouse.move(20 + progress * 10, 30);
+    };
+    for (const [index, progress] of [0, 0.44, 0.57, 0.7, 0.84, 1].entries()) {
+      await scrollScene(progress);
+      await expect.poll(frame).toBe(String(index));
+      expect(
+        await page
+          .locator(".atelier-slice-frame")
+          .evaluateAll(
+            (frames) =>
+              frames.filter((el) => getComputedStyle(el).visibility === "visible").length,
+          ),
+      ).toBe(1);
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth - innerWidth),
+      ).toBeLessThanOrEqual(1);
+    }
+    await expect(page.locator(".atelier-reveal-copy")).toHaveCSS("opacity", "1");
+    // La fin de la piste libère la pizza au-dessus du texte, sans le masquer.
+    expect(
+      await page
+        .locator(".atelier-pizza-visual")
+        .evaluate((el) => el.getBoundingClientRect().bottom),
+    ).toBeLessThan(
+      await page
+        .locator(".atelier-reveal-copy")
+        .evaluate((el) => el.getBoundingClientRect().top),
+    );
+    await scrollScene(0);
+    await expect.poll(frame).toBe("0");
+    // Une variation de hauteur (barre d’adresse) conserve une progression complète.
+    await page.setViewportSize({ width, height: 740 });
+    await scrollScene(1);
+    await expect.poll(frame).toBe("5");
+    await page.setViewportSize({ width: 844, height: 390 });
+    await expect.poll(frame).toBe("0");
+    await expect(page.locator(".atelier-pizza-visual")).not.toHaveCSS(
+      "position",
+      "sticky",
+    );
+    await page.setViewportSize({ width, height: 844 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await expect.poll(frame).toBe("0");
+    await expect(page.locator(".atelier-pizza-visual")).not.toHaveCSS(
+      "position",
+      "sticky",
+    );
+    await expect(page.locator(".atelier-reveal-copy")).toHaveCSS("opacity", "1");
+  });
+}

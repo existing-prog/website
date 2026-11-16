@@ -47,6 +47,9 @@
   gap: 65px;
   padding-block: 65px;
 }
+.atelier-pizza-track {
+  min-width: 0;
+}
 .atelier-pizza-visual {
   position: relative;
   width: 100%;
@@ -276,6 +279,20 @@
   }
   .atelier-project-note {
     font-size: 14px;
+  }
+}
+/* Une piste courte, sans pin GSAP ni blocage du défilement tactile.
+ * La pizza quitte le sticky avant le texte : aucun chevauchement des contenus.
+ * Les petits écrans en paysage conservent la présentation statique compacte.
+ */
+@media (max-width: 760px) and (min-height: 600px) and (prefers-reduced-motion: no-preference) {
+  .atelier-pizza-track {
+    height: calc(min(76vw, 300px) + 70svh);
+  }
+  .atelier-pizza-visual {
+    position: sticky;
+    top: 80px;
+    width: min(76vw, 300px);
   }
 }
 @media (prefers-reduced-motion: reduce) {

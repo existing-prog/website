@@ -19,11 +19,12 @@ export function useAtelierMotion(
     media.add(
       {
         desktop: "(min-width: 1024px) and (min-height: 700px)",
+        phone: "(max-width: 760px) and (min-height: 600px)",
         motion: "(prefers-reduced-motion: no-preference)",
         reduced: "(prefers-reduced-motion: reduce)",
       },
       (context) => {
-        const { desktop, motion } = context.conditions!;
+        const { desktop, phone, motion } = context.conditions!;
         if (!motion) return;
         page.dataset.motion = desktop ? "full" : "light";
         gsap.fromTo(
@@ -180,22 +181,39 @@ export function useAtelierMotion(
             },
           );
         }
-        if (desktop) {
-          const scene = page.querySelector(".atelier-unfold");
+        if (desktop || phone) {
+          const scene = page.querySelector(
+            desktop ? ".atelier-unfold" : ".atelier-pizza-track",
+          );
           const timeline = gsap.timeline({
             scrollTrigger: {
               trigger: scene,
-              start: "top 110px",
-              end: "bottom bottom",
-              scrub: 0.8,
+              start: desktop ? "top 110px" : "top 80px",
+              // Sur téléphone, seule la pizza reste sticky dans une courte piste.
+              // svh stabilise cette distance quand la barre d’adresse se rétracte.
+              end: desktop
+                ? "bottom bottom"
+                : () => {
+                    const track =
+                      page.querySelector<HTMLElement>(".atelier-pizza-track")!;
+                    const visual = page.querySelector<HTMLElement>(
+                      ".atelier-pizza-visual",
+                    )!;
+                    return `+=${Math.max(1, track.offsetHeight - visual.offsetHeight)}`;
+                  },
+              scrub: desktop ? 0.8 : 0.35,
+              invalidateOnRefresh: true,
             },
           });
-          timeline.fromTo(
-            page.querySelector(".atelier-pizza-visual"),
-            { xPercent: 45, rotation: -8 },
-            { xPercent: 0, rotation: 0, duration: 0.5, ease: "power2.inOut" },
-            0,
-          );
+          // Pas de voyage latéral sur un écran étroit : la pizza reste centrée.
+          if (desktop) {
+            timeline.fromTo(
+              page.querySelector(".atelier-pizza-visual"),
+              { xPercent: 45, rotation: -8 },
+              { xPercent: 0, rotation: 0, duration: 0.5, ease: "power2.inOut" },
+              0,
+            );
+          }
           const slice = page.querySelector<SVGGElement>(".atelier-pizza-slice")!;
           const frames = page.querySelectorAll<SVGImageElement>(".atelier-slice-frame");
           timeline.to(

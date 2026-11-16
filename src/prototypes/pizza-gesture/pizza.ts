@@ -5,6 +5,7 @@ export type PizzaModel = {
   group: THREE.Group;
   slice: THREE.Group;
   setBite: (index: number) => void;
+  setFlex: (amount: number) => void;
   dispose: () => void;
 };
 
@@ -735,10 +736,47 @@ export function createPizza(_legacyTexture?: THREE.Texture): PizzaModel {
       parent.add(mesh);
     }
   }
+  // Positions de repos conservées : le scroll arrière restitue exactement la
+  // part d’origine. La croûte reste rigide dans la prise ; seule la pointe plie.
+  const flexible = slice.children
+    .filter((child): child is THREE.Mesh => child instanceof THREE.Mesh)
+    .map((mesh) => {
+      mesh.frustumCulled = false;
+      return {
+        geometry: mesh.geometry,
+        rest: mesh.geometry.getAttribute("position").array.slice(),
+        normals: mesh.geometry.getAttribute("normal").array.slice(),
+      };
+    });
+  let lastFlex = -1;
   let currentBite = 0;
   return {
     group,
     slice,
+    setFlex(amount: number) {
+      const flex = THREE.MathUtils.clamp(amount, 0, 1.25);
+      if (Math.abs(flex - lastFlex) < 0.0001) return;
+      lastFlex = flex;
+      for (const { geometry, rest, normals } of flexible) {
+        const position = geometry.getAttribute("position");
+        const normal = geometry.getAttribute("normal");
+        for (let vertex = 0; vertex < position.count; vertex++) {
+          const offset = vertex * 3;
+          const distance = THREE.MathUtils.clamp((1.55 - rest[offset]) / 1.55, 0, 1);
+          position.setY(vertex, rest[offset + 1] - 0.18 * flex * distance * distance);
+          // Transformer les normales par la pente conserve le lissage de la
+          // mozzarella et des tomates sans reconstruire la topologie à chaque image.
+          const slope = (0.36 * flex * distance) / 1.55;
+          const nx = normals[offset] - slope * normals[offset + 1];
+          const ny = normals[offset + 1],
+            nz = normals[offset + 2];
+          const length = Math.hypot(nx, ny, nz) || 1;
+          normal.setXYZ(vertex, nx / length, ny / length, nz / length);
+        }
+        position.needsUpdate = true;
+        normal.needsUpdate = true;
+      }
+    },
     setBite(index: number) {
       const next = index >= 5 ? 5 : 0;
       if (next === currentBite) return;

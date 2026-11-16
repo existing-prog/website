@@ -104,11 +104,13 @@ test("the hand takes the whole slice once and stays out of frame afterwards", as
   expect((await sliceBounds(page))[0]).toBeGreaterThan(1);
   await expect(canvas).toHaveAttribute("data-bite", "0");
   await scrollScene(page, 0.6);
+  expect(Number(await canvas.getAttribute("data-slice-flex"))).toBeGreaterThan(0.9);
   await expect(canvas).toHaveAttribute("data-hand-visible", "true");
   await expect(canvas).toHaveAttribute("data-hand-travel", "0.0000");
   await scrollScene(page, 0);
   await expect(canvas).toHaveAttribute("data-bite", "0");
   await expect(canvas).toHaveAttribute("data-crumbs", "0");
+  await expect(canvas).toHaveAttribute("data-slice-flex", "0.0000");
   await expect(canvas).toHaveAttribute("data-view", "top");
 });
 
@@ -222,12 +224,11 @@ test("the shorter optional playback remains pausable and ends despite skipped fr
   await expect(page.locator(".outro-copy")).toHaveAttribute("aria-hidden", "false");
 });
 
-test("a failed skin download shows a usable fallback without a loading loop", async ({
+test("a failed hand download shows a usable fallback without a loading loop", async ({
   scenePage: page,
 }) => {
-  // Une ressource 3D manquante doit laisser une page utilisable, même lorsque
-  // le modèle anatomique lui-même a bien été téléchargé.
-  await page.route("**/assets/models/hand-skin-albedo.webp", (route) => route.abort());
+  // Une ressource 3D manquante doit laisser une page utilisable.
+  await page.route("**/assets/models/anatomical-hand.glb", (route) => route.abort());
   await page.goto("lab/pizza-gesture/");
   await expect(page.locator("body")).toHaveAttribute("data-renderer", "fallback");
   await expect(page.locator(".fallback")).toBeVisible();

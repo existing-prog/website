@@ -8,46 +8,16 @@ export type HandModel = {
 };
 
 /**
- * Main anatomique MakeHuman/Innerscene et matière de peau jartur69, sous CC0.
- * La géométrie et les poids de peau proviennent du GLB local ; seules les
- * articulations du squelette sont animées. La licence et la provenance
- * se trouvent à côté du modèle dans public/assets/models/.
+ * Main de personnage à partir du squelette CC0 MakeHuman/Innerscene.
+ * La matière unie et les doigts légèrement épaissis prolongent le style
+ * de la pizza. Le GLB et l’ancien prototype restent conservés tels quels.
  */
 export async function createHand(): Promise<HandModel> {
-  const [modelResult, skinResult] = await Promise.allSettled([
-    new GLTFLoader().loadAsync(
-      `${import.meta.env.BASE_URL}assets/models/anatomical-hand.glb`,
-    ),
-    new THREE.TextureLoader().loadAsync(
-      `${import.meta.env.BASE_URL}assets/models/hand-skin-albedo.webp`,
-    ),
-  ]);
-  if (modelResult.status === "rejected" || skinResult.status === "rejected") {
-    if (skinResult.status === "fulfilled") skinResult.value.dispose();
-    if (modelResult.status === "fulfilled") {
-      modelResult.value.scene.traverse((object) => {
-        if (!(object instanceof THREE.Mesh)) return;
-        object.geometry.dispose();
-        const materials = Array.isArray(object.material)
-          ? object.material
-          : [object.material];
-        materials.forEach((material) => material.dispose());
-        if (object instanceof THREE.SkinnedMesh) object.skeleton.dispose();
-      });
-    }
-    throw new Error("Impossible de charger la main et sa matière.");
-  }
-  const gltf = modelResult.value;
-  const skinTexture = skinResult.value;
-  // Atlas CC0 limité à la main : coordonnées du modèle MakeHuman conservées,
-  // sans distribuer ni charger la texture complète du corps.
-  skinTexture.colorSpace = THREE.SRGBColorSpace;
-  skinTexture.flipY = false;
-  skinTexture.repeat.set(4, 4);
-  skinTexture.offset.set(-1.375, -3);
-  skinTexture.anisotropy = 4;
+  const gltf = await new GLTFLoader().loadAsync(
+    `${import.meta.env.BASE_URL}assets/models/anatomical-hand.glb`,
+  );
   const group = new THREE.Group();
-  group.name = "Main texturée — prise latérale autour de la croûte";
+  group.name = "Main stylisée — prise latérale autour de la croûte";
   // Présenter le pouce côté caméra. Le miroir conserve les proportions du
   // modèle et le roulis rend la prise lisible sans plaquer la paume sur la pizza.
   group.scale.z = -1;
@@ -55,18 +25,14 @@ export async function createHand(): Promise<HandModel> {
   const geometries = new Set<THREE.BufferGeometry>();
   const materials = new Set<THREE.Material>();
   const sourceMaterials = new Set<THREE.Material>();
-  const skin = new THREE.MeshPhysicalMaterial({
-    color: "#ffffff",
-    map: skinTexture,
-    bumpMap: skinTexture,
-    bumpScale: 0.002,
-    roughness: 0.58,
-    sheen: 0.08,
-    sheenColor: new THREE.Color("#c5957d"),
-    sheenRoughness: 0.85,
+  // Une seule couleur mate : les détails photographiques de peau créaient
+  // un décalage avec les ingrédients sculptés et les formes douces de la pizza.
+  const skin = new THREE.MeshStandardMaterial({
+    color: "#d59c78",
+    roughness: 0.9,
     side: THREE.DoubleSide,
   });
-  const forearm = new THREE.MeshStandardMaterial({ color: "#c6ae98", roughness: 0.66 });
+  const forearm = skin;
   const cloth = new THREE.MeshStandardMaterial({ color: "#39443d", roughness: 0.97 });
   materials.add(skin);
   materials.add(forearm);
@@ -126,6 +92,52 @@ export async function createHand(): Promise<HandModel> {
       kept.push(a, b, c);
     }
     geometry.setIndex(kept);
+  }
+
+  // Épaissir les doigts autour de leurs axes de repos, sans les allonger.
+  // Les poids du squelette mélangent les corrections aux articulations : pas
+  // de boules ajoutées ni de séparation visible entre les phalanges.
+  for (const mesh of skinnedMeshes) {
+    const geometry = mesh.geometry;
+    const position = geometry.getAttribute("position");
+    const weights = geometry.getAttribute("skinWeight");
+    const boneIndices = geometry.getAttribute("skinIndex");
+    // Les positions du fichier sont dans l’espace de liaison du squelette,
+    // pas dans le repère monde après normalisation du GLB. L’inverse de
+    // bindMatrix reste celui du fichier ; bindMatrixInverse évolue en mode Attached.
+    const centers = mesh.skeleton.boneInverses.map((inverse) =>
+      new THREE.Vector3().setFromMatrixPosition(
+        mesh.bindMatrix.clone().invert().multiply(inverse.clone().invert()),
+      ),
+    );
+    const segments = mesh.skeleton.bones.map((bone, index) => {
+      if (!/^(index|middle|ring|pinky|thumb)_/.test(bone.name)) return null;
+      const next = bone.children.find((child) => child instanceof THREE.Bone);
+      const endIndex = mesh.skeleton.bones.indexOf((next ?? bone.parent) as THREE.Bone);
+      if (endIndex < 0) return null;
+      return {
+        center: centers[index],
+        axis: centers[endIndex].clone().sub(centers[index]).normalize(),
+      };
+    });
+    const point = new THREE.Vector3();
+    const radial = new THREE.Vector3();
+    const correction = new THREE.Vector3();
+    for (let index = 0; index < position.count; index++) {
+      point.fromBufferAttribute(position, index);
+      correction.set(0, 0, 0);
+      for (let influence = 0; influence < 4; influence++) {
+        const segment = segments[boneIndices.getComponent(index, influence)];
+        if (!segment) continue;
+        radial.subVectors(point, segment.center);
+        radial.addScaledVector(segment.axis, -radial.dot(segment.axis));
+        correction.addScaledVector(radial, weights.getComponent(index, influence) * 0.16);
+      }
+      point.add(correction);
+      position.setXYZ(index, point.x, point.y, point.z);
+    }
+    position.needsUpdate = true;
+    // Conserver les normales lissées de l’export aux coutures UV de la main.
   }
 
   /** Avant-bras et manche raccordés au poignet de la main importée. */
@@ -254,7 +266,6 @@ export async function createHand(): Promise<HandModel> {
       geometries.forEach((geometry) => geometry.dispose());
       materials.forEach((material) => material.dispose());
       skinnedMeshes.forEach((mesh) => mesh.skeleton.dispose());
-      skinTexture.dispose();
     },
   };
 }

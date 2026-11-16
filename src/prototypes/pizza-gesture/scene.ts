@@ -146,7 +146,10 @@ export async function createScene(
 
   // La boîte de la part entière garantit sa sortie complète avant de retirer
   // sa géométrie hors champ. Elle sert aussi aux contrôles de cette variante.
-  const fullSliceBounds = new THREE.Box3().setFromObject(pizza.slice);
+  // Inclure la pointe fléchie dans la marge de sortie, quelle que soit la pose.
+  const fullSliceBounds = new THREE.Box3()
+    .setFromObject(pizza.slice)
+    .expandByVector(new THREE.Vector3(0, 0.23, 0));
   const corners = Array.from(
     { length: 8 },
     (_, index) =>
@@ -187,6 +190,13 @@ export async function createScene(
       5 / (2 * Math.tan(THREE.MathUtils.degToRad(17)) * camera.aspect);
     const sideScale = (phoneDistance / 17.8) * 1.08;
     pizza.setBite(pose.bite);
+    // La pointe cède doucement sous son poids, puis se stabilise. Cette courbe
+    // déterministe évite une simulation et reste réversible au scroll.
+    const flex =
+      easeRange(progress, 0.36, 0.53) *
+      (1 + 0.15 * Math.sin(easeRange(progress, 0.4, 0.62) * Math.PI));
+    pizza.setFlex(flex);
+    canvas.dataset.sliceFlex = flex.toFixed(4);
     hand.setGrip(grip);
     hand.group.position.set(mix(8, 2.65, enter), 0.09, 0.12);
     hand.group.rotation.z = mix(-0.06, 0, grip);
@@ -195,7 +205,7 @@ export async function createScene(
     held.position.set(lift * 0.3, lift * 1.35, lift * -0.1);
     held.rotation.set(0, pose.twist, lift * 0.075 + pose.roll);
 
-    // L’angle de caméra change, pas la forme de la pizza. Le modèle reste volumique.
+    // La caméra accompagne la prise et révèle les couches du modèle volumique.
     const target = new THREE.Vector3(
       mix(phone ? 0 : -1.35, 0.4, sideView),
       mix(0, 0.7, sideView),

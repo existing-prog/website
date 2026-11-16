@@ -10,9 +10,11 @@ La variante possède ses propres modèles (`pizza-gesture/pizza.ts`, `pizza-gest
 
 La pizza est construite en volumes : pâte, sauce, fromage fondu, croûte, tomates et feuilles de basilic. Les tranches conservent leurs couches sur les faces de découpe. Les ingrédients sont répartis par part pour suivre le morceau soulevé et sont regroupés par matière pour limiter les appels de rendu. Il n’y a plus de photographie plane posée sur la pizza dans cette variante.
 
-La main utilise le squelette du GLB local, sans déformer ses proportions. Une texture de peau CC0 de jartur69, correspondant au modèle MakeHuman, apporte les ongles, les plis et les variations de couleur. Le fichier public ne contient que la région de la main : son origine dans l’atlas 2048 px est `(704, 1536)`, avec une taille de 512 px. Le recalage des UV utilise `repeat(4, 4)` et `offset(-1.375, -3)`, avec `flipY = false` comme pour les matériaux glTF. La carte de couleur reçoit un très léger relief ; ce n’est pas une carte de normales anatomique.
+La main utilise le squelette CC0 du GLB local, avec des doigts épaissis de 16 % autour des axes de repos, pondérés par les influences du squelette. La longueur des doigts est conservée. Une matière unie mate remplace la texture photographique de peau pour un rendu de personnage. La provenance du GLB reste documentée dans `public/assets/models/ANATOMICAL-HAND-LICENSE.txt`. L’ancien atlas de peau reste archivé mais n’est plus téléchargé par cette variante.
 
-Les sources, la licence CC0 et les transformations du fichier sont documentées dans `public/assets/models/HAND-SKIN-LICENSE.txt`. La main et sa texture sont chargées ensemble ; si l’une des ressources manque, le repli illustré prend le relais. Géométries, textures, matériaux et squelette sont libérés à la sortie de la page.
+La pointe de la part fléchit légèrement lors de la levée, avec une petite détente avant stabilisation. Les positions de repos sont conservées pour que le scroll inverse restitue la géométrie sans accumulation. Les ingrédients suivent la même déformation et la croûte reste rigide dans la prise. Les bornes de sortie incluent la flexion maximale. Aucun moteur de physique ni animation permanente n’est nécessaire.
+
+Si le modèle manque, le repli illustré prend le relais. Géométries, textures procédurales, matériaux et squelette sont libérés à la sortie de la page.
 
 ## Déroulement
 
@@ -29,7 +31,7 @@ Les sources, la licence CC0 et les transformations du fichier sont documentées 
 | 0,84 → 0,94 | Apparition de miettes fixes sur l’assiette.                                       |
 | 0,92 → 1    | Le texte apparaît à côté, ou en dessous sur téléphone.                            |
 
-Le trajet de la main reste monotone après la prise : sa progression de sortie ne diminue jamais en avançant. Le scroll arrière restitue volontairement le geste en sens inverse. La géométrie de la part ne change qu’une fois entièrement hors champ, en utilisant sa boîte complète projetée dans la caméra comme repère.
+Le trajet de la main reste monotone après la prise : sa progression de sortie ne diminue jamais en avançant. Le scroll arrière restitue volontairement le geste en sens inverse. La part ne disparaît qu’une fois entièrement hors champ, en utilisant sa boîte complète projetée dans la caméra comme repère.
 
 La lecture facultative dure **9 secondes**, mesurées avec `performance.now()` pour ne pas s’allonger lorsque des images sont perdues. La piste mesure 280 svh sur ordinateur et 250 svh sur téléphone ; le défilement reste natif, sans capture du geste tactile. Les commandes arrêtent la lecture au scroll, au toucher, au clavier et quand l’onglet est masqué.
 

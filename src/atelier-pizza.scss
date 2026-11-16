@@ -140,6 +140,15 @@
     margin-top: 25px;
   }
 }
+.atelier-site-frame {
+  perspective: 1400px;
+}
+.atelier-site-viewport {
+  overflow: hidden;
+  border: 1px solid #c5d6ed35;
+  border-radius: 10px;
+  transform-origin: center bottom;
+}
 .atelier-site-frame img {
   display: block;
   width: 100%;
@@ -276,5 +285,16 @@
     transform: none !important;
     opacity: 1 !important;
     visibility: visible !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atelier-study .atelier-site-viewport {
+    clip-path: none;
+    transform: none;
+  }
+  .atelier-study .atelier-site-viewport img,
+  .atelier-study .atelier-checks li {
+    transform: none;
   }
 }

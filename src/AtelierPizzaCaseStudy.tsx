@@ -191,10 +191,15 @@ export default function AtelierPizzaCaseStudy({ onStart }: { onStart: () => void
           </div>
           <div className="atelier-reveal-copy">
             <p className="eyebrow">{tr("01 / A MENU THAT MOVES WITH YOU")}</p>
-            <h2 id="atelier-menu-title">
-              {tr("Your menu.")}
+            <h2
+              id="atelier-menu-title"
+              aria-label={`${tr("Your menu.")} ${tr("In your hands.")}`}
+            >
+              <CaseWords text={tr("Your menu.")} />
               <br />
-              <em>{tr("In your hands.")}</em>
+              <em>
+                <CaseWords text={tr("In your hands.")} />
+              </em>
             </h2>
             <p>
               {tr(
@@ -226,16 +231,18 @@ export default function AtelierPizzaCaseStudy({ onStart }: { onStart: () => void
             )}
           </p>
         </div>
-        <figure className="atelier-site-frame atelier-reveal">
-          <img
-            src={asset("atelier-menu-desktop.webp")}
-            alt={tr(
-              "The Atelier Pizza menu with category filters and two prices per pizza",
-            )}
-            width="1440"
-            height="1000"
-            loading="lazy"
-          />
+        <figure className="atelier-site-frame">
+          <div className="atelier-site-viewport">
+            <img
+              src={asset("atelier-menu-desktop.webp")}
+              alt={tr(
+                "The Atelier Pizza menu with category filters and two prices per pizza",
+              )}
+              width="1440"
+              height="1000"
+              loading="lazy"
+            />
+          </div>
           <figcaption>
             {tr(
               "A real capture of the local WordPress prototype. All menu content is fictional.",

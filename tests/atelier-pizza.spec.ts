@@ -159,3 +159,50 @@ test("guided captures compare three real updates and keep their state when trans
     }),
   ).toBeVisible();
 });
+
+test("editorial titles and capture reveal follow scroll and clean up in reduced motion", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto("#project/atelier-pizza");
+  await expect(page.locator(".atelier-study")).toHaveAttribute("data-motion", "full");
+  const word = page.locator(".atelier-web h2 .case-word").first();
+  const offset = () =>
+    word.evaluate((el) => new DOMMatrixReadOnly(getComputedStyle(el).transform).m42);
+  expect(await offset()).toBeGreaterThan(1);
+  await page
+    .locator(".atelier-web h2")
+    .evaluate((el) => el.scrollIntoView({ block: "center", behavior: "instant" }));
+  await page.mouse.move(20, 30);
+  await expect.poll(offset).toBeLessThan(1);
+  await page.locator(".atelier-site-viewport").evaluate((el) =>
+    scrollTo({
+      top: el.getBoundingClientRect().top + scrollY - innerHeight * 0.2,
+      behavior: "instant",
+    }),
+  );
+  await page.mouse.move(21, 30);
+  await expect
+    .poll(() =>
+      page
+        .locator(".atelier-site-viewport")
+        .evaluate((el) =>
+          parseFloat(getComputedStyle(el).clipPath.replace("inset(", "")),
+        ),
+    )
+    .toBeLessThan(0.1);
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth - innerWidth),
+  ).toBeLessThanOrEqual(1);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expect(page.locator(".atelier-site-viewport")).toHaveCSS("clip-path", "none");
+  await expect(page.locator(".atelier-site-viewport img")).toHaveCSS("transform", "none");
+  await expect(word).toHaveCSS("transform", "none");
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await expect(page.locator(".atelier-study")).toHaveAttribute("data-motion", "light");
+  await expect(page.locator(".atelier-site-viewport")).toHaveCSS("clip-path", "none");
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth - innerWidth),
+  ).toBeLessThanOrEqual(1);
+});

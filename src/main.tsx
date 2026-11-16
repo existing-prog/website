@@ -91,6 +91,10 @@ function App() {
   const caseStudy = route === "#project/samantha" || kasaCase || ninaCase || atelierCase;
   useScrollHeader(menu, workspace || caseStudy);
   const [drafts, setDrafts] = useState<Draft[]>(loadDrafts);
+  const draftsRef = useRef(drafts);
+  useEffect(() => {
+    draftsRef.current = drafts;
+  }, [drafts]);
   const [editing, setEditing] = useState<Draft | null>(null);
   const [notice, setNotice] = useState("");
   const [preview, setPreview] = useState(0);
@@ -234,6 +238,7 @@ function App() {
    * Le booléen renvoyé interdit d’afficher « enregistré » si l’écriture a échoué.
    */
   const persist = (next: Draft[]) => {
+    draftsRef.current = next;
     setDrafts(next);
     try {
       localStorage.setItem("lb-project-drafts-v1", JSON.stringify(next));
@@ -260,6 +265,15 @@ function App() {
   const remove = (id: string) => {
     const stored = persist(drafts.filter((d) => d.id !== id));
     if (stored) setNotice("Draft removed from this device.");
+  };
+  // Un accusé positif de Formspree retire uniquement le brouillon envoyé.
+  // La référence courante préserve les autres brouillons créés pendant la requête.
+  const submitted = (draft: Draft) => {
+    if (!draft.id) return true;
+    const stored = persist(draftsRef.current.filter((item) => item.id !== draft.id));
+    if (stored)
+      setNotice("Request submitted. Its saved draft was removed from this device.");
+    return stored;
   };
   const showDesk = () => {
     close();
@@ -907,6 +921,7 @@ function App() {
           initial={editing}
           onClose={close}
           onSave={save}
+          onSubmitted={submitted}
           onDesk={showDesk}
           notice={notice}
         />

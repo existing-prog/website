@@ -529,5 +529,8 @@
   "This is a guided comparison of real captures from the local prototype. These controls do not edit a live restaurant website.": "This is a guided comparison of real captures from the local prototype. These controls do not edit a live restaurant website.",
   "Your menu evolves. Your website follows.": "Your menu evolves. Your website follows.",
   "A new price, a seasonal recipe, an exceptional closure: keep control of your restaurant’s information. Let’s define the right website and editing tools for your business.": "A new price, a seasonal recipe, an exceptional closure: keep control of your restaurant’s information. Let’s define the right website and editing tools for your business.",
-  "Let’s talk about your restaurant website": "Let’s talk about your restaurant website"
+  "Let’s talk about your restaurant website": "Let’s talk about your restaurant website",
+  "Request submitted. Its saved draft was removed from this device.": "Request submitted. Its saved draft was removed from this device.",
+  "The submitted draft has been removed from your project desk.": "The submitted draft has been removed from your project desk.",
+  "Your request was submitted, but this browser could not remove its saved copy. Do not send it again; remove the draft manually when browser storage is available.": "Your request was submitted, but this browser could not remove its saved copy. Do not send it again; remove the draft manually when browser storage is available."
 }

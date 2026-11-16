@@ -969,3 +969,14 @@ body {
 .service-card.glass-interactive:hover {
   transform: translateY(-6px);
 }
+
+/* Les listes natives peuvent avoir un fond clair imposé par le système.
+ * Fixer les deux couleurs des options empêche le texte clair sur blanc. */
+.builder-dialog .form-fields select {
+  color-scheme: dark;
+}
+.builder-dialog .form-fields select option,
+.builder-dialog .form-fields select optgroup {
+  background-color: #ffffff;
+  color: #172234;
+}

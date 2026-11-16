@@ -529,5 +529,8 @@
   "This is a guided comparison of real captures from the local prototype. These controls do not edit a live restaurant website.": "Cette démonstration compare de vraies captures du prototype local. Ces commandes ne modifient pas le site d’un restaurant en ligne.",
   "Your menu evolves. Your website follows.": "Votre carte évolue. Votre site suit.",
   "A new price, a seasonal recipe, an exceptional closure: keep control of your restaurant’s information. Let’s define the right website and editing tools for your business.": "Un nouveau prix, une recette du moment, une fermeture exceptionnelle : gardez la main sur les informations de votre établissement. Définissons le site et les outils d’édition adaptés à votre activité.",
-  "Let’s talk about your restaurant website": "Parlons du site de votre restaurant"
+  "Let’s talk about your restaurant website": "Parlons du site de votre restaurant",
+  "Request submitted. Its saved draft was removed from this device.": "Demande transmise. Son brouillon a été supprimé de cet appareil.",
+  "The submitted draft has been removed from your project desk.": "Le brouillon transmis a été retiré de votre bureau de projets.",
+  "Your request was submitted, but this browser could not remove its saved copy. Do not send it again; remove the draft manually when browser storage is available.": "Votre demande a été transmise, mais ce navigateur n’a pas pu supprimer sa copie enregistrée. Ne la renvoyez pas ; supprimez le brouillon manuellement lorsque le stockage du navigateur sera disponible."
 }

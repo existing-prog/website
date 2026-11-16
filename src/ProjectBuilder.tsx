@@ -31,17 +31,21 @@ export default function ProjectBuilder({
   initial,
   onClose,
   onSave,
+  onSubmitted,
   onDesk,
   notice,
 }: {
   initial: Draft;
   onClose: () => void;
   onSave: (d: Draft) => { draft: Draft; persisted: boolean };
+  onSubmitted: (d: Draft) => boolean;
   onDesk: () => void;
   notice: string;
 }) {
   const { i18n } = useTranslation();
   const [delivery, setDelivery] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [cleanupFailed, setCleanupFailed] = useState(false);
+  const sending = useRef(false);
   const deliveryController = useRef<AbortController | null>(null);
   useEffect(() => () => deliveryController.current?.abort(), []);
   const [draft, setDraft] = useState<Draft>(initial);
@@ -73,6 +77,7 @@ export default function ProjectBuilder({
       .forEach((field) => field.setCustomValidity(""));
   }, [i18n.resolvedLanguage]);
   const update = <K extends keyof Draft>(key: K, value: Draft[K]) => {
+    if (sending.current || delivery === "sent") return;
     setDraft((d) => ({ ...d, [key]: value }));
     setDelivery("idle");
     setSaved(false);
@@ -95,6 +100,7 @@ export default function ProjectBuilder({
   };
   // Enregistrer un brouillon ne signifie ni envoyer une demande ni confirmer un achat.
   const save = () => {
+    if (sending.current || delivery === "sent") return;
     const result = onSave(draft);
     setDraft(result.draft);
     setSaved(result.persisted);
@@ -123,17 +129,27 @@ export default function ProjectBuilder({
   };
   // Aucun succès optimiste : attendre l’acceptation explicite du prestataire.
   const send = async () => {
-    if (delivery === "sending" || delivery === "sent") return;
+    if (sending.current || delivery === "sent") return;
+    sending.current = true;
     const controller = new AbortController();
     deliveryController.current = controller;
     setDelivery("sending");
     const timeout = window.setTimeout(() => controller.abort(), 15000);
     try {
       await deliverRequest(draft, controller.signal);
-      if (dialog.current?.open) setDelivery("sent");
+      // Nettoyer après acceptation seulement, même si le dialogue vient de fermer.
+      const removed = onSubmitted(draft);
+      if (dialog.current?.open) {
+        setDelivery("sent");
+        setSaved(false);
+        setSaveAttempted(false);
+        setCopied("");
+        setCleanupFailed(!removed);
+      }
     } catch {
       if (dialog.current?.open) setDelivery("error");
     } finally {
+      sending.current = false;
       window.clearTimeout(timeout);
     }
   };
@@ -535,6 +551,20 @@ export default function ProjectBuilder({
                             ? "Your request has been accepted by the form service. I’ll review your brief and reply by email. No booking has been confirmed."
                             : "Your request could not be confirmed. Your brief is still here. Try again, or send it using your email app.",
                       )}
+                      {delivery === "sent" && draft.id && !cleanupFailed && (
+                        <p>
+                          {tr(
+                            "The submitted draft has been removed from your project desk.",
+                          )}
+                        </p>
+                      )}
+                      {cleanupFailed && (
+                        <p role="alert">
+                          {tr(
+                            "Your request was submitted, but this browser could not remove its saved copy. Do not send it again; remove the draft manually when browser storage is available.",
+                          )}
+                        </p>
+                      )}
                       {delivery === "error" && (
                         <p>
                           <a className="inline-link" href={email}>
@@ -556,7 +586,7 @@ export default function ProjectBuilder({
                   <button
                     type="button"
                     className="back-button"
-                    disabled={delivery === "sending"}
+                    disabled={delivery === "sending" || delivery === "sent"}
                     onClick={() => setStep((s) => s - 1)}
                   >
                     <ChevronLeft size={16} /> {tr("Back")}
@@ -571,7 +601,12 @@ export default function ProjectBuilder({
                 </button>
               ) : (
                 <div className="final-actions">
-                  <button className="save-button" type="button" onClick={save}>
+                  <button
+                    className="save-button"
+                    type="button"
+                    onClick={save}
+                    disabled={delivery === "sending" || delivery === "sent"}
+                  >
                     {saved ? <Check size={16} /> : <FolderOpen size={16} />}{" "}
                     {saved ? tr("Saved on this device") : tr("Save draft on this device")}
                   </button>
@@ -599,7 +634,7 @@ export default function ProjectBuilder({
                 </div>
               )}
             </div>
-            {saved && step === 3 && (
+            {(saved || delivery === "sent") && step === 3 && (
               <div className="saved-footer">
                 <button type="button" onClick={onDesk}>
                   {tr("Go to my project desk")} <ArrowRight size={14} />

@@ -48,6 +48,16 @@ test.describe("configured delivery with intercepted requests only", () => {
       await route.fulfill({ json: { ok: true } });
     });
     await completeBrief(page);
+    await page
+      .getByRole("button", { name: "Save draft on this device", exact: true })
+      .click();
+    await page.evaluate(() => {
+      const key = "lb-project-drafts-v1";
+      const drafts = JSON.parse(localStorage.getItem(key)!);
+      drafts.push({ ...drafts[0], id: "another-draft", company: "Another project" });
+      localStorage.setItem(key, JSON.stringify(drafts));
+      window.dispatchEvent(new StorageEvent("storage", { key }));
+    });
     await page.getByRole("button", { name: "Send project request", exact: true }).click();
     await expect(page.locator(".request-delivery")).toHaveAttribute(
       "data-status",
@@ -56,6 +66,20 @@ test.describe("configured delivery with intercepted requests only", () => {
     await expect(
       page.getByRole("button", { name: "Request submitted", exact: true }),
     ).toBeDisabled();
+    await expect(
+      page.getByRole("button", { name: "Saved on this device", exact: true }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByRole("button", { name: "Save draft on this device", exact: true }),
+    ).toBeDisabled();
+    await expect(page.getByRole("button", { name: "Back", exact: true })).toBeDisabled();
+    await page
+      .getByRole("button", { name: "Go to my project desk", exact: true })
+      .click();
+    await expect(page.locator(".draft-card")).toHaveCount(1);
+    await expect(page.locator(".draft-card")).toContainText("Another project");
+    await page.reload();
+    await expect(page.locator(".draft-card")).toHaveCount(1);
     expect(requests).toBe(1);
   });
   test("rejected and interrupted requests retain the brief and offer email fallback", async ({
@@ -69,6 +93,9 @@ test.describe("configured delivery with intercepted requests only", () => {
       else await route.abort("failed");
     });
     await completeBrief(page);
+    await page
+      .getByRole("button", { name: "Save draft on this device", exact: true })
+      .click();
     const send = page.getByRole("button", { name: "Send project request", exact: true });
     for (let attempt = 0; attempt < 2; attempt++) {
       await send.click();
@@ -81,7 +108,47 @@ test.describe("configured delivery with intercepted requests only", () => {
         page.getByRole("link", { name: "Email project request" }),
       ).toHaveAttribute("href", /^mailto:/);
       await expect(send).toBeEnabled();
+      expect(
+        await page.evaluate(
+          () => JSON.parse(localStorage.getItem("lb-project-drafts-v1")!).length,
+        ),
+      ).toBe(1);
     }
     expect(requests).toBe(2);
+  });
+  test("a storage cleanup failure keeps the accepted state and explains the remaining copy", async ({
+    page,
+  }) => {
+    await page.route("https://formspree.io/f/**", (route) =>
+      route.fulfill({ json: { ok: true } }),
+    );
+    await completeBrief(page);
+    await page
+      .getByRole("button", { name: "Save draft on this device", exact: true })
+      .click();
+    await page.evaluate(() => {
+      const original = Storage.prototype.setItem;
+      Storage.prototype.setItem = function (key, value) {
+        if (key === "lb-project-drafts-v1")
+          throw new DOMException("Unavailable", "QuotaExceededError");
+        original.call(this, key, value);
+      };
+    });
+    await page.getByRole("button", { name: "Send project request", exact: true }).click();
+    await expect(page.locator(".request-delivery")).toHaveAttribute(
+      "data-status",
+      "sent",
+    );
+    await expect(page.getByRole("alert")).toContainText(
+      "could not remove its saved copy",
+    );
+    expect(
+      await page.evaluate(
+        () => JSON.parse(localStorage.getItem("lb-project-drafts-v1")!).length,
+      ),
+    ).toBe(1);
+    await expect(
+      page.getByRole("button", { name: "Request submitted", exact: true }),
+    ).toBeDisabled();
   });
 });

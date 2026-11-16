@@ -1,0 +1,30 @@
+// Variante de comparaison indépendante, avec les commandes et le scroll éprouvés.
+@use "../pizza-gesture/style";
+:root {
+  background: #17211b;
+  color: #f4efe4;
+  --ink: #f4efe4;
+  --muted: #c0c9bc;
+  --accent: #f2c35b;
+  --line: #ffffff2e;
+  color-scheme: dark;
+}
+body {
+  background: #17211b;
+  color: #f4efe4;
+}
+.lab-header,
+.studio,
+.review {
+  background: #17211b;
+}
+.scene-vignette {
+  background: radial-gradient(ellipse at center, transparent 45%, #17211b40);
+}
+.outro-copy em {
+  color: #f2c35b;
+}
+.play-button {
+  background: #f2c35b;
+  color: #251e11;
+}

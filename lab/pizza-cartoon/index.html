@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#17211b" />
+    <meta
+      name="description"
+      content="Variante C du prototype : une seule prise, une sortie définitive et un retour à la carte."
+    />
+    <title>Un seul geste — Variante C / Lucas Berdy</title>
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <a class="skip-link" href="#controls">Passer aux commandes de la scène</a>
+    <header class="lab-header">
+      <a class="lab-brand" href="../../" aria-label="Retour au site Lucas Berdy"
+        >lb<span>.</span></a
+      >
+      <span class="lab-label"
+        ><i aria-hidden="true"></i> Atelier de mouvement <span>/ 03</span></span
+      >
+      <a
+        class="back-link"
+        href="../pizza-gesture/"
+        aria-label="Comparer avec l’ancien prototype"
+        >Ancien prototype <span aria-hidden="true">↗</span></a
+      >
+    </header>
+    <main>
+      <section class="experiment" aria-labelledby="experiment-title">
+        <div class="studio">
+          <div class="scene" aria-hidden="true">
+            <canvas id="pizza-canvas"></canvas>
+            <div class="scene-vignette"></div>
+          </div>
+          <div class="intro-copy">
+            <p class="eyebrow">Atelier Pizza / Variante C</p>
+            <h1 id="experiment-title">Une part.<br /><em>Un seul geste.</em></h1>
+            <p class="intro-detail">
+              Quatre doigts dessous. Le pouce dessus.<br />Puis place à votre carte.
+            </p>
+          </div>
+          <div class="scene-caption" aria-hidden="true">
+            <span class="caption-number">01</span>
+            <div>
+              <span class="caption-title">Tout commence ici.</span
+              ><span class="caption-detail"
+                >Une pizza. Un geste. Une autre perspective.</span
+              >
+            </div>
+          </div>
+          <div class="loading" role="status">Préparation de la scène…</div>
+          <div class="fallback" hidden>
+            <img
+              src="/assets/atelier-pizza-whole.webp"
+              alt="Pizza vue du dessus"
+              width="1000"
+              height="1000"
+              loading="lazy"
+            />
+            <p>
+              La 3D n’est pas disponible dans ce navigateur. Le projet original reste
+              accessible.
+            </p>
+            <a class="project-link" href="../../#project/atelier-pizza"
+              >Retour au projet Atelier Pizza <span aria-hidden="true">↗</span></a
+            >
+          </div>
+          <div class="outro-copy" inert>
+            <p class="eyebrow">Le mouvement attire. Le contenu reste.</p>
+            <h2>Votre carte.<br /><em>Entre vos mains.</em></h2>
+            <p>
+              Une animation pour ouvrir l’appétit.<br />Un site facile à modifier pour la
+              suite.
+            </p>
+            <a class="project-link" href="../../#project/atelier-pizza"
+              >Revoir le projet WordPress <span aria-hidden="true">↗</span></a
+            >
+          </div>
+          <div class="studio-footer">
+            <div class="footer-heading">
+              <p class="scroll-hint">
+                <span aria-hidden="true">↓</span> Faites défiler pour explorer
+              </p>
+              <p class="edition">Variante C <span>Une seule prise</span></p>
+            </div>
+            <div class="scene-controls" aria-label="Commandes de la scène">
+              <div class="control-heading">
+                <label for="scene-progress">Explorer la séquence</label
+                ><output id="progress-value" for="scene-progress" aria-live="off"
+                  >0 %</output
+                >
+              </div>
+              <input
+                id="scene-progress"
+                type="range"
+                min="0"
+                max="100"
+                value="0"
+                step="0.1"
+                aria-describedby="motion-note"
+              />
+              <div class="play-controls">
+                <button class="play-button" type="button" id="play">
+                  Lire la séquence <span aria-hidden="true">▷</span>
+                </button>
+                <button class="reset-button" type="button" id="reset">
+                  Revenir au début <span aria-hidden="true">↺</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="controls" class="review" aria-labelledby="review-title">
+        <div class="review-copy">
+          <p class="eyebrow">Deux variantes, à comparer</p>
+          <h2 id="review-title">Un geste suffit.<br /><em>À vous de juger.</em></h2>
+          <p>
+            La main saisit la part, l’emporte hors champ et reste hors de l’écran. La
+            caméra revient ensuite sur la pizza et ses miettes. L’ancienne version avec la
+            prise latérale reste disponible pour comparer.
+          </p>
+          <div class="variant-links">
+            <a class="project-link" href="../pizza-gesture/"
+              >Comparer avec l’ancien prototype <span aria-hidden="true">↗</span></a
+            >
+            <a class="project-link" href="../../#project/atelier-pizza"
+              >Revoir la page actuelle <span aria-hidden="true">↗</span></a
+            >
+          </div>
+        </div>
+        <div class="review-controls">
+          <h3>Revoir un moment</h3>
+          <div class="chapter-list" aria-label="Étapes du prototype">
+            <button type="button" data-progress="0">01 <span>Vue du dessus</span></button>
+            <button type="button" data-progress="0.34">02 <span>La prise</span></button>
+            <button type="button" data-progress="0.58">
+              03 <span>La perspective</span>
+            </button>
+            <button type="button" data-progress="0.72">04 <span>La sortie</span></button>
+            <button type="button" data-progress="1">
+              05 <span>Retour à la carte</span>
+            </button>
+          </div>
+          <p id="motion-note">
+            Défilement naturel, lecture facultative et retour en arrière possible. Aucune
+            modification de la page Atelier Pizza actuelle.
+          </p>
+          <p class="scene-status" role="status" aria-live="polite"></p>
+        </div>
+      </section>
+    </main>
+    <footer class="lab-footer">
+      <span>Lucas Berdy / Recherche visuelle</span
+      ><span>Prototype indépendant · Aucun service de commande</span>
+    </footer>
+    <script type="module" src="/src/prototypes/pizza-cartoon/main.ts"></script>
+  </body>
+</html>

@@ -195,7 +195,11 @@ test("unavailable WebGL provides an honest static fallback and a working return 
 test("the storefront does not load the 3D laboratory", async ({ page }) => {
   const labRequests: string[] = [];
   page.on("request", (request) => {
-    if (/pizzaLab-|\/src\/prototypes\/pizza3d\/|\/deps\/three/.test(request.url()))
+    if (
+      /pizzaLab-|anatomical-hand\.glb|\/src\/prototypes\/pizza3d\/|\/deps\/three/.test(
+        request.url(),
+      )
+    )
       labRequests.push(request.url());
   });
   await page.goto("");
@@ -366,4 +370,18 @@ test("optional playback finishes after elapsed time even when frames are skipped
   await expect(page.locator(".scene-status")).toContainText("Séquence terminée");
   await expect(page.locator("#pizza-canvas")).toHaveAttribute("data-view", "top");
   await expect(page.locator("#pizza-canvas")).toHaveAttribute("data-crumbs", "12");
+});
+
+test("a missing anatomical hand falls back without leaving the scene loading", async ({
+  gpuPage: page,
+}) => {
+  await page.route("**/assets/models/anatomical-hand.glb", (route) => route.abort());
+  await page.goto("lab/pizza-3d/");
+  await expect(page.locator("body")).toHaveAttribute("data-renderer", "fallback");
+  await expect(page.locator(".fallback")).toBeVisible();
+  await expect(page.locator(".loading")).toBeHidden();
+  await expect(page.locator("#scene-progress")).toBeDisabled();
+  await expect(
+    page.getByRole("link", { name: "Retour au projet Atelier Pizza" }),
+  ).toBeVisible();
 });

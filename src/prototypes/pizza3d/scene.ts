@@ -12,8 +12,8 @@ export type PizzaScene = {
 const clamp = THREE.MathUtils.clamp;
 const mix = THREE.MathUtils.lerp;
 /**
- * Scène volontairement séparée du site : aucun asset 3D tiers ni modèle à installer.
- * La pizza réutilise sa texture existante ; seuls lumière, géométrie et geste changent.
+ * Scène volontairement séparée du site. La main CC0 est hébergée localement ;
+ * la pizza réutilise sa texture existante. Aucune dépendance à un service 3D distant.
  * On ne rend une image que lorsqu’une pose ou la taille change (pas de boucle au repos).
  */
 export async function createScene(
@@ -55,17 +55,26 @@ export async function createScene(
   fill.position.set(5, 4, -5);
   scene.add(fill);
 
-  const texture = await new THREE.TextureLoader()
-    .loadAsync(`${import.meta.env.BASE_URL}assets/atelier-pizza-whole.webp`)
-    .catch((error) => {
-      renderer.dispose();
-      throw error;
-    });
+  // Deux fichiers locaux indépendants : texture de la pizza et main articulée.
+  // En cas d’échec, libérer aussi celui qui a déjà fini de charger.
+  const [imageResult, handResult] = await Promise.allSettled([
+    new THREE.TextureLoader().loadAsync(
+      `${import.meta.env.BASE_URL}assets/atelier-pizza-whole.webp`,
+    ),
+    createHand(),
+  ]);
+  if (imageResult.status === "rejected" || handResult.status === "rejected") {
+    if (imageResult.status === "fulfilled") imageResult.value.dispose();
+    if (handResult.status === "fulfilled") handResult.value.dispose();
+    renderer.dispose();
+    throw new Error("Impossible de charger les modèles du prototype.");
+  }
+  const texture = imageResult.value;
+  const hand = handResult.value;
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
   const pizza = createPizza(texture);
   scene.add(pizza.group);
-  const hand = createHand();
   const held = new THREE.Group();
   held.name = "Prise commune — main et part montent ensemble";
   held.add(pizza.slice, hand.group);

@@ -1,340 +1,205 @@
 import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
-/**
- * Main sculptée en surfaces continues, autonome et réversible.
- * Le poignet reste à l’origine : avant-bras vers +X, doigts vers -X, dos vers +Y.
- * setGrip déforme des buffers déjà alloués ; aucune géométrie n’est reconstruite.
- */
-export function createHand(): {
+export type HandModel = {
   group: THREE.Group;
   setGrip: (progress: number) => void;
   dispose: () => void;
-} {
+};
+
+/**
+ * Main anatomique MakeHuman/Innerscene, distribuée sous CC0.
+ * La géométrie et les poids de peau proviennent du GLB local ; seules les
+ * articulations du squelette sont animées. La licence et la provenance
+ * se trouvent à côté du modèle dans public/assets/models/.
+ */
+export async function createHand(): Promise<HandModel> {
+  const gltf = await new GLTFLoader().loadAsync(
+    `${import.meta.env.BASE_URL}assets/models/anatomical-hand.glb`,
+  );
   const group = new THREE.Group();
-  group.name = "Main — paume sculptée et doigts continus";
+  group.name = "Main anatomique — modèle CC0 et prise articulée";
   const geometries = new Set<THREE.BufferGeometry>();
-  const textures = new Set<THREE.Texture>();
   const materials = new Set<THREE.Material>();
-
-  /** Grain très fin : une matière mate, sans effet peau photographique. */
-  function grainTexture(fabric = false) {
-    const canvas = document.createElement("canvas");
-    canvas.width = canvas.height = 128;
-    const context = canvas.getContext("2d")!;
-    const pixels = context.createImageData(128, 128);
-    let seed = fabric ? 271 : 839;
-    for (let index = 0; index < 128 * 128; index++) {
-      seed = (seed * 1664525 + 1013904223) >>> 0;
-      const x = index % 128;
-      const y = Math.floor(index / 128);
-      const warp = x % 4 < 2;
-      const weft = y % 4 < 2;
-      const weave = fabric ? (warp !== weft ? 12 : -12) : 0;
-      const value = 130 + (seed / 4294967296 - 0.5) * 24 + weave;
-      for (let channel = 0; channel < 3; channel++)
-        pixels.data[index * 4 + channel] = value;
-      pixels.data[index * 4 + 3] = 255;
-    }
-    context.putImageData(pixels, 0, 0);
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-    textures.add(texture);
-    return texture;
-  }
-
+  const sourceMaterials = new Set<THREE.Material>();
   const skin = new THREE.MeshStandardMaterial({
-    color: "#c9b195",
-    roughness: 0.67,
-    metalness: 0,
-    bumpMap: grainTexture(),
-    bumpScale: 0.0025,
-    vertexColors: true,
+    color: "#b98772",
+    roughness: 0.62,
+    side: THREE.DoubleSide,
   });
-  const nailMaterial = new THREE.MeshStandardMaterial({
-    color: "#e2ccb5",
-    roughness: 0.44,
-    metalness: 0,
-  });
-  const fabric = new THREE.MeshStandardMaterial({
-    color: "#39443d",
-    roughness: 0.98,
-    bumpMap: grainTexture(true),
-    bumpScale: 0.006,
-    vertexColors: true,
-  });
-  [skin, nailMaterial, fabric].forEach((material) => materials.add(material));
+  const cloth = new THREE.MeshStandardMaterial({ color: "#39443d", roughness: 0.97 });
+  materials.add(skin);
+  materials.add(cloth);
 
-  function mesh(
-    geometry: THREE.BufferGeometry,
-    material: THREE.Material,
-    parent = group,
-  ) {
-    geometries.add(geometry);
-    const result = new THREE.Mesh(geometry, material);
-    result.castShadow = true;
-    result.receiveShadow = true;
-    parent.add(result);
-    return result;
+  // Adaptation du repère de cet export glTF : poignet à l’origine, doigts vers
+  // -X et dos de la main vers +Y. L’échelle uniforme conserve son anatomie.
+  const normalized = new THREE.Group();
+  normalized.quaternion.set(-0.02298459, 0.76889286, 0.04186606, 0.63759134);
+  normalized.position.set(0.15295006, -0.38279729, 0.12114368);
+  normalized.scale.setScalar(7.1018864);
+  normalized.add(gltf.scene);
+  group.add(normalized);
+  const skinnedMeshes: THREE.SkinnedMesh[] = [];
+  gltf.scene.traverse((object) => {
+    if (!(object instanceof THREE.Mesh)) return;
+    geometries.add(object.geometry);
+    const original = Array.isArray(object.material) ? object.material : [object.material];
+    original.forEach((material) => sourceMaterials.add(material));
+    object.material = skin;
+    object.castShadow = true;
+    object.receiveShadow = true;
+    // Les doigts déplacent la surface hors de sa boîte de repos. Le modèle est
+    // petit ; garder le maillage actif évite de couper une phalange pendant la prise.
+    object.frustumCulled = false;
+    if (object instanceof THREE.SkinnedMesh) skinnedMeshes.push(object);
+  });
+  sourceMaterials.forEach((material) => material.dispose());
+
+  // Le GLB est fermé au poignet. Retirer ce capuchon interne évite qu’il ne
+  // projette une ligne d’ombre sur le prolongement d’avant-bras ajouté ici.
+  // Le fichier d’origine reste intact ; seules ses faces de fermeture sont filtrées.
+  group.updateMatrixWorld(true);
+  for (const mesh of skinnedMeshes) {
+    mesh.skeleton.update();
+    const geometry = mesh.geometry;
+    const indices = geometry.getIndex();
+    if (!indices) continue;
+    const vertices = Array.from(
+      { length: geometry.getAttribute("position").count },
+      (_, index) =>
+        mesh.getVertexPosition(index, new THREE.Vector3()).applyMatrix4(mesh.matrixWorld),
+    );
+    const kept: number[] = [];
+    const edgeA = new THREE.Vector3();
+    const edgeB = new THREE.Vector3();
+    for (let index = 0; index < indices.count; index += 3) {
+      const a = indices.getX(index),
+        b = indices.getX(index + 1),
+        c = indices.getX(index + 2);
+      const centerX = (vertices[a].x + vertices[b].x + vertices[c].x) / 3;
+      const normal = edgeA
+        .subVectors(vertices[b], vertices[a])
+        .cross(edgeB.subVectors(vertices[c], vertices[a]))
+        .normalize();
+      if (centerX > -0.17 && Math.abs(normal.x) > 0.85) continue;
+      kept.push(a, b, c);
+    }
+    geometry.setIndex(kept);
   }
 
-  type Profile = { x: number; y: number; width: number; height: number };
-  /** Une seule enveloppe raccorde l’avant-bras, le poignet et la paume. */
-  function loft(profiles: Profile[], rings: number, radial = 28, cloth = false) {
+  /** Avant-bras et manche raccordés au poignet de la main importée. */
+  function sleeveSurface(
+    profiles: Array<{ x: number; width: number; height: number; y?: number; z?: number }>,
+    material: THREE.Material,
+  ) {
     const positions: number[] = [];
-    const uvs: number[] = [];
-    const colors: number[] = [];
     const indices: number[] = [];
+    const rings = 36;
+    const sides = 28;
     for (let ring = 0; ring <= rings; ring++) {
-      const t = (ring / rings) * (profiles.length - 1);
-      const section = Math.min(profiles.length - 2, Math.floor(t));
-      const a = profiles[section];
-      const b = profiles[section + 1];
-      const u = t - section;
-      const eased = u * u * (3 - 2 * u);
-      const x = THREE.MathUtils.lerp(a.x, b.x, u);
-      const centerY = THREE.MathUtils.lerp(a.y, b.y, eased);
-      const width = THREE.MathUtils.lerp(a.width, b.width, eased);
-      const height = THREE.MathUtils.lerp(a.height, b.height, eased);
-      for (let side = 0; side <= radial; side++) {
-        const angle = (side / radial) * Math.PI * 2;
-        const cosine = Math.cos(angle);
-        const sine = Math.sin(angle);
-        const fold = cloth
-          ? Math.sin(x * 22 + sine * 2) * Math.exp(-Math.max(0, x - 0.55) * 2) * 0.006
-          : 0;
-        // Les sections légèrement aplaties dessinent une paume, plutôt qu’un ovale.
-        const z =
-          Math.sign(sine) * Math.pow(Math.abs(sine), cloth ? 1 : 0.86) * (width + fold);
-        const knuckle = cloth
-          ? 0
-          : Math.exp(-Math.pow((x + 0.66) / 0.12, 2)) *
-            Math.max(0, cosine) ** 5 *
-            Math.cos(z * 34) *
-            0.007;
-        // Le coussinet sous le pouce relie sa racine à la paume fermée.
-        // Il appartient au même maillage : pas de petite boule détachée.
-        const thenar = cloth
-          ? 0
-          : Math.exp(-Math.pow((x + 0.37) / 0.25, 2)) *
-            Math.pow(Math.max(0, sine), 3) *
-            Math.sqrt(Math.max(0, -cosine)) *
-            0.2;
-        positions.push(x, centerY + cosine * (height + fold) + knuckle - thenar, z);
-        uvs.push((ring / rings) * (cloth ? 8 : 3), (side / radial) * 3);
-        const shade = 0.97 + Math.max(0, cosine) * 0.03;
-        colors.push(shade, shade, shade);
+      const position = (ring / rings) * (profiles.length - 1);
+      const index = Math.min(profiles.length - 2, Math.floor(position));
+      const a = profiles[index];
+      const b = profiles[index + 1];
+      const t = position - index;
+      const smooth = t * t * (3 - 2 * t);
+      const x = THREE.MathUtils.lerp(a.x, b.x, t);
+      const width = THREE.MathUtils.lerp(a.width, b.width, smooth);
+      const height = THREE.MathUtils.lerp(a.height, b.height, smooth);
+      const centerY = THREE.MathUtils.lerp(a.y ?? 0, b.y ?? 0, smooth);
+      const centerZ = THREE.MathUtils.lerp(a.z ?? 0, b.z ?? 0, smooth);
+      for (let side = 0; side <= sides; side++) {
+        const angle = (side / sides) * Math.PI * 2;
+        positions.push(
+          x,
+          centerY + Math.cos(angle) * height,
+          centerZ + Math.sin(angle) * width,
+        );
       }
     }
     for (let ring = 0; ring < rings; ring++) {
-      for (let side = 0; side < radial; side++) {
-        const a = ring * (radial + 1) + side;
-        const b = a + radial + 1;
-        indices.push(a, b, a + 1, b, b + 1, a + 1);
+      for (let side = 0; side < sides; side++) {
+        const a = ring * (sides + 1) + side;
+        const b = a + sides + 1;
+        indices.push(a, a + 1, b, b, a + 1, b + 1);
       }
     }
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-    geometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
-    geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
     geometry.setIndex(indices);
     geometry.computeVertexNormals();
-    return geometry;
+    geometries.add(geometry);
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    group.add(mesh);
   }
-
-  mesh(
-    loft(
-      [
-        { x: 0.86, y: 0, width: 0.24, height: 0.18 },
-        { x: 0.48, y: 0, width: 0.22, height: 0.145 },
-        { x: 0.16, y: 0, width: 0.205, height: 0.12 },
-        { x: -0.1, y: -0.005, width: 0.25, height: 0.125 },
-        { x: -0.34, y: -0.012, width: 0.335, height: 0.14 },
-        { x: -0.57, y: -0.008, width: 0.35, height: 0.13 },
-        { x: -0.73, y: -0.006, width: 0.31, height: 0.085 },
-        { x: -0.82, y: -0.018, width: 0.24, height: 0.018 },
-        { x: -0.85, y: -0.018, width: 0.005, height: 0.004 },
-      ],
-      40,
-    ),
+  sleeveSurface(
+    [
+      { x: -0.2, width: 0.17, height: 0.1, y: -0.006, z: -0.026 },
+      { x: 0.1, width: 0.186, height: 0.112, y: -0.006, z: -0.026 },
+      { x: 0.45, width: 0.22, height: 0.15 },
+      { x: 0.8, width: 0.24, height: 0.18 },
+    ],
     skin,
   );
-
-  // Le bord de manche est intégré au profil, sans bague cylindrique détachée.
-  mesh(
-    loft(
-      [
-        { x: 3.3, y: 0, width: 0.39, height: 0.35 },
-        { x: 2.45, y: 0, width: 0.365, height: 0.33 },
-        { x: 1.48, y: 0, width: 0.32, height: 0.29 },
-        { x: 0.86, y: 0, width: 0.29, height: 0.265 },
-        { x: 0.63, y: 0, width: 0.267, height: 0.245 },
-        { x: 0.58, y: 0, width: 0.272, height: 0.25 },
-        { x: 0.53, y: 0, width: 0.258, height: 0.235 },
-      ],
-      42,
-      28,
-      true,
-    ),
-    fabric,
+  sleeveSurface(
+    [
+      { x: 0.53, width: 0.248, height: 0.217 },
+      { x: 0.59, width: 0.255, height: 0.225 },
+      { x: 0.7, width: 0.26, height: 0.23 },
+      { x: 1.4, width: 0.31, height: 0.28 },
+      { x: 2.4, width: 0.36, height: 0.32 },
+      { x: 3.3, width: 0.39, height: 0.35 },
+    ],
+    cloth,
   );
 
-  type Finger = {
-    root: THREE.Group;
-    geometry: THREE.BufferGeometry;
-    nail: THREE.Mesh;
-    length: number;
-    radius: number;
-    relaxed: [number, number, number];
-    closed: [number, number, number];
+  type Joint = { bone: THREE.Bone; rest: THREE.Quaternion; flex: number; oppose: number };
+  const joints: Joint[] = [];
+  const poses: Record<string, readonly number[]> = {
+    index: [0.16, 0.3, 0.1],
+    middle: [0.2, 0.36, 0.14],
+    ring: [0.32, 0.48, 0.22],
+    pinky: [0.38, 0.52, 0.25],
+    thumb: [0.04, 0.08, 0.04],
   };
-  const fingers: Finger[] = [];
-  const ringCount = 24;
-  const radialCount = 14;
-  const nailGeometry = new THREE.SphereGeometry(1, 16, 10);
-  geometries.add(nailGeometry);
-
-  /** Surface continue autour d’une ligne de flexion à trois articulations. */
-  function finger(
-    root: THREE.Group,
-    length: number,
-    radius: number,
-    relaxed: Finger["relaxed"],
-    closed: Finger["closed"],
-  ) {
-    const count = (ringCount + 1) * (radialCount + 1);
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute(
-      "position",
-      new THREE.BufferAttribute(new Float32Array(count * 3), 3).setUsage(
-        THREE.DynamicDrawUsage,
-      ),
-    );
-    geometry.setAttribute(
-      "normal",
-      new THREE.BufferAttribute(new Float32Array(count * 3), 3).setUsage(
-        THREE.DynamicDrawUsage,
-      ),
-    );
-    const uv = new Float32Array(count * 2);
-    const color = new Float32Array(count * 3).fill(1);
-    const indices: number[] = [];
-    for (let ring = 0; ring <= ringCount; ring++) {
-      for (let side = 0; side <= radialCount; side++) {
-        const vertex = ring * (radialCount + 1) + side;
-        uv[vertex * 2] = (ring / ringCount) * 3;
-        uv[vertex * 2 + 1] = side / radialCount;
-        if (ring < ringCount && side < radialCount) {
-          const next = vertex + radialCount + 1;
-          indices.push(vertex, next, vertex + 1, next, next + 1, vertex + 1);
-        }
-      }
-    }
-    geometry.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
-    geometry.setAttribute("color", new THREE.BufferAttribute(color, 3));
-    geometry.setIndex(indices);
-    // Ce volume couvre les poses ouverte et fermée sans recalcul au scroll.
-    geometry.boundingSphere = new THREE.Sphere(
-      new THREE.Vector3(-length * 0.45, -length * 0.28, 0),
-      length * 0.85 + radius,
-    );
-    mesh(geometry, skin, root);
-    const nail = new THREE.Mesh(nailGeometry, nailMaterial);
-    nail.scale.set(length * 0.105, 0.008, radius * 0.6);
-    root.add(nail);
-    fingers.push({ root, geometry, nail, length, radius, relaxed, closed });
+  for (const [finger, flexions] of Object.entries(poses)) {
+    flexions.forEach((flex, index) => {
+      const name = `${finger}_0${index + 1}_r`;
+      const bone = gltf.scene.getObjectByName(name);
+      if (!(bone instanceof THREE.Bone))
+        throw new Error(`Articulation absente : ${name}`);
+      joints.push({
+        bone,
+        rest: bone.quaternion.clone(),
+        flex,
+        oppose: finger === "thumb" && index === 0 ? 0.6 : 0,
+      });
+    });
   }
-
-  const fingerProfiles = [
-    { x: -0.69, z: 0.25, length: 0.57, radius: 0.073, spread: -0.075 },
-    { x: -0.745, z: 0.082, length: 0.66, radius: 0.076, spread: -0.025 },
-    { x: -0.73, z: -0.092, length: 0.61, radius: 0.074, spread: 0.018 },
-    { x: -0.65, z: -0.252, length: 0.46, radius: 0.063, spread: 0.065 },
-  ];
-  fingerProfiles.forEach((profile, index) => {
-    const root = new THREE.Group();
-    root.position.set(profile.x, 0.005, profile.z);
-    root.rotation.y = profile.spread;
-    group.add(root);
-    finger(
-      root,
-      profile.length,
-      profile.radius,
-      [0.025, 0.1, 0.06],
-      [0.43 + index * 0.025, 0.87, 0.55],
-    );
-  });
-
-  // Le pouce passe sous le bord ; son opposition se règle indépendamment des doigts.
-  const thumbRoot = new THREE.Group();
-  group.add(thumbRoot);
-  finger(thumbRoot, 0.57, 0.09, [0.02, 0.08, 0.03], [0.25, 0.28, 0.08]);
-
-  const smooth = (value: number) => {
-    const t = THREE.MathUtils.clamp(value, 0, 1);
-    return t * t * (3 - 2 * t);
-  };
+  // Cet export possède un repère interne inversé : -Z ferme les doigts vers
+  // la paume. Le pouce oppose sa base autour de son axe local X.
+  const flexAxis = new THREE.Vector3(0, 0, -1);
+  const opposeAxis = new THREE.Vector3(1, 0, 0);
+  const delta = new THREE.Quaternion();
   let lastGrip = Number.NaN;
-  function setGrip(progress: number) {
-    const grip = smooth(progress);
-    // La caméra et la part bougent souvent sans changer la prise : aucun travail
-    // sur les sommets n’est alors nécessaire, même pendant le défilement.
-    if (grip === lastGrip) return;
-    lastGrip = grip;
-    thumbRoot.position.set(
-      THREE.MathUtils.lerp(-0.32, -0.43, grip),
-      THREE.MathUtils.lerp(-0.055, -0.23, grip),
-      0.315,
-    );
-    thumbRoot.rotation.y = THREE.MathUtils.lerp(0.32, -0.58, grip);
-    for (const digit of fingers) {
-      const position = digit.geometry.getAttribute("position") as THREE.BufferAttribute;
-      const normal = digit.geometry.getAttribute("normal") as THREE.BufferAttribute;
-      let centerX = 0;
-      let centerY = 0;
-      const baseAngle = THREE.MathUtils.lerp(digit.relaxed[0], digit.closed[0], grip);
-      const middleAngle = THREE.MathUtils.lerp(digit.relaxed[1], digit.closed[1], grip);
-      const tipAngle = THREE.MathUtils.lerp(digit.relaxed[2], digit.closed[2], grip);
-      for (let ring = 0; ring <= ringCount; ring++) {
-        const t = ring / ringCount;
-        const angle =
-          baseAngle +
-          middleAngle * smooth((t - 0.31) / 0.22) +
-          tipAngle * smooth((t - 0.66) / 0.22);
-        if (ring > 0) {
-          centerX -= (Math.cos(angle) * digit.length) / ringCount;
-          centerY -= (Math.sin(angle) * digit.length) / ringCount;
-        }
-        const tipRound = Math.sqrt(
-          Math.max(0.001, 1 - Math.max(0, (t - 0.85) / 0.15) ** 2),
+  function setGrip(value: number) {
+    const grip = THREE.MathUtils.clamp(value, 0, 1);
+    const eased = grip * grip * (3 - 2 * grip);
+    if (lastGrip === eased) return;
+    lastGrip = eased;
+    for (const joint of joints) {
+      joint.bone.quaternion.copy(joint.rest);
+      joint.bone.quaternion.multiply(
+        delta.setFromAxisAngle(flexAxis, joint.flex * eased),
+      );
+      if (joint.oppose)
+        joint.bone.quaternion.multiply(
+          delta.setFromAxisAngle(opposeAxis, joint.oppose * eased),
         );
-        const radius = digit.radius * (1 - t * 0.22) * tipRound;
-        for (let side = 0; side <= radialCount; side++) {
-          const theta = (side / radialCount) * Math.PI * 2;
-          const cosine = Math.cos(theta);
-          const sine = Math.sin(theta);
-          const index = ring * (radialCount + 1) + side;
-          position.setXYZ(
-            index,
-            centerX - Math.sin(angle) * radius * cosine,
-            centerY + Math.cos(angle) * radius * cosine,
-            radius * sine * 0.94,
-          );
-          normal.setXYZ(index, -Math.sin(angle) * cosine, Math.cos(angle) * cosine, sine);
-        }
-        if (ring === 21) {
-          digit.nail.position.set(
-            centerX - Math.sin(angle) * radius * 0.96,
-            centerY + Math.cos(angle) * radius * 0.96,
-            0,
-          );
-          digit.nail.rotation.z = angle;
-        }
-      }
-      position.needsUpdate = true;
-      normal.needsUpdate = true;
     }
   }
-
   setGrip(0);
   return {
     group,
@@ -342,7 +207,7 @@ export function createHand(): {
     dispose() {
       geometries.forEach((geometry) => geometry.dispose());
       materials.forEach((material) => material.dispose());
-      textures.forEach((texture) => texture.dispose());
+      skinnedMeshes.forEach((mesh) => mesh.skeleton.dispose());
     },
   };
 }

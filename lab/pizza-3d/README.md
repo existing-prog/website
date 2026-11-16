@@ -39,7 +39,11 @@ En mouvement réduit, la longue piste est supprimée et la scène reste fixe. Le
 
 ## Modèles, coût et limites
 
-Les géométries sont créées en code avec Three.js, sans modèle 3D distant ni fichier sous licence à acheter. La main utilise une enveloppe continue pour la paume et le poignet, ainsi que des doigts dont les buffers de sommets et de normales sont déformés en place. La prise est mise en cache : quand sa valeur reste identique, aucun sommet n’est recalculé. De fines textures générées localement donnent un grain mat à la main et un tissage discret à la manche.
+La version 5 remplace la main procédurale par un maillage anatomique articulé MakeHuman/Innerscene. Le GLB est hébergé localement dans `public/assets/models/anatomical-hand.glb` (506 696 octets), sous licence **CC0 1.0**, autorisant l’utilisation commerciale, la modification et la redistribution. Sa provenance, son SHA-256 et le texte de copyright intégré sont conservés dans `public/assets/models/ANATOMICAL-HAND-LICENSE.txt`. Le fichier d’origine est stocké sans modification ; les matériaux et la pose sont adaptés à l’exécution.
+
+`hand.ts` charge ce modèle avec `GLTFLoader`, adapte son repère pour placer le poignet à l’origine et conserve une échelle uniforme. Les 15 articulations des doigts partent toujours de leurs quaternions de repos ; elles ne cumulent pas de rotations au fil du scroll. Dans cet export, la fermeture utilise l’axe local **-Z**, et l’opposition du pouce l’axe local **X**. Les poids de peau restent ceux du modèle d’origine. Seules les faces de fermeture au poignet sont filtrées à l’exécution pour raccorder l’avant-bras sans ombre interne. L’avant-bras et la manche prolongent le poignet avec deux surfaces légères générées en code.
+
+Le chargement de la main et de l’image de pizza se fait en parallèle. Si l’un échoue, les ressources déjà chargées sont libérées et le prototype affiche son repli statique. Aucun service 3D distant ni équipement de suivi de main n’est requis.
 
 La pizza réutilise l’illustration existante `public/assets/atelier-pizza-whole.webp`. Ses dessus subdivisés portent un relief léger guidé par les couleurs de la garniture. Les croûtes fermées ont un profil irrégulier et une dorure de cuisson ; leurs faces coupées et les tranches utilisent une matière de mie pâle et alvéolée. Les géométries de toutes les bouchées sont préconstruites avant le premier rendu, sans subdivision pendant le scroll. Le dos de la pizza, la mie et la main restent stylisés ; il ne s’agit pas d’une simulation anatomique ou physique de la nourriture.
 
@@ -52,6 +56,6 @@ npm run build
 CHROMIUM_PATH=/usr/bin/chromium npm test -- tests/pizza-lab.spec.ts
 ```
 
-La version 4 conserve cet enchaînement et affine les volumes de la main, le contact avec la croûte et les matières de la pizza. Les modèles restent procéduraux et stylisés ; ils doivent être jugés dans la scène et sur des appareils réels.
+La version 5 conserve cet enchaînement et le rythme court. La main anatomique remplace la reconstruction en formes procédurales ; les modèles et la pose doivent encore être jugés dans la scène et sur des appareils réels.
 
 Le rendu doit encore être apprécié sur des appareils réels avant de décider d’une intégration. Le rythme des sorties hors champ, le retour à la vue du dessus et la place laissée au texte sont les principaux points de discussion de cette version.

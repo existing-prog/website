@@ -1,0 +1,24 @@
+Anatomical right hand — source and license
+
+Asset: anatomical-hand.glb
+Original file: hand-posable.glb
+Author / distributor: Innerscene Corp, from MakeHuman / MPFB CC0 assets.
+Source: https://www.innerscene.com/tools/library/3d-parts/posable-anatomical-right-hand-f6098b4f
+Original download: https://files.innerscene.com/library/posable-anatomical-right-hand-f6098b4f/c28ad5ff8fafd424275f/hand-posable.glb
+License: CC0 1.0 Universal (Public Domain Dedication).
+License URL: https://creativecommons.org/publicdomain/zero/1.0/
+Terms: https://www.innerscene.com/tools/library/terms
+Downloaded: 2026-11-16
+Bytes: 506696
+SHA-256: 4e9a6219f4147f80fbd29cd4c349e1ae1d59d436d81822a0da8247984cb2d4e9
+
+The source page and the embedded glTF asset.copyright both explicitly release
+this model under CC0, including commercial use, modification and redistribution.
+Attribution is not required by CC0. This notice preserves provenance for maintenance.
+
+Embedded copyright statement (verbatim):
+Authored by Innerscene Corp (innerscene.com). Public domain: dedicated under CC0 1.0 Universal, https://creativecommons.org/publicdomain/zero/1.0/. Free to use, modify and redistribute for any purpose, with no credit required.
+
+The GLB is stored unmodified. The website adds its own material, arm/sleeve,
+normalization, wrist-cap filtering and deterministic bone animation at runtime. No tracking hardware,
+third-party runtime request or online model service is required by this scene.

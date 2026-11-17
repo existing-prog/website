@@ -17,6 +17,9 @@ export interface ScrollSequenceOptions {
   fit?: "cover" | "contain";
   /** Agrandissement supplémentaire, utile pour masquer un bord ou un filigrane. */
   zoom?: number;
+  /** Fondu des bords de l’image vers la couleur de fond du canvas (fraction de la
+   * largeur, par ex. 0.08). Masque un léger écart de teinte entre la vidéo et la page. */
+  edgeFade?: number;
   /** Appelé quand la première image est prête (pour retirer un poster). */
   onReady?: () => void;
   /** Appelé à chaque nouvelle image chargée, avec la proportion chargée. */
@@ -120,9 +123,38 @@ export class ScrollSequence {
       ) * (this.options.zoom ?? 1);
     const w = image.naturalWidth * ratio;
     const h = image.naturalHeight * ratio;
-    this.context.drawImage(image, (width - w) / 2, (height - h) / 2, w, h);
+    const x = (width - w) / 2;
+    const y = (height - h) / 2;
+    this.context.drawImage(image, x, y, w, h);
+    if (this.options.edgeFade) this.fadeEdges(x, y, w, h);
     this.drawn = index;
     canvas.dataset.frame = String(index);
+  }
+
+  /** Dégradés transparents → couleur de fond sur les quatre bords de l’image. */
+  private fadeEdges(x: number, y: number, w: number, h: number) {
+    const ctx = this.context;
+    const color = this.background();
+    const size = Math.min(w, h) * this.options.edgeFade!;
+    const transparent = color.replace(/rgb\((.*)\)/, "rgba($1, 0)");
+    const band = (x0: number, y0: number, x1: number, y1: number) => {
+      const gradient = ctx.createLinearGradient(x0, y0, x1, y1);
+      gradient.addColorStop(0, color);
+      gradient.addColorStop(1, transparent);
+      return gradient;
+    };
+    ctx.fillStyle = band(x, 0, x + size, 0);
+    ctx.fillRect(x, y, size, h);
+    ctx.fillStyle = band(x + w, 0, x + w - size, 0);
+    ctx.fillRect(x + w - size, y, size, h);
+    ctx.fillStyle = band(0, y, 0, y + size);
+    ctx.fillRect(x, y, w, size);
+    ctx.fillStyle = band(0, y + h, 0, y + h - size);
+    ctx.fillRect(x, y + h - size, w, size);
+  }
+
+  private background() {
+    return getComputedStyle(this.options.canvas).backgroundColor || "rgb(0, 0, 0)";
   }
 
   private resize() {
@@ -134,7 +166,7 @@ export class ScrollSequence {
       canvas.width = width;
       canvas.height = height;
       // Fond identique à la vidéo pendant le redimensionnement.
-      this.context.fillStyle = getComputedStyle(canvas).backgroundColor || "#000";
+      this.context.fillStyle = this.background();
       this.context.fillRect(0, 0, width, height);
       this.schedule(true);
     }

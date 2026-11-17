@@ -41,9 +41,12 @@
 .rb-leaf {
   position: absolute;
   translate: -50% -50%;
-  filter: drop-shadow(0 12px 18px #0006);
-  svg {
+  img {
     display: block;
+    max-width: none;
+    // Ombre portée sur le fond rouge : la feuille flotte au-dessus de la scène.
+    filter: drop-shadow(0 14px 16px #3a040699);
+    user-select: none;
   }
 }
 .rb-flour {
@@ -161,5 +164,11 @@
   }
   .rb-outline {
     -webkit-text-stroke-width: 1.5px;
+  }
+}
+/* Grand écran : des feuilles plus présentes, comme le décor de premier plan de la référence. */
+@media (min-width: 1024px) {
+  .rb-leaf {
+    scale: 1.5;
   }
 }

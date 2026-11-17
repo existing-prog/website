@@ -27,28 +27,17 @@ const FLOUR = Array.from({ length: 18 }, (_, i) => {
   };
 });
 
-function Leaf({ size, id }: { size: number; id: number }) {
+/** Feuille de basilic photographiée (détourée), retournée une fois sur deux. */
+function Leaf({ size, flip }: { size: number; flip: boolean }) {
   return (
-    <svg viewBox="-50 -60 100 120" width={size} height={size * 1.2}>
-      <defs>
-        <linearGradient id={`leaf-${id}`} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#7fbf4d" />
-          <stop offset="0.55" stopColor="#3f8f2f" />
-          <stop offset="1" stopColor="#1f5a1c" />
-        </linearGradient>
-      </defs>
-      <path
-        d="M0 -56 C34 -42 40 12 0 56 C-40 12 -34 -42 0 -56 Z"
-        fill={`url(#leaf-${id})`}
-      />
-      <path
-        d="M0 -50 C3 -10 2 20 0 52"
-        stroke="#c9e6a8"
-        strokeOpacity="0.55"
-        strokeWidth="2.4"
-        fill="none"
-      />
-    </svg>
+    <img
+      src={asset("pizza-burst/basil.webp")}
+      width={Math.round(size * 0.58 * 1.3)}
+      height={Math.round(size * 1.3)}
+      alt=""
+      draggable={false}
+      style={flip ? { scale: "-1 1" } : undefined}
+    />
   );
 }
 
@@ -103,10 +92,15 @@ export default function RestaurantBurstScene() {
                   left: `${leaf.x}%`,
                   top: `${leaf.y}%`,
                   rotate: `${leaf.rotate}deg`,
-                  filter: leaf.depth >= 1 ? "blur(1.5px)" : undefined,
+                  filter:
+                    leaf.depth >= 1
+                      ? "blur(1.5px)"
+                      : leaf.depth < 0.35
+                        ? "blur(1px) brightness(0.75)"
+                        : undefined,
                 }}
               >
-                <Leaf size={leaf.size} id={i} />
+                <Leaf size={leaf.size} flip={i % 2 === 1} />
               </span>
             ))}
           </div>

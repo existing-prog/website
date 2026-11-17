@@ -22,7 +22,7 @@ test.describe("French-language visitors", () => {
       await page.evaluate(() => document.fonts.ready);
       await expect(page.locator("html")).toHaveAttribute("lang", "fr");
       await expect(page.locator(".hero-copy > p")).toHaveText(
-        "Je conçois et développe des sites web pour les entreprises indépendantes et les professionnels.",
+        "Je conçois et développe des sites qui marquent dès le premier scroll, pour les indépendants, les restaurants et les chercheurs.",
       );
       await expect(
         page.locator("header").getByRole("button", { name: "Français", exact: true }),

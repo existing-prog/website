@@ -173,7 +173,7 @@ test("personal project opens internally, video is click-to-load, and quote selec
     if (r.url().endsWith("atelier-wordpress-demo.mp4")) videos.push(r.url());
   });
   await page.goto("en/");
-  await page.locator(".atelier-project-teaser").click();
+  await page.locator("#chapter-atelier-pizza .project-card").click();
   await expect(page.locator(".case-title")).toBeFocused();
   expect(videos).toHaveLength(0);
   await page.getByRole("button", { name: "Play the demonstration", exact: true }).click();

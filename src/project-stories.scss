@@ -284,6 +284,58 @@
     }
   }
 }
+/* Atelier Pizza : le rouge et le basilic de la page restaurants. */
+.scene-atelier-pizza {
+  background: radial-gradient(ellipse at 50% 30%, #a5161a 0%, #6d0c0f 75%);
+  .scene-corner {
+    color: #ffd9c9;
+  }
+  .story-browser {
+    top: 48%;
+    left: 14%;
+    width: 72%;
+    transform: rotate(-2deg);
+    border-color: #ffffff30;
+    > img {
+      aspect-ratio: 2.1;
+      object-fit: cover;
+      object-position: top;
+    }
+  }
+}
+.atelier-scene-glow {
+  position: absolute;
+  inset: 10% 20% 40%;
+  background: radial-gradient(circle, #ff8a5c55, transparent 70%);
+  filter: blur(20px);
+}
+.atelier-scene-pizza {
+  position: absolute;
+  top: 9%;
+  left: 50%;
+  width: 40%;
+  margin-left: -20%;
+  filter: drop-shadow(0 25px 30px #3a0406);
+}
+.atelier-scene-basil {
+  position: absolute;
+  width: 9%;
+  filter: drop-shadow(0 10px 12px #3a040699);
+  &.basil-0 {
+    top: 10%;
+    left: 14%;
+  }
+  &.basil-1 {
+    top: 30%;
+    right: 13%;
+    scale: -1 1;
+  }
+  &.basil-2 {
+    top: 6%;
+    right: 26%;
+    width: 6%;
+  }
+}
 /* Photographies du projet Nina : le masque de révélation est animé par GSAP. */
 .contact-sheet {
   position: absolute;
@@ -473,6 +525,7 @@
   }
   &[data-active="samantha"] .story-stage .scene-samantha,
   &[data-active="kasa"] .story-stage .scene-kasa,
+  &[data-active="atelier-pizza"] .story-stage .scene-atelier-pizza,
   &[data-active="nina"] .story-stage .scene-nina {
     opacity: 1;
     visibility: visible;

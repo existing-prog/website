@@ -70,6 +70,20 @@ export const projects = [
     url: "https://samantharamsey.github.io/portfolio_samantha/",
     tags: ["Academic portfolio", "Interactive experience"],
     color: "violet",
+    category: "portfolio",
+  },
+  {
+    id: "atelier-pizza",
+    name: "Atelier Pizza",
+    kind: "Personal project",
+    caption: "A menu the owner updates.",
+    description:
+      "A restaurant website with a custom WordPress interface, so the owner can change prices, dishes and opening hours without touching the layout.",
+    image: "atelier.webp",
+    url: "https://existing-prog.github.io/website/demos/atelier-pizza.html",
+    tags: ["WordPress", "Restaurant website"],
+    color: "tomato",
+    category: "restaurant",
   },
   {
     id: "kasa",
@@ -82,6 +96,7 @@ export const projects = [
     url: "https://portfolio-swart-psi-26.vercel.app/projects/kasa",
     tags: ["React", "Responsive UI"],
     color: "sand",
+    category: "frontend",
   },
   {
     id: "nina",
@@ -94,11 +109,15 @@ export const projects = [
     url: "https://portfolio-swart-psi-26.vercel.app/projects/nina-carducci",
     tags: ["Performance", "SEO & accessibility"],
     color: "sage",
+    category: "frontend",
   },
 ];
 /** Un seul point pour les liens de projet : étude interne ou site externe. */
 export const projectHref = (project: (typeof projects)[number]) =>
-  project.id === "samantha" || project.id === "kasa" || project.id === "nina"
+  project.id === "samantha" ||
+  project.id === "kasa" ||
+  project.id === "nina" ||
+  project.id === "atelier-pizza"
     ? pathFor({ kind: "case", id: project.id }, currentLang())
     : project.url;
 export const isInternalHref = (href: string) => !/^https?:/.test(href);

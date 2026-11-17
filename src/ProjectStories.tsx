@@ -31,6 +31,11 @@ const directions: Record<string, { service: ServiceId; result: string; label: st
       label: "RESPONSIVE DEVELOPMENT",
       result: "A considered experience, wherever your visitors find you.",
     },
+    "atelier-pizza": {
+      service: "website",
+      label: "RESTAURANT WEBSITE",
+      result: "A menu you update yourself, on a website that makes people hungry.",
+    },
     nina: {
       service: "care",
       label: "PERFORMANCE & ACCESSIBILITY",
@@ -38,6 +43,12 @@ const directions: Record<string, { service: ServiceId; result: string; label: st
     },
   };
 type Project = (typeof projects)[number];
+const FILTER_CATEGORIES = {
+  Portfolios: "portfolio",
+  Restaurants: "restaurant",
+  "Frontend & performance": "frontend",
+} as const;
+const total = String(projects.length).padStart(2, "0");
 
 function BrowserFrame({ project }: { project: Project }) {
   return (
@@ -76,7 +87,8 @@ function ProjectVisual({
       aria-hidden="true"
     >
       <span className="scene-corner">
-        0{projects.indexOf(project) + 1} / {tr(directions[project.id].label)}
+        {String(projects.indexOf(project) + 1).padStart(2, "0")} /{" "}
+        {tr(directions[project.id].label)}
       </span>
       {project.id === "samantha" && (
         <>
@@ -133,6 +145,27 @@ function ProjectVisual({
           </div>
         </>
       )}
+      {project.id === "atelier-pizza" && (
+        <>
+          <div className="atelier-scene-glow" />
+          <img
+            className="atelier-scene-pizza"
+            src={asset("atelier-pizza-whole.webp")}
+            alt=""
+            loading="lazy"
+          />
+          {[0, 1, 2].map((i) => (
+            <img
+              className={`atelier-scene-basil basil-${i}`}
+              key={i}
+              src={asset("pizza-burst/basil.webp")}
+              alt=""
+              loading="lazy"
+            />
+          ))}
+          <BrowserFrame project={project} />
+        </>
+      )}
       {project.id === "nina" && (
         <>
           <div className="contact-sheet">
@@ -166,10 +199,14 @@ export default function ProjectStories({
   const [reduced, setReduced] = useState(
     () => matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
+  // Chaque filtre correspond à une catégorie stable du projet (voir data.ts).
   const visible = useMemo(
     () =>
       projects.filter(
-        (_, i) => filter === "All work" || (filter === "Portfolios" ? i === 0 : i !== 0),
+        (project) =>
+          filter === "All work" ||
+          project.category ===
+            FILTER_CATEGORIES[filter as keyof typeof FILTER_CATEGORIES],
       ),
     [filter],
   );
@@ -310,6 +347,40 @@ export default function ProjectStories({
             },
             0.6,
           );
+        } else if (project.id === "atelier-pizza") {
+          // La pizza arrive en tournant, le basilic tombe, puis la carte en ligne.
+          tl.fromTo(
+            scene.querySelector(".atelier-scene-pizza"),
+            { rotation: -120, scale: 0.55, opacity: 0 },
+            { rotation: 0, scale: 1, opacity: 1, duration: 0.6, ease: "power2.out" },
+            0,
+          );
+          tl.fromTo(
+            scene.querySelectorAll(".atelier-scene-basil"),
+            { y: -120, rotation: (i) => [-80, 60, 140][i], opacity: 0 },
+            {
+              y: 0,
+              rotation: (i) => [-20, 25, 110][i],
+              opacity: 1,
+              duration: 0.45,
+              stagger: 0.08,
+              ease: "power2.out",
+            },
+            0.1,
+          );
+          tl.fromTo(
+            browser,
+            { y: 90, scale: 0.84, rotationZ: -6, opacity: 0 },
+            {
+              y: 0,
+              scale: 1,
+              rotationZ: -2,
+              opacity: 1,
+              duration: 0.6,
+              ease: "power2.out",
+            },
+            0.35,
+          );
         } else {
           tl.fromTo(
             scene.querySelectorAll(".photo-print"),
@@ -380,7 +451,7 @@ export default function ProjectStories({
       ref={root}
     >
       <div className="work-filters" aria-label={tr("Filter selected projects")}>
-        {["All work", "Portfolios", "Frontend & performance"].map((f) => (
+        {["All work", "Portfolios", "Restaurants", "Frontend & performance"].map((f) => (
           <button
             key={f}
             className={filter === f ? "active" : ""}
@@ -413,7 +484,7 @@ export default function ProjectStories({
                   aria-label={tr("Show {{name}}", { name: project.name })}
                   aria-pressed={active === project.id}
                 >
-                  0{projects.indexOf(project) + 1}
+                  {String(projects.indexOf(project) + 1).padStart(2, "0")}
                 </button>
               ))}
             </nav>
@@ -431,8 +502,8 @@ export default function ProjectStories({
               </div>
               <div className="chapter-content">
                 <span className="chapter-number">
-                  0{projects.indexOf(project) + 1}
-                  <span> / 03</span>
+                  {String(projects.indexOf(project) + 1).padStart(2, "0")}
+                  <span> / {total}</span>
                 </span>
                 <a
                   href={projectHref(project)}

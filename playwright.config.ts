@@ -23,6 +23,9 @@ export default defineConfig({
     ...(process.env.TEST_WEBKIT
       ? [{ name: "webkit", use: { browserName: "webkit" as const } }]
       : []),
+    ...(process.env.TEST_FIREFOX
+      ? [{ name: "firefox", use: { browserName: "firefox" as const } }]
+      : []),
   ],
   webServer: process.env.TEST_URL
     ? undefined

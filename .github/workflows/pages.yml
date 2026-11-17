@@ -28,9 +28,13 @@ jobs:
       - name: Typecheck and build
         run: npm run build
       - name: Install test browser
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --with-deps chromium firefox
       - name: Browser regression checks
         run: npm test
+      - name: Firefox media suspension regression checks
+        env:
+          TEST_FIREFOX: "1"
+        run: npm test -- tests/atelier-pizza.spec.ts --project=firefox -g "decoder|page-cache|first scroll"
       - name: Build configured contact form
         env:
           # Identifiant public fourni par Lucas ; une variable de dépôt peut le remplacer.

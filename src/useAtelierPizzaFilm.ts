@@ -50,6 +50,43 @@ export function useAtelierPizzaFilm(root: RefObject<HTMLElement | null>) {
         let frame = 0;
         let refreshFrame = 0;
         let loaded = false;
+        let suspended = document.hidden;
+        let recoveryTimer = 0;
+        let recoveryAttempts = 0;
+        let resumeFrame = 0;
+
+        const clearRecoveryTimer = () => {
+          window.clearTimeout(recoveryTimer);
+          recoveryTimer = 0;
+        };
+        const watchDecoder = (delay: number) => {
+          // Un seul délai pour le chargement ou la recherche en cours. Il ne
+          // tourne jamais en arrière-plan et ne s’accumule pas au scroll.
+          if (recoveryTimer || document.hidden || suspended) return;
+          recoveryTimer = window.setTimeout(() => {
+            recoveryTimer = 0;
+            recoverDecoder();
+          }, delay);
+        };
+
+        function recoverDecoder() {
+          if (!active || failed || !loaded || document.hidden || suspended) return;
+          if (recoveryAttempts >= 2) {
+            fail();
+            return;
+          }
+          recoveryAttempts += 1;
+          clearRecoveryTimer();
+          cancelAnimationFrame(frame);
+          frame = 0;
+          delete section.dataset.videoReady;
+          // load() libère les recherches abandonnées et recrée le décodeur
+          // suspendu par le téléphone. La source garde son URL pour le cache ;
+          // loadedmetadata/loadeddata réappliquent la dernière cible du scroll.
+          video.pause();
+          video.load();
+          watchDecoder(8000);
+        }
 
         const queueFrame = () => {
           if (frame || !active || failed) return;
@@ -59,6 +96,7 @@ export function useAtelierPizzaFilm(root: RefObject<HTMLElement | null>) {
               !active ||
               failed ||
               document.hidden ||
+              suspended ||
               video.readyState < 1 ||
               !Number.isFinite(video.duration)
             )
@@ -70,11 +108,16 @@ export function useAtelierPizzaFilm(root: RefObject<HTMLElement | null>) {
             if (!video.seeking && Math.abs(video.currentTime - target) > 1 / 48) {
               try {
                 video.currentTime = target;
+                watchDecoder(2000);
               } catch {
                 /* Le chargement reprendra au prochain événement média. */
               }
             } else if (!video.seeking && video.readyState >= 2) {
               section.dataset.videoReady = "true";
+              clearRecoveryTimer();
+              recoveryAttempts = 0;
+            } else if (video.seeking) {
+              watchDecoder(2000);
             }
           });
         };
@@ -125,6 +168,7 @@ export function useAtelierPizzaFilm(root: RefObject<HTMLElement | null>) {
         const fail = () => {
           if (!active || failed) return;
           failed = true;
+          clearRecoveryTimer();
           trigger.kill();
           smoothProgress.tween.kill();
           clearScene();
@@ -140,16 +184,75 @@ export function useAtelierPizzaFilm(root: RefObject<HTMLElement | null>) {
         };
         const onSeeked = () => {
           if (!active || failed) return;
+          clearRecoveryTimer();
           if (video.readyState >= 2) section.dataset.videoReady = "true";
           queueFrame();
         };
         video.addEventListener("loadedmetadata", queueFrame, { signal: events.signal });
         video.addEventListener("loadeddata", queueFrame, { signal: events.signal });
         video.addEventListener("seeked", onSeeked, { signal: events.signal });
-        video.addEventListener("error", fail, { signal: events.signal });
-        document.addEventListener("visibilitychange", queueFrame, {
-          signal: events.signal,
-        });
+        video.addEventListener(
+          "error",
+          () => {
+            // Une erreur pendant la suspension sera récupérée au retour, au
+            // lieu de condamner l’animation pour toute la visite.
+            if (!document.hidden && !suspended) fail();
+          },
+          { signal: events.signal },
+        );
+
+        const suspend = () => {
+          suspended = true;
+          clearRecoveryTimer();
+          cancelAnimationFrame(frame);
+          frame = 0;
+          cancelAnimationFrame(resumeFrame);
+          resumeFrame = 0;
+          video.pause();
+        };
+        const resume = () => {
+          if (!active || failed || document.hidden || !suspended || resumeFrame) return;
+          // Plusieurs événements de retour peuvent arriver ensemble : une seule
+          // remise en route du média à l’image suivante.
+          resumeFrame = requestAnimationFrame(() => {
+            resumeFrame = 0;
+            if (!active || failed || document.hidden || !suspended) return;
+            suspended = false;
+            recoveryAttempts = 0;
+            // Le système peut restaurer une autre position ou hauteur de viewport.
+            // Resynchroniser la cible, même si l’utilisateur ne scrolle pas encore.
+            trigger.refresh();
+            smoothProgress.tween.pause();
+            progress.value = requested = trigger.progress;
+            section.dataset.filmProgress = requested.toFixed(3);
+            recoverDecoder();
+            queueFrame();
+          });
+        };
+        document.addEventListener(
+          "visibilitychange",
+          () => {
+            if (document.hidden) suspend();
+            else resume();
+          },
+          {
+            signal: events.signal,
+          },
+        );
+        window.addEventListener("pagehide", suspend, { signal: events.signal });
+        window.addEventListener(
+          "pageshow",
+          (event) => {
+            if (event.persisted) suspended = true;
+            resume();
+          },
+          { signal: events.signal },
+        );
+        // freeze/resume couvrent la suspension du processus ; focus ne recharge
+        // rien sans suspension préalable (clics, clavier, traduction, etc.).
+        document.addEventListener("freeze", suspend, { signal: events.signal });
+        document.addEventListener("resume", resume, { signal: events.signal });
+        window.addEventListener("focus", resume, { signal: events.signal });
 
         // Le film ne se télécharge qu’à proximité de la scène, et jamais en
         // mouvement réduit. La page d’accueil ne monte pas cette étude de cas.
@@ -159,6 +262,7 @@ export function useAtelierPizzaFilm(root: RefObject<HTMLElement | null>) {
           video.src = asset("atelier-film/pizza-scroll-v1.mp4");
           video.preload = "auto";
           video.load();
+          watchDecoder(8000);
         };
         const observer = new IntersectionObserver(
           (entries) => {
@@ -182,11 +286,13 @@ export function useAtelierPizzaFilm(root: RefObject<HTMLElement | null>) {
         queueFrame();
         return () => {
           active = false;
+          clearRecoveryTimer();
           events.abort();
           observer.disconnect();
           resize.disconnect();
           cancelAnimationFrame(frame);
           cancelAnimationFrame(refreshFrame);
+          cancelAnimationFrame(resumeFrame);
           trigger.kill();
           smoothProgress.tween.kill();
           clearScene();

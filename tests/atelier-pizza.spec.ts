@@ -110,7 +110,138 @@ test("reduced motion never downloads the decorative film", async ({ page }) => {
   await page.locator(".atelier-reveal-copy").scrollIntoViewIfNeeded();
   await expect(page.locator(".atelier-film-static")).toBeVisible();
   await expect(page.locator(".atelier-pizza-film")).not.toHaveAttribute("src");
+  await page.evaluate(() => {
+    window.dispatchEvent(new PageTransitionEvent("pagehide", { persisted: true }));
+    window.dispatchEvent(new PageTransitionEvent("pageshow", { persisted: true }));
+  });
   expect(movies).toHaveLength(0);
+});
+
+test("mobile film resumes a discarded decoder at the current scroll position", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("#project/atelier-pizza");
+  await scrollFilm(page, 0.55);
+  const film = page.locator(".atelier-pizza-film");
+  await film.evaluate((node: HTMLVideoElement) => {
+    node.addEventListener("emptied", () => {
+      node.dataset.reloads = String(Number(node.dataset.reloads || 0) + 1);
+      // Injection de panne : le système avait laissé seeking bloqué. Un vrai
+      // rechargement du média doit le libérer, puis décoder la cible native.
+      Reflect.deleteProperty(node, "seeking");
+    });
+    node.addEventListener("play", () => {
+      node.dataset.unexpectedPlayback = "true";
+    });
+  });
+  for (const attempt of [1, 2]) {
+    await page.evaluate(() => {
+      Object.defineProperty(document, "hidden", { configurable: true, value: true });
+      document.dispatchEvent(new Event("visibilitychange"));
+      Object.defineProperty(document.querySelector(".atelier-pizza-film"), "seeking", {
+        configurable: true,
+        value: true,
+      });
+    });
+    await page.evaluate(() => {
+      Reflect.deleteProperty(document, "hidden");
+      document.dispatchEvent(new Event("visibilitychange"));
+      // Firefox peut envoyer plusieurs notifications pour le même retour.
+      window.dispatchEvent(new Event("focus"));
+      window.dispatchEvent(new PageTransitionEvent("pageshow", { persisted: true }));
+    });
+    await expect(film).toHaveAttribute("data-reloads", String(attempt));
+    await expect
+      .poll(() =>
+        film.evaluate(
+          (v: HTMLVideoElement) =>
+            !v.seeking &&
+            v.readyState >= 2 &&
+            Math.abs(v.currentTime - (v.duration - 1 / 30) * 0.55) < 0.09,
+        ),
+      )
+      .toBe(true);
+    await expect(page.locator(".atelier-unfold")).toHaveAttribute(
+      "data-video-ready",
+      "true",
+    );
+  }
+  await expect(film).not.toHaveAttribute("data-unexpected-playback");
+  for (const progress of [0.9, 0.1, 1]) await scrollFilm(page, progress);
+});
+
+test("mobile film resumes after a page-cache restore and ignores ordinary focus", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("#project/atelier-pizza");
+  await scrollFilm(page, 0.35);
+  const film = page.locator(".atelier-pizza-film");
+  await film.evaluate((v) =>
+    v.addEventListener("emptied", () => v.setAttribute("data-reloaded", "true")),
+  );
+  await page.evaluate(() => {
+    window.dispatchEvent(new Event("focus"));
+    window.dispatchEvent(new PageTransitionEvent("pageshow", { persisted: false }));
+  });
+  await expect(film).not.toHaveAttribute("data-reloaded");
+  await page.evaluate(() => {
+    window.dispatchEvent(new PageTransitionEvent("pagehide", { persisted: true }));
+    window.dispatchEvent(new PageTransitionEvent("pageshow", { persisted: true }));
+  });
+  await expect(film).toHaveAttribute("data-reloaded", "true");
+  await expect
+    .poll(() =>
+      film.evaluate(
+        (v: HTMLVideoElement) =>
+          !v.seeking &&
+          v.readyState >= 2 &&
+          Math.abs(v.currentTime - (v.duration - 1 / 30) * 0.35) < 0.09,
+      ),
+    )
+    .toBe(true);
+  await scrollFilm(page, 0.8);
+  // Quitter la scène pendant la suspension doit supprimer les listeners de
+  // reprise ; ils ne doivent pas ressusciter une vidéo sur la page d’accueil.
+  await page.evaluate(() => document.dispatchEvent(new Event("freeze")));
+  await page.locator(".case-back").first().click();
+  await page.evaluate(() => document.dispatchEvent(new Event("resume")));
+  await expect(page.locator(".atelier-pizza-film")).toHaveCount(0);
+  await expect(page.locator("#work")).toBeVisible();
+});
+
+test("a stalled decoder recovers and uses the static fallback if it stays blocked", async ({
+  page,
+}) => {
+  test.setTimeout(45000);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("#project/atelier-pizza");
+  await scrollFilm(page, 0.35);
+  await page.locator(".atelier-pizza-film").evaluate((v) => {
+    Object.defineProperty(v, "seeking", { configurable: true, value: true });
+    v.addEventListener("emptied", () => Reflect.deleteProperty(v, "seeking"), {
+      once: true,
+    });
+  });
+  await scrollFilm(page, 0.75);
+  // Une panne persistante ne doit pas laisser une image figée face à des
+  // légendes qui continuent : le mode statique supprime la piste de scroll.
+  await page.locator(".atelier-pizza-film").evaluate((v) => {
+    Object.defineProperty(v, "seeking", { configurable: true, value: true });
+    Object.defineProperty(v, "readyState", { configurable: true, value: 1 });
+  });
+  await page.locator(".atelier-unfold").evaluate((el) => {
+    const track = el.querySelector<HTMLElement>(".atelier-scene-track")!;
+    scrollBy({ top: -track.offsetHeight * 0.1, behavior: "instant" });
+  });
+  await expect(page.locator(".atelier-unfold")).toHaveAttribute(
+    "data-film-mode",
+    "fallback",
+    { timeout: 22000 },
+  );
+  await expect(page.locator(".atelier-film-static")).toBeVisible();
+  await expect(page.locator(".atelier-pizza-stage")).not.toHaveCSS("position", "sticky");
 });
 
 test("a failed film leaves a static image, readable copy and no long scroll track", async ({

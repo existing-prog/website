@@ -68,3 +68,18 @@ Les trois repères décoratifs changent selon la progression, sans masquer les
 informations utiles. Les détails du menu suivent dans le flux normal et restent
 accessibles si le film échoue. Le masque commun aux posters et à la vidéo fond
 les bords du rendu dans le fond, sans recadrer le fichier source.
+
+### Reprise après suspension mobile
+
+`useAtelierPizzaFilm.ts` annule les recherches et leurs délais en arrière-plan.
+Au retour (`visibilitychange`, `pageshow` ou `resume`), il regroupe les événements
+sur une seule image, recharge le même média sans le lire et retrouve la cible du
+scroll actuel. Cela libère les décodeurs et les recherches suspendus par le système.
+Un délai de 2 s surveille une recherche bloquée ; un rechargement dispose de 8 s.
+Après deux tentatives infructueuses, l’image fixe prend le relais et la longue
+piste disparaît. Tous les délais et écouteurs sont retirés à la sortie de la page.
+
+Les tests Atelier couvrent deux retours successifs, la restauration depuis le
+cache de navigation, le respect du mouvement réduit et un décodeur bloqué. Le
+projet Playwright Firefox est activable avec `TEST_FIREFOX=1` ; les scénarios de
+reprise sont aussi exécutés dans GitHub Actions avant chaque publication.

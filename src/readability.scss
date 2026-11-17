@@ -70,3 +70,24 @@
     }
   }
 }
+
+/* Pied de page : les liens passent à la ligne sur les petits écrans. */
+.site-footer div {
+  flex-wrap: wrap;
+  row-gap: 12px;
+}
+@media (max-width: 760px) {
+  .site-footer div {
+    justify-content: flex-start;
+    column-gap: 22px;
+  }
+}
+
+/* Téléphone : la petite ligne au-dessus du titre tient sur deux lignes en français.
+ * On réserve deux lignes dans toutes les langues pour que l’accueil ne saute pas
+ * quand on change de langue. */
+@media (max-width: 480px) {
+  .hero-kicker .eyebrow {
+    min-height: 3.2em;
+  }
+}

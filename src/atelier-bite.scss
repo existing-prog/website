@@ -32,13 +32,6 @@
 .atelier-bite-board {
   fill: #e4d7c2;
 }
-.atelier-bite-strand {
-  fill: none;
-  stroke: #f6e7bd;
-  stroke-width: 9;
-  stroke-linecap: round;
-  opacity: 0;
-}
 .atelier-bite-shadow {
   fill: #3b2614;
   opacity: 0;
@@ -194,7 +187,6 @@
 .atelier-bite[data-scene="static"] {
   .atelier-bite-slice,
   .atelier-bite-shadow,
-  .atelier-bite-strand,
   .atelier-bite-crumbs {
     display: none;
   }

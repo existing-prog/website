@@ -1,7 +1,7 @@
 import { useLayoutEffect, type RefObject } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { AXIS } from "./atelierBiteGeometry";
+import { AXIS, PIVOT } from "./atelierBiteGeometry";
 gsap.registerPlugin(ScrollTrigger);
 
 /** Repères de la chronologie (0 → 1), partagés par l’animation et les attributs de test. */
@@ -39,12 +39,11 @@ export function useAtelierBite(root: RefObject<HTMLElement | null>, language?: s
         scene.dataset.phase = "intro";
         const slice = q<SVGGElement>(".atelier-bite-slice");
         const shadow = q<SVGPathElement>(".atelier-bite-shadow");
-        const strands = scene.querySelectorAll<SVGPathElement>(".atelier-bite-strand");
         const marks = scene.querySelectorAll<SVGGElement>(".atelier-bite-mark");
         const words = scene.querySelectorAll(".atelier-bite-copy h2 .case-word");
 
         // Pointe de la part = pivot : sa position suit directement x/y.
-        gsap.set([slice, shadow], { svgOrigin: "500 500" });
+        gsap.set([slice, shadow], { svgOrigin: PIVOT });
         // Bouchées fermées : rayon nul tant qu’elles n’ont pas eu lieu. On anime
         // l’attribut r, car un élément de <mask> n’a pas de boîte pour un transform.
         const circles = [...marks].map((mark) => [...mark.querySelectorAll("circle")]);
@@ -60,21 +59,6 @@ export function useAtelierBite(root: RefObject<HTMLElement | null>, language?: s
           y: 24,
         });
         gsap.set(scene.querySelectorAll(".atelier-bite-crumbs"), { opacity: 0 });
-
-        // Fils de fromage entre le centre de la pizza et la pointe qui s’éloigne.
-        const pull = { x: 0, y: 0, sag: 0 };
-        const drawStrands = () =>
-          strands.forEach((strand) => {
-            const offset = Number(strand.dataset.offset);
-            const tipX = 500 + pull.x + offset * 0.4;
-            const tipY = 500 + pull.y;
-            const midX = (500 + offset + tipX) / 2;
-            const midY = (500 + tipY) / 2 + pull.sag;
-            strand.setAttribute(
-              "d",
-              `M${500 + offset} 500 Q${midX} ${midY} ${tipX} ${tipY}`,
-            );
-          });
 
         const tl = gsap.timeline({
           defaults: { ease: "none" },
@@ -103,7 +87,7 @@ export function useAtelierBite(root: RefObject<HTMLElement | null>, language?: s
         // 1. La pizza entre en tournant.
         tl.fromTo(
           q(".atelier-bite-pizza"),
-          { rotation: -24, scale: 0.84, svgOrigin: "500 500" },
+          { rotation: -24, scale: 0.84, svgOrigin: PIVOT },
           { rotation: 0, scale: 1, duration: AT.lift, ease: "power2.out" },
           0,
         );
@@ -118,7 +102,7 @@ export function useAtelierBite(root: RefObject<HTMLElement | null>, language?: s
           { opacity: 0, y: -20, duration: 0.06 },
           AT.drop - 0.04,
         );
-        // 2. La part se soulève : les fils de fromage s’étirent, puis cèdent.
+        // 2. La part se soulève et s’écarte de la pizza.
         const lifted = { x: AXIS.x * 95, y: AXIS.y * 95 };
         tl.to(
           slice,
@@ -130,38 +114,16 @@ export function useAtelierBite(root: RefObject<HTMLElement | null>, language?: s
             ease: "power2.inOut",
           },
           AT.lift,
-        )
-          .to(
-            shadow,
-            {
-              x: lifted.x + 26,
-              y: lifted.y + 46,
-              opacity: 0.42,
-              duration: AT.snap - AT.lift,
-            },
-            AT.lift,
-          )
-          .fromTo(
-            pull,
-            { x: 0, y: 0, sag: 0 },
-            {
-              x: lifted.x,
-              y: lifted.y,
-              sag: 38,
-              duration: AT.snap - AT.lift,
-              ease: "power2.inOut",
-              onUpdate: drawStrands,
-            },
-            AT.lift,
-          )
-          .fromTo(strands, { opacity: 0 }, { opacity: 1, duration: 0.01 }, AT.lift)
-          .fromTo(
-            strands,
-            { opacity: 1 },
-            { opacity: 0, duration: 0.025, immediateRender: false },
-            AT.snap,
-          )
-          .to(pull, { sag: 90, duration: 0.03, onUpdate: drawStrands }, AT.snap);
+        ).to(
+          shadow,
+          {
+            x: lifted.x + 26,
+            y: lifted.y + 46,
+            opacity: 0.42,
+            duration: AT.snap - AT.lift,
+          },
+          AT.lift,
+        );
         // 3. La part s’approche pour être croquée.
         const bitePosition = { x: AXIS.x * 120 + 70, y: AXIS.y * 120 + 40 };
         tl.to(
@@ -261,14 +223,12 @@ export function useAtelierBite(root: RefObject<HTMLElement | null>, language?: s
             AT.reveal + 0.05,
           )
           .to({}, { duration: 0.04 }, 0.96);
-        drawStrands();
 
         return () => {
           scene.dataset.scene = "static";
           scene.dataset.bite = "5";
           delete scene.dataset.phase;
           scene.style.removeProperty("--bite-progress");
-          strands.forEach((strand) => strand.setAttribute("d", "M500 500 L500 500"));
         };
       },
     );

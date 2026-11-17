@@ -5,7 +5,7 @@ import { asset } from "./data";
 import { tr } from "./i18n";
 import CaseWords from "./CaseWords";
 import { useAtelierBite } from "./useAtelierBite";
-import { BITES, SLICE, STRANDS } from "./atelierBiteGeometry";
+import { BITES, SLICE } from "./atelierBiteGeometry";
 import "./atelier-bite.scss";
 
 /**
@@ -101,14 +101,6 @@ export default function AtelierBiteScene() {
                   height="1000"
                   mask="url(#atelier-rest)"
                 />
-                {STRANDS.map((offset) => (
-                  <path
-                    className="atelier-bite-strand"
-                    key={offset}
-                    data-offset={offset}
-                    d="M500 500 L500 500"
-                  />
-                ))}
                 <path
                   className="atelier-bite-shadow"
                   d={SLICE}

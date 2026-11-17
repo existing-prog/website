@@ -35,35 +35,39 @@
   margin-top: 25px;
   max-width: 850px;
 }
+/* Une seule surface pour la scène et le film : les bords se fondent dans
+ * le décor, sans cadre vidéo. Les informations ne dépendent jamais du scroll. */
 .atelier-unfold {
   background: #f6f0e5;
   color: #2b251e;
   position: relative;
 }
-.atelier-pizza-stage {
-  display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
-  align-items: center;
-  gap: 65px;
-  padding-block: 65px;
+.atelier-scene-track {
+  background: #d8d6d1;
 }
-.atelier-pizza-track {
-  min-width: 0;
+.atelier-pizza-stage {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(15px, 3vw, 55px);
+  max-width: 1800px;
+  margin-inline: auto;
+  padding: 65px clamp(24px, 5vw, 100px);
+  overflow: hidden;
 }
 .atelier-pizza-visual {
   position: relative;
-  width: 100%;
+  width: 110%;
+  margin-left: -9%;
   min-width: 0;
 }
-/* Le cadrage reste en 3:2 : aucune découpe latérale de la main sur téléphone. */
 .atelier-pizza-media {
   position: relative;
   aspect-ratio: 3 / 2;
-  overflow: hidden;
-  border-radius: 14px;
-  border: 1px solid #44352818;
-  background: #d1cfca;
-  box-shadow: 0 18px 40px #33210c12;
+  // Le masque est commun au poster et au film : pas de saut au chargement.
+  mask-image: radial-gradient(ellipse at center, #000 57%, transparent 70%);
   img,
   video {
     display: block;
@@ -97,33 +101,98 @@
     opacity: 1;
   }
 }
-.atelier-unfold:not([data-film-mode="scroll"]) .atelier-scroll-label {
-  display: none;
-}
 .atelier-scroll-label {
-  display: block;
-  margin-top: 20px;
-  text-align: center;
+  display: none;
+  position: absolute;
+  bottom: 30px;
+  left: clamp(24px, 5vw, 100px);
+  right: clamp(24px, 5vw, 100px);
+  align-items: center;
+  gap: 24px;
   font: 10px monospace;
   letter-spacing: 1.2px;
-  color: #786956;
+  color: #544b40;
+}
+.atelier-scene-progress {
+  height: 1px;
+  flex: 1;
+  background: #53412d30;
+  > span {
+    display: block;
+    height: 100%;
+    background: #943729;
+    transform: scaleX(0);
+    transform-origin: left;
+  }
 }
 .atelier-reveal-copy {
+  position: relative;
+  z-index: 1;
   .eyebrow {
-    color: #943729;
+    color: #7c3025;
+    font-size: 10px;
+    letter-spacing: 1.3px;
   }
   h2 {
+    margin-top: 30px;
     font-family: Georgia, serif;
-    font-size: clamp(42px, 4.4vw, 65px);
-    letter-spacing: -2px;
+    font-size: clamp(50px, 5.5vw, 90px);
+    letter-spacing: -3px;
+    line-height: 1.04;
   }
   h2 em {
-    color: #9c392c;
+    color: #943729;
   }
-  > p:not(.eyebrow) {
+  > .atelier-scene-caption {
+    max-width: 340px;
     font-size: 17px;
-    color: #5b5247;
+    color: #534a40;
     margin-top: 25px;
+    line-height: 1.6;
+  }
+}
+.atelier-scene-beats {
+  position: relative;
+  height: 34px;
+  margin-top: 36px;
+  font-size: 14px;
+  color: #4b4136;
+}
+.atelier-scene-beat {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: translateY(7px);
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+  small {
+    margin-right: 12px;
+    font: 11px monospace;
+    color: #8d382b;
+  }
+  &[data-active="true"] {
+    opacity: 1;
+    transform: none;
+  }
+}
+.atelier-unfold:not([data-film-mode="scroll"]) .atelier-scene-beat:last-child {
+  opacity: 1;
+  transform: none;
+}
+.atelier-menu-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: clamp(30px, 8vw, 120px);
+  padding-block: 65px;
+  > p {
+    font-size: clamp(18px, 1.8vw, 24px);
+    color: #5b5247;
+    line-height: 1.7;
+  }
+  .atelier-menu-example {
+    margin-top: 0;
   }
 }
 .atelier-menu-example {
@@ -256,35 +325,81 @@
   font-size: 15px;
   margin-top: 20px;
 }
-/* Le sticky est purement CSS : le défilement tactile n’est jamais capturé. */
-@media (min-width: 1024px) and (min-height: 700px) {
-  .atelier-unfold[data-film-mode="scroll"] {
-    min-height: 190svh;
-    .atelier-pizza-stage {
-      position: sticky;
-      top: 110px;
-      height: calc(100svh - 145px);
-      padding-block: 30px;
-    }
+/* Une piste courte pour la scène entière, sur ordinateur comme sur téléphone.
+ * Aucun pin JS ni capture tactile ; les détails suivent dans le flux normal. */
+.atelier-unfold[data-film-mode="scroll"] {
+  .atelier-scene-track {
+    height: calc(175svh - 80px);
+  }
+  .atelier-pizza-stage {
+    position: sticky;
+    top: 80px;
+    height: calc(100svh - 80px);
+    padding-block: 40px 65px;
+  }
+  .atelier-scroll-label {
+    display: flex;
   }
 }
 @media (max-width: 1023px) {
   .atelier-pizza-stage {
     grid-template-columns: 1fr;
-    gap: 35px;
+    gap: 0;
+    padding-block: 40px;
+  }
+  .atelier-reveal-copy {
+    grid-row: 1;
+    text-align: center;
+    h2 {
+      font-size: clamp(42px, 7.5vw, 68px);
+      margin-top: 16px;
+      letter-spacing: -2px;
+    }
+    > .atelier-scene-caption {
+      margin: 15px auto 0;
+      max-width: 430px;
+      font-size: 15px;
+    }
+  }
+  .atelier-scene-beats {
+    margin-top: 18px;
+    height: 22px;
+    font-size: 13px;
   }
   .atelier-pizza-visual {
-    width: min(100%, 720px);
-    margin-inline: auto;
+    width: min(calc(100% + 100px), 800px);
+    margin-left: 0;
+    justify-self: center;
+    grid-row: 2;
+    min-height: 0;
   }
   .atelier-unfold[data-film-mode="scroll"] {
-    .atelier-pizza-track {
-      height: calc(var(--atelier-film-height, 65vw) + 100svh);
+    .atelier-pizza-stage {
+      grid-template-rows: auto minmax(0, 1fr);
+      padding-block: 24px 45px;
     }
     .atelier-pizza-visual {
-      position: sticky;
-      top: 80px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      container-type: size;
     }
+    .atelier-pizza-media {
+      // Garder le masque au format du film, pas autour des bandes vides
+      // produites par object-fit dans une grande cellule de grille.
+      height: auto;
+      aspect-ratio: 3 / 2;
+      width: min(100%, 150cqh);
+    }
+    .atelier-scroll-label {
+      bottom: 22px;
+      font-size: 9px;
+      gap: 15px;
+    }
+  }
+  .atelier-menu-details {
+    gap: 35px;
   }
   .atelier-intro-details {
     align-items: start;
@@ -302,20 +417,10 @@
   .atelier-intro-details > p {
     font-size: 16px;
   }
-  .atelier-pizza-stage {
+  .atelier-menu-details {
     grid-template-columns: 1fr;
+    padding-block: 40px;
     gap: 25px;
-    padding-block: 40px 55px;
-  }
-  .atelier-pizza-visual {
-    width: 100%;
-    margin-inline: auto;
-  }
-  .atelier-reveal-copy h2 {
-    font-size: 46px;
-  }
-  .atelier-reveal-copy > p:not(.eyebrow) {
-    font-size: 16px;
   }
   .atelier-editor-grid {
     grid-template-columns: 1fr;

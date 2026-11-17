@@ -44,7 +44,7 @@ Le rendu peut être partagé en plages d’images indépendantes (`-s 1 -e 48 -a
 
 L’assembleur conserve les PNG bruts, débruite les images puis produit `preview-v01.mp4` et `poster-v01.jpg`. Il reprend les images déjà débruitées après interruption. Le MP4 utilise H.264, des pixels YUV420 et un index placé en début de fichier pour les navigateurs mobiles. Il est muet. Toutes les images proviennent du rendu Blender ; aucune image intermédiaire n’est inventée par interpolation vidéo.
 
-Cet export de 768 × 512 et huit échantillons Cycles par image est destiné à valider la chorégraphie, pas à remplacer l’export final. La durée et la cadence sont vérifiées sur le MP4. Une fois le mouvement validé, il restera à choisir la résolution finale et les paramètres de rendu, puis à relier le temps de la vidéo au scroll.
+Cet export de 768 × 512 et huit échantillons Cycles par image sert à valider la chorégraphie. La durée et la cadence sont vérifiées sur le MP4. L’export léger utilisé dans l’étude de cas et son branchement au scroll sont décrits ci-dessous ; une future hausse de résolution pourra remplacer le média sans changer la composition.
 
 ## Film livré au scroll dans l’étude Atelier Pizza
 
@@ -57,3 +57,14 @@ ffmpeg -framerate 24 -i /tmp/pizza-motion/clean/frame-%04d.png -frames:v 144 -c:
 Les images clés sont espacées d’un quart de seconde, sans images B, pour limiter le poids et faciliter les recherches de temps dans les décodeurs mobiles. Les images WebP `first-v1.webp` et `final-v1.webp` proviennent des images 1 et 144. Le film ne démarre jamais en lecture automatique : `useAtelierPizzaFilm.ts` fait suivre son temps au scroll et regroupe les recherches pendant les gestes rapides.
 
 Le composant est limité à l’étude Atelier Pizza. Le film ne charge qu’à proximité de la scène ; les préférences de mouvement réduit et les petits écrans en paysage montrent l’image finale sans charger le MP4. Une erreur réseau ou de décodage revient à cette même présentation statique, sans longue piste de scroll. La traduction garde le même élément vidéo et ne recharge pas le média.
+
+### Composition de la scène Atelier Pizza
+
+La piste `.atelier-scene-track` maintient **la scène entière** en sticky CSS à
+80 px du haut, sur ordinateur et téléphone. Le titre, la légende et la pizza
+restent visibles ensemble. Sa course est limitée à 75 svh ; le ScrollTrigger
+mesure `track.offsetHeight - stage.offsetHeight` au redimensionnement.
+Les trois repères décoratifs changent selon la progression, sans masquer les
+informations utiles. Les détails du menu suivent dans le flux normal et restent
+accessibles si le film échoue. Le masque commun aux posters et à la vidéo fond
+les bords du rendu dans le fond, sans recadrer le fichier source.

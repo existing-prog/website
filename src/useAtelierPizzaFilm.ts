@@ -15,8 +15,8 @@ export function useAtelierPizzaFilm(root: RefObject<HTMLElement | null>) {
     const page = root.current;
     if (!page) return;
     const section = page.querySelector<HTMLElement>(".atelier-unfold")!;
-    const track = section.querySelector<HTMLElement>(".atelier-pizza-track")!;
-    const visual = section.querySelector<HTMLElement>(".atelier-pizza-visual")!;
+    const track = section.querySelector<HTMLElement>(".atelier-scene-track")!;
+    const stage = section.querySelector<HTMLElement>(".atelier-pizza-stage")!;
     const video = section.querySelector<HTMLVideoElement>(".atelier-pizza-film")!;
     const media = gsap.matchMedia();
 
@@ -34,10 +34,9 @@ export function useAtelierPizzaFilm(root: RefObject<HTMLElement | null>) {
         // hauteur disponible ne permet pas le sticky et le texte côte à côte.
         animated:
           "(prefers-reduced-motion: no-preference) and (min-height: 700px), (prefers-reduced-motion: no-preference) and (max-width: 1023px) and (min-height: 600px)",
-        wide: "(min-width: 1024px) and (min-height: 700px)",
       },
       (context) => {
-        const { animated, wide } = context.conditions!;
+        const { animated } = context.conditions!;
         section.dataset.filmMode = "static";
         if (!animated || !video.canPlayType("video/mp4")) {
           release();
@@ -79,11 +78,11 @@ export function useAtelierPizzaFilm(root: RefObject<HTMLElement | null>) {
             }
           });
         };
-        const copy = section.querySelector<HTMLElement>(".atelier-reveal-copy")!;
-        const hint = section.querySelector<HTMLElement>(".atelier-scroll-label")!;
-        const opacity = gsap.quickSetter(copy, "opacity");
-        const translate = gsap.quickSetter(copy, "y", "px");
-        const hintOpacity = gsap.quickSetter(hint, "opacity");
+        const beats = section.querySelectorAll<HTMLElement>(".atelier-scene-beat");
+        const progressLine = gsap.quickSetter(
+          section.querySelector(".atelier-scene-progress > span"),
+          "scaleX",
+        );
         const progress = { value: 0 };
         const smoothProgress = gsap.quickTo(progress, "value", {
           duration: 0.2,
@@ -95,27 +94,28 @@ export function useAtelierPizzaFilm(root: RefObject<HTMLElement | null>) {
             queueFrame();
           },
         });
-        const clearCopy = () => {
-          copy.style.removeProperty("opacity");
-          copy.style.removeProperty("transform");
-          hint.style.removeProperty("opacity");
-        };
+        // Le titre et la légende restent visibles dès le début. Seul le repère
+        // narratif change ; aucune moitié de l’écran ne reste volontairement vide.
         const update = (value: number) => {
           smoothProgress(value);
-          const reveal = gsap.utils.clamp(0, 1, (value - 0.78) / 0.22);
-          const eased = 1 - (1 - reveal) ** 3;
-          opacity(eased);
-          translate(26 * (1 - eased));
-          hintOpacity(1 - gsap.utils.clamp(0, 1, (value - 0.02) / 0.08));
+          progressLine(value);
+          const step = value < 0.32 ? 0 : value < 0.76 ? 1 : 2;
+          beats.forEach((beat, index) => {
+            beat.dataset.active = String(index === step);
+          });
+        };
+        const clearScene = () => {
+          beats.forEach((beat) => delete beat.dataset.active);
+          section
+            .querySelector(".atelier-scene-progress > span")
+            ?.removeAttribute("style");
         };
         // La progression du film vient directement du déclencheur. Elle ne
         // dépend pas de l’initialisation d’une timeline au premier geste.
         const trigger = ScrollTrigger.create({
-          trigger: wide ? section : track,
-          start: wide ? "top 110px" : "top 80px",
-          end: wide
-            ? "bottom bottom"
-            : () => `+=${Math.max(1, track.offsetHeight - visual.offsetHeight)}`,
+          trigger: track,
+          start: "top 80px",
+          end: () => `+=${Math.max(1, track.offsetHeight - stage.offsetHeight)}`,
           invalidateOnRefresh: true,
           onUpdate: (self) => update(self.progress),
           onRefresh: (self) => update(self.progress),
@@ -127,7 +127,7 @@ export function useAtelierPizzaFilm(root: RefObject<HTMLElement | null>) {
           failed = true;
           trigger.kill();
           smoothProgress.tween.kill();
-          clearCopy();
+          clearScene();
           section.dataset.filmMode = "fallback";
           delete section.dataset.videoReady;
           video.pause();
@@ -170,17 +170,15 @@ export function useAtelierPizzaFilm(root: RefObject<HTMLElement | null>) {
           { rootMargin: "700px 0px" },
         );
         observer.observe(section);
+        // Les changements de largeur/hauteur recalculent la même scène CSS,
+        // sans reconstruire la vidéo ni modifier la position de défilement.
         const resize = new ResizeObserver(() => {
-          if (!active) return;
-          const height = `${visual.offsetHeight}px`;
-          if (track.style.getPropertyValue("--atelier-film-height") === height) return;
-          track.style.setProperty("--atelier-film-height", height);
           cancelAnimationFrame(refreshFrame);
           refreshFrame = requestAnimationFrame(() => {
             if (active) ScrollTrigger.refresh();
           });
         });
-        resize.observe(visual);
+        resize.observe(stage);
         queueFrame();
         return () => {
           active = false;
@@ -191,8 +189,7 @@ export function useAtelierPizzaFilm(root: RefObject<HTMLElement | null>) {
           cancelAnimationFrame(refreshFrame);
           trigger.kill();
           smoothProgress.tween.kill();
-          clearCopy();
-          track.style.removeProperty("--atelier-film-height");
+          clearScene();
           delete section.dataset.filmProgress;
           release();
         };

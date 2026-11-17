@@ -9,14 +9,10 @@ async function scrollFilm(page: Page, progress: number) {
       ),
   );
   await page.locator(".atelier-unfold").evaluate((section, value) => {
-    const wide = matchMedia("(min-width: 1024px) and (min-height: 700px)").matches;
-    const track = section.querySelector<HTMLElement>(".atelier-pizza-track")!;
-    const visual = section.querySelector<HTMLElement>(".atelier-pizza-visual")!;
-    const start =
-      (wide ? section : track).getBoundingClientRect().top + scrollY - (wide ? 110 : 80);
-    const distance = wide
-      ? (section as HTMLElement).offsetHeight - innerHeight + 110
-      : track.offsetHeight - visual.offsetHeight;
+    const track = section.querySelector<HTMLElement>(".atelier-scene-track")!;
+    const stage = section.querySelector<HTMLElement>(".atelier-pizza-stage")!;
+    const start = track.getBoundingClientRect().top + scrollY - 80;
+    const distance = track.offsetHeight - stage.offsetHeight;
     scrollTo({ top: start + distance * value, behavior: "instant" });
   }, progress);
   await page.mouse.move(20 + progress * 10, 30);
@@ -69,7 +65,18 @@ test("the Blender film follows the first scroll, completes and reverses without 
     "scroll",
   );
   // Le tout premier geste doit déjà changer l’image, même après un chargement lent.
-  for (const progress of [0.25, 0.55, 1, 0]) await scrollFilm(page, progress);
+  for (const progress of [0.25, 0.55, 1, 0]) {
+    await scrollFilm(page, progress);
+    // Le titre reste visible pendant toute la scène, y compris avant la fin.
+    await expect(page.locator("#atelier-menu-title")).toBeInViewport();
+    await expect(page.locator(".atelier-reveal-copy")).toHaveCSS("opacity", "1");
+    await expect(page.locator(".atelier-scene-beat[data-active=true]")).toHaveCount(1);
+    const step = progress < 0.32 ? 0 : progress < 0.76 ? 1 : 2;
+    await expect(page.locator(".atelier-scene-beat").nth(step)).toHaveAttribute(
+      "data-active",
+      "true",
+    );
+  }
   await expect(page.locator(".atelier-pizza-film")).toHaveJSProperty("paused", true);
   await scrollFilm(page, 1);
   await expect(page.locator(".atelier-reveal-copy")).toHaveCSS("opacity", "1");
@@ -260,8 +267,8 @@ test("editorial titles and capture reveal follow scroll and clean up in reduced 
   ).toBeLessThanOrEqual(1);
 });
 
-for (const width of [320, 390]) {
-  test(`mobile film follows scroll at ${width}px, translates and releases above the copy`, async ({
+for (const width of [320, 390, 768]) {
+  test(`mobile scene keeps its title with the film at ${width}px and translates without reloading`, async ({
     page,
   }) => {
     await page.setViewportSize({ width, height: 844 });
@@ -306,11 +313,24 @@ for (const width of [320, 390]) {
       await page.evaluate(() => document.documentElement.scrollWidth - innerWidth),
     ).toBeLessThanOrEqual(1);
     const boxes = await page.evaluate(() => ({
-      film: document.querySelector(".atelier-pizza-visual")!.getBoundingClientRect()
+      filmTop: document.querySelector(".atelier-pizza-media")!.getBoundingClientRect()
+        .top,
+      filmBottom: document.querySelector(".atelier-pizza-visual")!.getBoundingClientRect()
         .bottom,
-      copy: document.querySelector(".atelier-reveal-copy")!.getBoundingClientRect().top,
+      copyBottom: document.querySelector(".atelier-reveal-copy")!.getBoundingClientRect()
+        .bottom,
+      stageBottom: document.querySelector(".atelier-pizza-stage")!.getBoundingClientRect()
+        .bottom,
+      details: document.querySelector(".atelier-menu-details")!.getBoundingClientRect()
+        .top,
+      track: (document.querySelector(".atelier-scene-track") as HTMLElement).offsetHeight,
+      stage: (document.querySelector(".atelier-pizza-stage") as HTMLElement).offsetHeight,
+      height: innerHeight,
     }));
-    expect(boxes.film).toBeLessThan(boxes.copy);
+    expect(boxes.copyBottom).toBeLessThanOrEqual(boxes.filmTop + 1);
+    expect(boxes.filmBottom).toBeLessThanOrEqual(boxes.stageBottom);
+    expect(boxes.details).toBeGreaterThanOrEqual(boxes.stageBottom - 1);
+    expect(boxes.track - boxes.stage).toBeLessThan(boxes.height);
     await page.setViewportSize({ width, height: 740 });
     await scrollFilm(page, 0.5);
     await page.setViewportSize({ width: 844, height: 390 });

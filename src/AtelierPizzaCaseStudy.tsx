@@ -84,8 +84,10 @@ export default function AtelierPizzaCaseStudy({ onStart }: { onStart: () => void
         data-film-mode="static"
         aria-labelledby="atelier-menu-title"
       >
-        <div className="atelier-pizza-stage shell">
-          <div className="atelier-pizza-track">
+        {/* La scène entière reste à l’écran : le titre accompagne le geste,
+         * puis les détails prennent le relais dans le défilement normal. */}
+        <div className="atelier-scene-track">
+          <div className="atelier-pizza-stage">
             <div className="atelier-pizza-visual">
               {/* Le film est décoratif : le contenu commercial reste du texte.
                * Les deux images servent au chargement et au mouvement réduit. */}
@@ -115,37 +117,55 @@ export default function AtelierPizzaCaseStudy({ onStart }: { onStart: () => void
                   aria-hidden="true"
                 />
               </div>
-              <span className="atelier-scroll-label" aria-hidden="true">
-                {tr("SCROLL FOR A TASTE")}
-              </span>
             </div>
-          </div>
-          <div className="atelier-reveal-copy">
-            <p className="eyebrow">{tr("01 / A MENU THAT MOVES WITH YOU")}</p>
-            <h2
-              id="atelier-menu-title"
-              aria-label={`${tr("Your menu.")} ${tr("In your hands.")}`}
-            >
-              <CaseWords text={tr("Your menu.")} />
-              <br />
-              <em>
-                <CaseWords text={tr("In your hands.")} />
-              </em>
-            </h2>
-            <p>
-              {tr(
-                "Change a price, hide an unavailable pizza or announce a closure. Save in WordPress, then refresh the website. The layout stays consistent.",
-              )}
-            </p>
-            <div className="atelier-menu-example">
-              <span>{tr("EXAMPLE MENU ITEM")}</span>
-              <strong>Margherita</strong>
-              <p>
-                29 cm <b>10,50 €</b> <span aria-hidden="true">/</span> 33 cm{" "}
-                <b>11,50 €</b>
+            <div className="atelier-reveal-copy">
+              <p className="eyebrow">{tr("01 / A MENU THAT MOVES WITH YOU")}</p>
+              <h2
+                id="atelier-menu-title"
+                aria-label={`${tr("Your menu.")} ${tr("In your hands.")}`}
+              >
+                <CaseWords text={tr("Your menu.")} />
+                <br />
+                <em>
+                  <CaseWords text={tr("In your hands.")} />
+                </em>
+              </h2>
+              <p className="atelier-scene-caption">
+                {tr("A website to savour. A menu you control.")}
               </p>
-              <small>{tr("Illustrative content from the personal project.")}</small>
+              {/* Repères visuels uniquement : aucun live-region ne bavarde
+               * pendant le scroll, et tout le contenu utile reste disponible. */}
+              <div className="atelier-scene-beats" aria-hidden="true">
+                {["Make an impression.", "Keep control.", "Make it your own."].map(
+                  (label, index) => (
+                    <span className="atelier-scene-beat" key={label}>
+                      <small>0{index + 1}</small> {tr(label)}
+                    </span>
+                  ),
+                )}
+              </div>
             </div>
+            <span className="atelier-scroll-label" aria-hidden="true">
+              {tr("SCROLL FOR A TASTE")}
+              <span className="atelier-scene-progress">
+                <span />
+              </span>
+            </span>
+          </div>
+        </div>
+        <div className="atelier-menu-details shell">
+          <p>
+            {tr(
+              "Change a price, hide an unavailable pizza or announce a closure. Save in WordPress, then refresh the website. The layout stays consistent.",
+            )}
+          </p>
+          <div className="atelier-menu-example">
+            <span>{tr("EXAMPLE MENU ITEM")}</span>
+            <strong>Margherita</strong>
+            <p>
+              29 cm <b>10,50 €</b> <span aria-hidden="true">/</span> 33 cm <b>11,50 €</b>
+            </p>
+            <small>{tr("Illustrative content from the personal project.")}</small>
           </div>
         </div>
       </section>

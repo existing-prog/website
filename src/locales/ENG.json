@@ -474,13 +474,11 @@
   "Change a price, hide an unavailable pizza or announce a closure. Save in WordPress, then refresh the website. The layout stays consistent.": "Change a price, hide an unavailable pizza or announce a closure. Save in WordPress, then refresh the website. The layout stays consistent.",
   "EXAMPLE MENU ITEM": "EXAMPLE MENU ITEM",
   "Illustrative content from the personal project.": "Illustrative content from the personal project.",
-  "02 / CLEAR ON EVERY SCREEN": "02 / CLEAR ON EVERY SCREEN",
   "Made to browse. Built to adapt.": "Made to browse. Built to adapt.",
   "Categories, ingredients and two sizes with their prices. The interface is built for a quick look on a phone, with accessible filters and restrained motion.": "Categories, ingredients and two sizes with their prices. The interface is built for a quick look on a phone, with accessible filters and restrained motion.",
   "The Atelier Pizza menu with category filters and two prices per pizza": "The Atelier Pizza menu with category filters and two prices per pizza",
   "A real capture of the local WordPress prototype. All menu content is fictional.": "A real capture of the local WordPress prototype. All menu content is fictional.",
   "Open the static website preview": "Open the static website preview",
-  "03 / BEHIND THE MENU": "03 / BEHIND THE MENU",
   "Simple fields. Real control.": "Simple fields. Real control.",
   "This recording shows a real update in the local WordPress administration: a price changes, a pizza is hidden, and the website reflects the saved content.": "This recording shows a real update in the local WordPress administration: a price changes, a pizza is hidden, and the website reflects the saved content.",
   "Recorded update of the Atelier Pizza menu in WordPress": "Recorded update of the Atelier Pizza menu in WordPress",
@@ -542,5 +540,11 @@
   "This page doesn’t exist.": "This page doesn’t exist.",
   "The link may be outdated. The rest of the website is still here.": "The link may be outdated. The rest of the website is still here.",
   "Back to the home page": "Back to the home page",
-  "Delete the draft {{name}}": "Delete the draft {{name}}"
+  "Delete the draft {{name}}": "Delete the draft {{name}}",
+  "02 / BEHIND THE MENU": "02 / BEHIND THE MENU",
+  "03 / CLEAR ON EVERY SCREEN": "03 / CLEAR ON EVERY SCREEN",
+  "Updated": "Updated",
+  "See how it works": "See how it works",
+  "A Margherita, eight slices.": "A Margherita, eight slices.",
+  "Help yourself.": "Help yourself."
 }

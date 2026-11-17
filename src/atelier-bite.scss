@@ -1,0 +1,254 @@
+/* Scène « une part croquée » : état final statique par défaut (pré-rendu,
+ * mouvement réduit, écran trop bas). Le mode animé ajoute la piste de défilement. */
+.atelier-bite {
+  --bite-ink: #2b251e;
+  --bite-tomato: #943729;
+  background: #f4ede1;
+  color: var(--bite-ink);
+  overflow: clip;
+}
+.atelier-bite-stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(30px, 5vw, 90px);
+  max-width: 1500px;
+  margin-inline: auto;
+  padding: 90px clamp(24px, 5vw, 100px);
+}
+.atelier-bite-visual {
+  position: relative;
+  justify-self: center;
+  width: min(100%, 600px);
+  aspect-ratio: 1;
+}
+.atelier-bite-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.atelier-bite-board {
+  fill: #e4d7c2;
+}
+.atelier-bite-strand {
+  fill: none;
+  stroke: #f6e7bd;
+  stroke-width: 9;
+  stroke-linecap: round;
+  opacity: 0;
+}
+.atelier-bite-shadow {
+  fill: #3b2614;
+  opacity: 0;
+}
+.atelier-bite-crumbs circle {
+  fill: #c98c4c;
+  &:nth-child(odd) {
+    fill: #e8c793;
+  }
+}
+/* L’étiquette occupe la place laissée par la part, au centre de son secteur. */
+.atelier-price-anchor {
+  position: absolute;
+  left: 62%;
+  top: 25%;
+  transform: translate(-50%, -50%);
+}
+.atelier-price-tag {
+  display: grid;
+  gap: 2px;
+  min-width: 150px;
+  padding: 14px 18px 12px;
+  background: #fffaf1;
+  border: 1px solid #2b251e1f;
+  border-radius: 14px;
+  box-shadow:
+    0 18px 40px #3b261426,
+    0 2px 6px #3b26141f;
+  transform: rotate(-6deg);
+  text-align: left;
+  .atelier-price-name {
+    font-family: Georgia, serif;
+    font-size: 20px;
+    font-style: italic;
+  }
+  .atelier-price-values {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .atelier-price-old {
+    color: #6f6355;
+    font-size: 15px;
+  }
+  .atelier-price-new {
+    display: inline-block;
+    color: var(--bite-tomato);
+    font-size: 26px;
+    letter-spacing: -0.5px;
+  }
+  small {
+    font: 12px monospace;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #5f7b55;
+  }
+}
+.atelier-bite-copy {
+  .eyebrow {
+    color: #7c3025;
+    letter-spacing: 1.3px;
+  }
+  h2 {
+    margin-top: 26px;
+    font-family: Georgia, serif;
+    font-size: clamp(46px, 5.2vw, 86px);
+    font-weight: 400;
+    letter-spacing: -2.5px;
+    line-height: 1.04;
+    color: var(--bite-ink);
+  }
+  h2 em {
+    color: var(--bite-tomato);
+  }
+}
+.atelier-bite-copy {
+  position: relative;
+}
+/* Accroche du début de scène, superposée au titre (affichée seulement en mode animé). */
+.atelier-bite-tease {
+  display: none;
+  font-family: Georgia, serif;
+  font-size: clamp(26px, 2.6vw, 40px);
+  line-height: 1.2;
+  letter-spacing: -0.8px;
+  em {
+    color: var(--bite-tomato);
+    white-space: nowrap;
+  }
+}
+.atelier-bite[data-scene="animated"] .atelier-bite-tease {
+  display: block;
+  position: absolute;
+  top: 60px;
+  left: 0;
+  right: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.atelier-bite-text {
+  max-width: 420px;
+  margin-top: 26px;
+  font-size: 17px;
+  line-height: 1.6;
+  color: #534a40;
+}
+.atelier-study .atelier-bite-link {
+  display: inline-flex;
+  margin-top: 26px;
+  color: var(--bite-ink);
+  border-color: currentColor;
+}
+.atelier-bite-hint {
+  display: none;
+}
+
+/* Mode animé : une piste haute, la scène reste collée pendant le défilement. */
+.atelier-bite[data-scene="animated"] {
+  .atelier-bite-track {
+    height: 320vh;
+  }
+  .atelier-bite-stage {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    padding-block: 70px;
+  }
+  .atelier-bite-hint {
+    position: absolute;
+    left: clamp(24px, 5vw, 100px);
+    right: clamp(24px, 5vw, 100px);
+    bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    font: 12px monospace;
+    letter-spacing: 1.2px;
+    color: #544b40;
+  }
+}
+.atelier-bite-progress {
+  flex: 1;
+  height: 1px;
+  background: #53412d30;
+  > span {
+    display: block;
+    height: 100%;
+    background: var(--bite-tomato);
+    transform: scaleX(var(--bite-progress, 0));
+    transform-origin: left;
+  }
+}
+.atelier-bite[data-scene="static"] {
+  .atelier-bite-slice,
+  .atelier-bite-shadow,
+  .atelier-bite-strand,
+  .atelier-bite-crumbs {
+    display: none;
+  }
+}
+
+@media (max-width: 1023px) {
+  .atelier-bite-stage {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+    gap: 24px;
+    padding-block: 60px;
+  }
+  .atelier-bite-visual {
+    width: min(78vw, 46svh, 460px);
+  }
+  .atelier-bite-copy h2 {
+    margin-top: 14px;
+    font-size: clamp(36px, 9vw, 60px);
+    letter-spacing: -1.5px;
+  }
+  .atelier-bite-text {
+    margin-inline: auto;
+    margin-top: 14px;
+    font-size: 16px;
+  }
+  .atelier-study .atelier-bite-link {
+    margin-top: 14px;
+  }
+  .atelier-price-tag {
+    min-width: 0;
+    padding: 9px 12px 8px;
+    border-radius: 10px;
+    .atelier-price-name {
+      font-size: 15px;
+    }
+    .atelier-price-new {
+      font-size: 19px;
+    }
+    .atelier-price-old {
+      font-size: 12px;
+    }
+  }
+  .atelier-bite[data-scene="animated"] {
+    .atelier-bite-track {
+      height: 280svh;
+    }
+    .atelier-bite-stage {
+      height: 100svh;
+      align-content: center;
+      padding-block: 64px 70px;
+    }
+    .atelier-bite-hint {
+      bottom: 20px;
+    }
+  }
+}

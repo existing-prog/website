@@ -32,6 +32,8 @@ const pages = [
   ]),
   { path: "portfolios-chercheurs/", indexable: true },
   { path: "en/academic-portfolios/", indexable: true },
+  { path: "restaurants-commerces/", indexable: true },
+  { path: "en/restaurants-shops/", indexable: true },
   { path: "bureau/" },
   { path: "en/desk/" },
   { path: "page-introuvable/", file: "404.html" },

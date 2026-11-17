@@ -7,3 +7,7 @@ test-results/
 
 .env*
 !.env.example
+
+# Outils de rendu Blender / Python
+__pycache__/
+*.blend1

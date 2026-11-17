@@ -12,6 +12,7 @@ export default defineConfig({
         pizzaLab: "lab/pizza-3d/index.html",
         pizzaGesture: "lab/pizza-gesture/index.html",
         pizzaCartoon: "lab/pizza-cartoon/index.html",
+        pizzaBlender: "lab/pizza-blender/index.html",
       },
     },
   },

@@ -69,6 +69,7 @@ const KasaCaseStudy = lazy(() => import("./KasaCaseStudy"));
 const NinaCaseStudy = lazy(() => import("./NinaCaseStudy"));
 const AtelierPizzaCaseStudy = lazy(() => import("./AtelierPizzaCaseStudy"));
 const AcademicLanding = lazy(() => import("./AcademicLanding"));
+const RestaurantLanding = lazy(() => import("./RestaurantLanding"));
 
 function Mark({ className = "" }: { className?: string }) {
   return (
@@ -176,39 +177,45 @@ function App() {
       ? tr("Page not found — Lucas Berdy")
       : landingId === "academic"
         ? tr("Portfolio websites for researchers — Lucas Berdy")
-        : workspace
-          ? tr("Project desk — Lucas Berdy")
-          : atelierCase
-            ? tr("Atelier Pizza — Personal project · Lucas Berdy")
-            : ninaCase
-              ? tr("Nina Carducci — Case study · Lucas Berdy")
-              : kasaCase
-                ? tr("Kasa — Case study · Lucas Berdy")
-                : caseStudy
-                  ? tr("Samantha Ramsey — Case study · Lucas Berdy")
-                  : tr("Lucas Berdy — Your next chapter, online.");
+        : landingId === "restaurants"
+          ? tr("Websites for restaurants and shops — Lucas Berdy")
+          : workspace
+            ? tr("Project desk — Lucas Berdy")
+            : atelierCase
+              ? tr("Atelier Pizza — Personal project · Lucas Berdy")
+              : ninaCase
+                ? tr("Nina Carducci — Case study · Lucas Berdy")
+                : kasaCase
+                  ? tr("Kasa — Case study · Lucas Berdy")
+                  : caseStudy
+                    ? tr("Samantha Ramsey — Case study · Lucas Berdy")
+                    : tr("Lucas Berdy — Your next chapter, online.");
     const description =
-      landingId === "academic"
+      landingId === "restaurants"
         ? tr(
-            "Portfolio websites for PhD students, postdocs and researchers: research, publications, talks and CV in one distinctive site, designed and developed by Lucas Berdy.",
+            "Websites for restaurants and shops that make people want to come, with a menu, prices and opening hours you update yourself. Designed and developed by Lucas Berdy.",
           )
-        : atelierCase
+        : landingId === "academic"
           ? tr(
-              "Atelier Pizza: a personal restaurant website project with a custom WordPress menu editing interface by Lucas Berdy.",
+              "Portfolio websites for PhD students, postdocs and researchers: research, publications, talks and CV in one distinctive site, designed and developed by Lucas Berdy.",
             )
-          : ninaCase
+          : atelierCase
             ? tr(
-                "Nina Carducci: frontend performance, SEO and accessibility improvements by Lucas Berdy, presented as a training project.",
+                "Atelier Pizza: a personal restaurant website project with a custom WordPress menu editing interface by Lucas Berdy.",
               )
-            : kasaCase
+            : ninaCase
               ? tr(
-                  "Kasa: a responsive React rental interface built by Lucas Berdy as a frontend training project.",
+                  "Nina Carducci: frontend performance, SEO and accessibility improvements by Lucas Berdy, presented as a training project.",
                 )
-              : caseStudy
+              : kasaCase
                 ? tr(
-                    "A scientific portfolio designed and developed by Lucas Berdy: visual identity, responsive interface and orbital demonstrations.",
+                    "Kasa: a responsive React rental interface built by Lucas Berdy as a frontend training project.",
                   )
-                : tr("meta.description");
+                : caseStudy
+                  ? tr(
+                      "A scientific portfolio designed and developed by Lucas Berdy: visual identity, responsive interface and orbital demonstrations.",
+                    )
+                  : tr("meta.description");
     setHead({ title, description, view, lang });
   }, [
     view,
@@ -519,7 +526,11 @@ function App() {
               </section>
             }
           >
-            <AcademicLanding onStart={() => start("portfolio")} />
+            {landingId === "restaurants" ? (
+              <RestaurantLanding onStart={() => start("website")} />
+            ) : (
+              <AcademicLanding onStart={() => start("portfolio")} />
+            )}
           </Suspense>
         ) : caseStudy ? (
           <Suspense

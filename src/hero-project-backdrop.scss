@@ -199,3 +199,36 @@
     animation: none;
   }
 }
+
+/* Atelier Pizza : halo tomate, pizza en arrière-plan et deux feuilles de basilic. */
+.backdrop-atelier-pizza .project-aura {
+  background: radial-gradient(ellipse 48% 46% at 50% 50%, #c4282538, transparent 100%);
+}
+.backdrop-pizza {
+  position: absolute;
+  top: -4%;
+  right: -6%;
+  width: 46%;
+  opacity: 0.55;
+  filter: blur(1px) drop-shadow(0 20px 30px #0008);
+  transform: translateY(calc(var(--orbit-rise, 0px) * 0.3))
+    rotate(calc(-12deg + var(--orbit-turn, 0deg) * 0.3));
+}
+.backdrop-basil {
+  position: absolute;
+  width: 54px;
+  filter: drop-shadow(0 10px 14px #0007);
+  &.basil-a {
+    bottom: 14%;
+    left: 2%;
+    rotate: -30deg;
+  }
+  &.basil-b {
+    top: 6%;
+    left: 18%;
+    width: 40px;
+    rotate: 120deg;
+    scale: -1 1;
+    opacity: 0.8;
+  }
+}

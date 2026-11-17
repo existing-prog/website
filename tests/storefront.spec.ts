@@ -7,7 +7,7 @@ for (const width of [320, 360, 375, 390, 430, 768, 1024, 1440, 1920]) {
     await page.goto("en/");
     await page.evaluate(() => document.fonts.ready);
     await expect(
-      page.getByRole("heading", { name: /Your business.*Impossible/ }),
+      page.getByRole("heading", { name: /Living websites.*your hands/ }),
     ).toBeVisible();
     const dimensions = await page.evaluate(() => ({
       scroll: document.documentElement.scrollWidth,
@@ -15,7 +15,7 @@ for (const width of [320, 360, 375, 390, 430, 768, 1024, 1440, 1920]) {
     }));
     expect(dimensions.scroll).toBeLessThanOrEqual(dimensions.client + 1);
     await expect(page.locator(".service-ribbon")).toHaveCount(0);
-    await expect(page.locator(".project-card")).toHaveCount(3);
+    await expect(page.locator(".project-card")).toHaveCount(4);
     await expect(page.locator(".service-budget")).toHaveText([
       "€600–€1,200",
       "€1,200–€2,400",
@@ -118,6 +118,12 @@ test("mobile menu, filters, preview switching, and Escape", async ({ page }) => 
   await expect(page.getByRole("navigation")).toBeHidden();
   await page.getByRole("button", { name: "Portfolios", exact: true }).click();
   await expect(page.locator(".project-card")).toHaveCount(1);
+  await page.getByRole("button", { name: "Restaurants", exact: true }).click();
+  await expect(page.locator(".project-card")).toHaveCount(1);
+  await expect(page.locator("#chapter-atelier-pizza .project-card")).toHaveAttribute(
+    "href",
+    "/website/en/projects/atelier-pizza/",
+  );
   await page.getByRole("button", { name: "Frontend & performance" }).click();
   await expect(page.locator(".project-card")).toHaveCount(2);
   await page.getByRole("button", { name: "All work", exact: true }).click();
@@ -207,7 +213,7 @@ for (const width of [390, 1440]) {
     await page.goto("en/");
     await page.evaluate(() => document.fonts.ready);
     await expect(page.locator(".hero-copy > p")).toHaveText(
-      "I design and build websites for independent businesses and professionals.",
+      "I design and build websites that stand out from the first scroll, for independent businesses, restaurants and researchers.",
     );
     await expect(page.locator(".hero-actions .button")).toHaveAccessibleName(
       "Start a project",
@@ -218,7 +224,7 @@ for (const width of [390, 1440]) {
     await expect(
       page.locator(".hero-overline,.stage-label,.stage-caption,.hero-bottom"),
     ).toHaveCount(0);
-    for (const name of ["Samantha Ramsey", "Kasa", "Nina Carducci"])
+    for (const name of ["Samantha Ramsey", "Atelier Pizza", "Kasa", "Nina Carducci"])
       await expect(
         page
           .locator(".project-card")

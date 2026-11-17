@@ -204,7 +204,7 @@ test("the storefront does not load the 3D laboratory", async ({ page }) => {
   });
   await page.goto("");
   await expect(page.locator("h1")).toBeVisible();
-  await page.locator(".atelier-project-teaser").scrollIntoViewIfNeeded();
+  await page.locator("#chapter-atelier-pizza").scrollIntoViewIfNeeded();
   expect(labRequests).toEqual([]);
   await expect(page.locator('a[href*="lab/pizza-3d"]')).toHaveCount(0);
 });

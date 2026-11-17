@@ -1,4 +1,3 @@
-import AtelierProjectTeaser from "./AtelierProjectTeaser";
 import ProjectQuestions from "./ProjectQuestions";
 import { useTranslation } from "react-i18next";
 import { tr, dateLocale, i18nReady, setLanguage } from "./i18n";
@@ -62,6 +61,7 @@ import HeroWorkTransition from "./HeroWorkTransition";
 import { useScrollHeader } from "./useScrollHeader";
 import "./interaction-polish.scss";
 import "./readability.scss";
+import "./approach-person.scss";
 import HeroProjectBackdrop from "./HeroProjectBackdrop";
 import TwoWorlds from "./TwoWorlds";
 
@@ -570,13 +570,13 @@ function App() {
               </div>
               <div className="hero-grid">
                 <div className="hero-copy">
-                  <h1 aria-label={tr("Your business. Impossible to ignore.")}>
-                    <span className="hero-line">{tr("Your business.")}</span>
-                    <span className="hero-line">{tr("Impossible")}</span>
+                  <h1 aria-label={tr("Living websites. That stay in your hands.")}>
+                    <span className="hero-line">{tr("Living websites.")}</span>
+                    <span className="hero-line">{tr("That stay")}</span>
                     <span className="hero-line">
-                      {tr("to")}{" "}
+                      {tr("in")}{" "}
                       <span className="hero-accent">
-                        {tr("ignore")}
+                        {tr("your hands")}
                         <svg
                           viewBox="0 0 340 22"
                           preserveAspectRatio="none"
@@ -590,7 +590,7 @@ function App() {
                   </h1>
                   <p>
                     {tr(
-                      "I design and build websites for independent businesses and professionals.",
+                      "I design and build websites that stand out from the first scroll, for independent businesses, restaurants and researchers.",
                     )}
                   </p>
                   <div className="hero-actions">
@@ -704,7 +704,6 @@ function App() {
                   </a>
                 </div>
                 <ProjectStories onStart={start} />
-                <AtelierProjectTeaser />
               </div>
             </section>
             <TwoWorlds />
@@ -839,52 +838,17 @@ function App() {
                   </article>
                 ))}
               </div>
-              <div className="project-preparation reveal">
-                <h3>{tr("What to bring to our first exchange")}</h3>
-                <p>
-                  {tr(
-                    "Your goals, a few references, and any existing text, logo or photos. If something is missing, we’ll identify it together and clarify the responsibilities in your quote.",
-                  )}
-                </p>
-                <a href="#questions">
-                  {tr("Questions about content, hosting or revisions?")}
-                </a>
-              </div>
-            </section>
-            <ProjectQuestions onStart={() => start("website")} />
-            <section className="about-section">
-              <div className="shell about-grid">
-                <div className="identity-card glass-interactive reveal">
-                  <div className="identity-top">
-                    <span className="eyebrow">{tr("THE PERSON BEHIND THE PIXELS")}</span>
-                    <span>FR / 01</span>
-                  </div>
-                  <div className="identity-monogram">
-                    lb
-                    <Mark />
-                  </div>
-                  <div className="identity-bottom">
-                    <span>
-                      LUCAS BERDY
-                      <small>{tr("Independent frontend developer")}</small>
-                    </span>
-                    <span className="status-dot" />
-                  </div>
-                </div>
-                <div className="about-copy reveal">
+              {/* Ancienne section « À propos », fusionnée ici : une seule promesse,
+               * celle d’échanger directement avec la personne qui construit le site.
+               * Le cercle « lb. » accueillera la photo de Lucas. */}
+              <div className="approach-person reveal">
+                <span className="approach-avatar" aria-hidden="true">
+                  lb.
+                </span>
+                <div>
                   <span className="eyebrow">
                     {tr("A PERSON. NOT A PRODUCTION LINE.")}
                   </span>
-                  <h2>
-                    {tr("Small studio energy.")}
-                    <br />
-                    <span>{tr("Personal attention.")}</span>
-                  </h2>
-                  <p>
-                    {tr(
-                      "I’m Lucas, a frontend developer based in France. I love clean interfaces, expressive details and the moment a website starts to feel like the person behind it.",
-                    )}
-                  </p>
                   <p>
                     {tr(
                       "When we work together, you’re talking to the person building your website. I take the time to understand what matters to you, explain the choices and sweat the small stuff.",
@@ -912,6 +876,7 @@ function App() {
                 </div>
               </div>
             </section>
+            <ProjectQuestions onStart={() => start("website")} />
             <section className="closing-section" id="contact">
               <div className="shell closing-inner">
                 <span className="eyebrow">

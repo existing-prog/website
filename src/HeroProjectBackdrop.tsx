@@ -1,8 +1,9 @@
+import { asset } from "./data";
 import "./hero-project-backdrop.scss";
 
-type ProjectId = "samantha" | "kasa" | "nina";
+type ProjectId = "samantha" | "atelier-pizza" | "kasa" | "nina";
 
-/** Trois décors décoratifs persistants : les opacités se croisent sans démonter
+/** Quatre décors décoratifs persistants : les opacités se croisent sans démonter
  * la carte ni réinitialiser son mouvement. Aucune information n’est ajoutée au
  * lecteur d’écran ; le lien et le nom du projet restent portés par le vrai aperçu.
  */
@@ -16,6 +17,23 @@ export default function HeroProjectBackdrop({ projectId }: { projectId: string }
           <span />
           <span />
         </div>
+      </div>
+      <div
+        className="hero-scene backdrop-atelier-pizza"
+        data-active={active("atelier-pizza")}
+      >
+        <div className="project-aura" />
+        <img className="backdrop-pizza" src={asset("atelier-pizza-whole.webp")} alt="" />
+        <img
+          className="backdrop-basil basil-a"
+          src={asset("pizza-burst/basil.webp")}
+          alt=""
+        />
+        <img
+          className="backdrop-basil basil-b"
+          src={asset("pizza-burst/basil.webp")}
+          alt=""
+        />
       </div>
       <div className="hero-scene backdrop-kasa" data-active={active("kasa")}>
         <div className="project-aura" />

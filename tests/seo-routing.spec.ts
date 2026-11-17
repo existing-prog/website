@@ -5,7 +5,7 @@ test("French is the default page and its HTML is prerendered for search engines"
 }) => {
   const html = await (await request.get("")).text();
   expect(html).toContain('<html lang="fr"');
-  expect(html).toContain("Votre activité.");
+  expect(html).toContain("Des sites vivants.");
   expect(html).toContain(
     '<link rel="canonical" href="https://existing-prog.github.io/website/">',
   );

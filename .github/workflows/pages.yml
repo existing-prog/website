@@ -32,10 +32,10 @@ jobs:
         run: npm run build
       - name: Browser regression checks
         run: npm test
-      - name: Firefox media suspension regression checks
+      - name: Firefox scroll scene checks
         env:
           TEST_FIREFOX: "1"
-        run: npm test -- tests/atelier-pizza.spec.ts --project=firefox -g "decoder|page-cache|first scroll"
+        run: npm test -- tests/atelier-pizza.spec.ts --project=firefox -g "bite scene"
       - name: Build configured contact form
         env:
           # Identifiant public fourni par Lucas ; une variable de dépôt peut le remplacer.

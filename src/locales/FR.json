@@ -474,13 +474,11 @@
   "Change a price, hide an unavailable pizza or announce a closure. Save in WordPress, then refresh the website. The layout stays consistent.": "Modifier un prix, masquer une pizza indisponible ou annoncer une fermeture. Enregistrez dans WordPress, puis actualisez le site. La mise en page reste cohérente.",
   "EXAMPLE MENU ITEM": "EXEMPLE DE PRODUIT",
   "Illustrative content from the personal project.": "Contenu fictif issu du projet personnel.",
-  "02 / CLEAR ON EVERY SCREEN": "02 / LISIBLE SUR TOUS LES ÉCRANS",
   "Made to browse. Built to adapt.": "Une carte à parcourir. Sur tous les écrans.",
   "Categories, ingredients and two sizes with their prices. The interface is built for a quick look on a phone, with accessible filters and restrained motion.": "Des catégories, les ingrédients et deux tailles avec leurs prix. L’interface permet une consultation rapide sur téléphone, avec des filtres accessibles et des animations mesurées.",
   "The Atelier Pizza menu with category filters and two prices per pizza": "La carte Atelier Pizza avec ses filtres par catégorie et deux prix par pizza",
   "A real capture of the local WordPress prototype. All menu content is fictional.": "Une véritable capture du prototype WordPress local. Tous les contenus de la carte sont fictifs.",
   "Open the static website preview": "Ouvrir l’aperçu statique du site",
-  "03 / BEHIND THE MENU": "03 / DERRIÈRE LA CARTE",
   "Simple fields. Real control.": "Des champs simples. Une vraie autonomie.",
   "This recording shows a real update in the local WordPress administration: a price changes, a pizza is hidden, and the website reflects the saved content.": "Cette vidéo montre une véritable modification dans l’administration WordPress locale : un prix change, une pizza est masquée et le site affiche les contenus enregistrés.",
   "Recorded update of the Atelier Pizza menu in WordPress": "Enregistrement d’une mise à jour de la carte Atelier Pizza dans WordPress",
@@ -542,5 +540,11 @@
   "This page doesn’t exist.": "Cette page n’existe pas.",
   "The link may be outdated. The rest of the website is still here.": "Le lien est peut-être ancien. Le reste du site est toujours là.",
   "Back to the home page": "Retour à l’accueil",
-  "Delete the draft {{name}}": "Supprimer le brouillon {{name}}"
+  "Delete the draft {{name}}": "Supprimer le brouillon {{name}}",
+  "02 / BEHIND THE MENU": "02 / DERRIÈRE LA CARTE",
+  "03 / CLEAR ON EVERY SCREEN": "03 / LISIBLE SUR TOUS LES ÉCRANS",
+  "Updated": "Mis à jour",
+  "See how it works": "Voir comment ça marche",
+  "A Margherita, eight slices.": "Une Margherita, huit parts.",
+  "Help yourself.": "Servez-vous."
 }

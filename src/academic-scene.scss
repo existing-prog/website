@@ -1,0 +1,450 @@
+/* Scène « du papier au portfolio ». Par défaut : état final (site), lisible sans
+ * animation et dans le HTML pré-rendu. Le mode animé ajoute une piste haute. */
+.ac-scene {
+  --ac-ink: #e9eefb;
+  --ac-muted: #9fb0cc;
+  --ac-accent: #b9a6ff;
+  position: relative;
+  background: radial-gradient(ellipse at 70% 40%, #1a2547 0%, #0b0f17 62%);
+  overflow: clip;
+}
+.ac-stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  align-items: center;
+  gap: clamp(30px, 5vw, 90px);
+  max-width: 1500px;
+  margin-inline: auto;
+  padding: 100px clamp(24px, 5vw, 100px);
+}
+.ac-captions .eyebrow {
+  color: var(--ac-accent);
+}
+.ac-beats {
+  list-style: none;
+  padding: 0;
+  margin: 28px 0 0;
+  display: grid;
+  gap: 28px;
+}
+.ac-beat {
+  display: grid;
+  gap: 8px;
+  max-width: 440px;
+  strong {
+    font-size: clamp(26px, 2.6vw, 40px);
+    line-height: 1.1;
+    letter-spacing: -1px;
+    font-weight: 500;
+    color: var(--ac-ink);
+  }
+  > span:last-child {
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--ac-muted);
+  }
+}
+.ac-beat-number {
+  font: 12px monospace;
+  letter-spacing: 1.2px;
+  color: var(--ac-accent);
+}
+
+/* La feuille : toutes les tailles internes suivent sa largeur (unités cqi). */
+.ac-sheet-wrap {
+  justify-self: center;
+  width: min(100%, 640px, (100vh - 150px) * 0.78);
+  perspective: 1400px;
+}
+.ac-sheet {
+  position: relative;
+  container-type: inline-size;
+  aspect-ratio: 0.78;
+  background: #0c1222;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow:
+    0 40px 90px #0009,
+    0 0 0 1px #ffffff14;
+  color: #1d1d1f;
+}
+/* Ordre d’empilement : article < nuit < site, à travers tous les blocs. */
+.ac-night {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: radial-gradient(circle at 50% 66%, #18234a 0%, #0c1222 55%);
+}
+.ac-chrome {
+  z-index: 4;
+  position: absolute;
+  inset: 0 0 auto;
+  height: 5%;
+  display: flex;
+  align-items: center;
+  gap: 4cqi;
+  padding-inline: 3.5cqi;
+  background: #161e35;
+  border-bottom: 1px solid #ffffff12;
+  overflow: hidden;
+}
+.ac-chrome-dots {
+  display: flex;
+  gap: 1.2cqi;
+  i {
+    width: 1.6cqi;
+    height: 1.6cqi;
+    border-radius: 50%;
+    background: #ffffff30;
+  }
+}
+.ac-chrome-url {
+  flex: 1;
+  max-width: 50%;
+  margin-inline: auto;
+  padding: 0.6cqi 2cqi;
+  border-radius: 99px;
+  background: #ffffff0f;
+  color: #aab6d3;
+  font: 2cqi monospace;
+  text-align: center;
+}
+
+.ac-block {
+  position: absolute;
+  overflow: hidden;
+}
+.ac-paper,
+.ac-site {
+  position: absolute;
+  inset: 0;
+}
+.ac-paper {
+  z-index: 1;
+}
+.ac-site {
+  z-index: 3;
+}
+/* Les mots du résumé peuvent s’échapper du bloc en s’envolant. */
+.ac-abstract {
+  overflow: visible;
+}
+/* Place finale de chaque bloc dans le site (en % de la feuille). */
+.ac-nav {
+  left: 5%;
+  top: 8%;
+  width: 90%;
+  height: 5%;
+}
+.ac-head {
+  left: 5%;
+  top: 19%;
+  width: 52%;
+  height: 25%;
+}
+.ac-abstract {
+  left: 5%;
+  top: 45%;
+  width: 50%;
+  height: 16%;
+}
+.ac-figure {
+  left: 58%;
+  top: 16%;
+  width: 38%;
+  height: 44%;
+}
+.ac-refs {
+  left: 5%;
+  top: 64%;
+  width: 90%;
+  height: 32%;
+}
+
+/* — Version « article » — */
+.ac-paper {
+  font-family: Georgia, "Times New Roman", serif;
+  color: #1d1d1f;
+}
+.ac-nav .ac-paper {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #1d1d1f40;
+  font-size: 1.9cqi;
+  letter-spacing: 0.25cqi;
+  color: #555;
+}
+.ac-head .ac-paper {
+  text-align: center;
+  h3 {
+    font-family: Georgia, "Times New Roman", serif;
+    letter-spacing: 0;
+    margin: 2cqi 0 0;
+    font-size: 4.6cqi;
+    line-height: 1.15;
+    font-weight: 700;
+  }
+  p {
+    margin: 2cqi 0 0;
+    font-size: 2.6cqi;
+  }
+  small {
+    display: block;
+    margin-top: 1cqi;
+    font-size: 1.9cqi;
+    color: #666;
+  }
+}
+.ac-abstract .ac-paper {
+  font-size: 2.45cqi;
+  line-height: 1.55;
+  text-align: justify;
+  hyphens: auto;
+}
+.ac-word {
+  display: inline-block;
+  white-space: pre;
+}
+.ac-figure .ac-paper {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  small {
+    margin-top: 1cqi;
+    font-size: 1.9cqi;
+    font-style: italic;
+    color: #555;
+    text-align: center;
+  }
+}
+.ac-refs .ac-paper {
+  display: grid;
+  align-content: start;
+  gap: 0.6cqi;
+  font-size: 1.9cqi;
+  color: #333;
+  b {
+    font-size: 2.2cqi;
+  }
+}
+.ac-orbits {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  ellipse {
+    fill: none;
+    stroke: #1d1d1f55;
+    stroke-width: 0.35;
+  }
+  line {
+    stroke: #1d1d1f;
+    stroke-width: 0.4;
+  }
+  .ac-orbit-dot,
+  .ac-orbit-sun {
+    fill: #1d1d1f;
+  }
+  &.is-live {
+    ellipse {
+      stroke: #c9d6ff40;
+    }
+    .ac-orbit-dot {
+      fill: #d9ccff;
+      filter: drop-shadow(0 0 1.2px #b9a6ff);
+    }
+    .ac-orbit-sun {
+      fill: #ffe1a3;
+      filter: drop-shadow(0 0 3px #ffb347);
+    }
+  }
+}
+.ac-orbit-glow {
+  fill: #6f5bd633;
+  filter: blur(6px);
+}
+
+/* — Version « site » — */
+.ac-site {
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  color: var(--ac-ink);
+}
+.ac-nav .ac-site {
+  display: flex;
+  align-items: center;
+  gap: 4cqi;
+  font-size: 2.2cqi;
+  color: #b8c4de;
+  b {
+    margin-right: auto;
+    font-size: 2.8cqi;
+    color: var(--ac-ink);
+  }
+}
+.ac-head .ac-site {
+  display: grid;
+  align-content: center;
+  small {
+    font: 1.8cqi monospace;
+    letter-spacing: 0.25cqi;
+    color: var(--ac-accent);
+  }
+  h3 {
+    margin: 2cqi 0 0;
+    font-size: 6.4cqi;
+    line-height: 1.02;
+    letter-spacing: -0.3cqi;
+    font-weight: 500;
+  }
+  em {
+    color: var(--ac-accent);
+    font-family: Georgia, serif;
+  }
+}
+.ac-abstract .ac-site {
+  p {
+    margin: 0;
+    font-family: "DM Sans", system-ui, sans-serif;
+    font-size: 2.5cqi;
+    line-height: 1.5;
+    color: #b8c4de;
+  }
+}
+.ac-button {
+  display: inline-block;
+  margin-top: 2.4cqi;
+  padding: 1.3cqi 2.6cqi;
+  border-radius: 99px;
+  background: #e8e2ff;
+  color: #17162b;
+  font-size: 2.1cqi;
+  font-weight: 600;
+}
+.ac-refs .ac-site small {
+  font: 1.8cqi monospace;
+  letter-spacing: 0.25cqi;
+  color: var(--ac-accent);
+}
+.ac-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.4cqi;
+  margin-top: 2.4cqi;
+}
+.ac-card {
+  display: grid;
+  align-content: start;
+  gap: 1.2cqi;
+  min-height: 19cqi;
+  padding: 2.4cqi;
+  border-radius: 2cqi;
+  background: #ffffff0d;
+  border: 1px solid #ffffff1a;
+  i {
+    font: normal 1.8cqi monospace;
+    color: var(--ac-accent);
+  }
+  b {
+    font-size: 2.4cqi;
+    line-height: 1.25;
+    font-weight: 500;
+  }
+  em {
+    font-size: 1.9cqi;
+    color: #9fb0cc;
+  }
+}
+
+.ac-hint {
+  display: none;
+}
+
+/* — Mode animé — */
+.ac-scene[data-scene="animated"] {
+  .ac-track {
+    height: 380vh;
+  }
+  .ac-stage {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    padding-block: 70px;
+  }
+  .ac-beats {
+    display: block;
+    position: relative;
+    min-height: 220px;
+  }
+  .ac-beat {
+    position: absolute;
+    inset: 0 0 auto;
+  }
+  .ac-hint {
+    position: absolute;
+    left: clamp(24px, 5vw, 100px);
+    right: clamp(24px, 5vw, 100px);
+    bottom: 26px;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    font: 12px monospace;
+    letter-spacing: 1.2px;
+    color: #8d9bb8;
+  }
+}
+.ac-progress {
+  flex: 1;
+  height: 1px;
+  background: #ffffff1f;
+  > span {
+    display: block;
+    height: 100%;
+    background: var(--ac-accent);
+    transform: scaleX(var(--ac-progress, 0));
+    transform-origin: left;
+  }
+}
+.ac-scene[data-scene="static"] .ac-paper {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  .ac-stage {
+    grid-template-columns: 1fr;
+    gap: 26px;
+    padding-block: 70px;
+  }
+  .ac-sheet-wrap {
+    order: -1;
+    width: min(100%, 520px);
+  }
+  .ac-beat strong {
+    font-size: clamp(24px, 6.5vw, 34px);
+  }
+  .ac-beat > span:last-child {
+    font-size: 16px;
+  }
+  .ac-scene[data-scene="animated"] {
+    .ac-track {
+      height: 340svh;
+    }
+    .ac-stage {
+      height: 100svh;
+      align-content: center;
+      padding-block: 64px 64px;
+      gap: 18px;
+    }
+    .ac-sheet-wrap {
+      width: min(100%, 50svh * 0.78, 480px);
+    }
+    .ac-captions .eyebrow {
+      display: none;
+    }
+    .ac-beats {
+      margin-top: 0;
+      min-height: 150px;
+    }
+    .ac-hint {
+      bottom: 18px;
+    }
+  }
+}

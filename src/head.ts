@@ -41,7 +41,7 @@ export function setHead({
   lang: Lang;
 }) {
   document.title = title;
-  const indexable = view.kind === "home" || view.kind === "case";
+  const indexable = view.kind !== "desk" && view.kind !== "notfound";
   meta("name", "description", description);
   meta("name", "robots", indexable ? "index, follow" : "noindex, follow");
   meta("property", "og:title", title);

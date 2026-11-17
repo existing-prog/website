@@ -30,6 +30,8 @@ const pages = [
     { path: `projets/${id}/`, indexable: true },
     { path: `en/projects/${id}/`, indexable: true },
   ]),
+  { path: "portfolios-chercheurs/", indexable: true },
+  { path: "en/academic-portfolios/", indexable: true },
   { path: "bureau/" },
   { path: "en/desk/" },
   { path: "page-introuvable/", file: "404.html" },

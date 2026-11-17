@@ -68,6 +68,7 @@ const SamanthaCaseStudy = lazy(() => import("./SamanthaCaseStudy"));
 const KasaCaseStudy = lazy(() => import("./KasaCaseStudy"));
 const NinaCaseStudy = lazy(() => import("./NinaCaseStudy"));
 const AtelierPizzaCaseStudy = lazy(() => import("./AtelierPizzaCaseStudy"));
+const AcademicLanding = lazy(() => import("./AcademicLanding"));
 
 function Mark({ className = "" }: { className?: string }) {
   return (
@@ -105,9 +106,10 @@ function App() {
   const ninaCase = caseId === "nina";
   const atelierCase = caseId === "atelier-pizza";
   const caseStudy = caseId !== null;
+  const landingId = view.kind === "landing" ? view.id : null;
   const lang = i18n.resolvedLanguage === "en" ? "en" : "fr";
   const home = pathFor({ kind: "home" }, lang);
-  useScrollHeader(menu, workspace || caseStudy || notFound);
+  useScrollHeader(menu, workspace || caseStudy || notFound || landingId !== null);
   const [drafts, setDrafts] = useState<Draft[]>(loadDrafts);
   const draftsRef = useRef(drafts);
   useEffect(() => {
@@ -172,36 +174,53 @@ function App() {
   useEffect(() => {
     const title = notFound
       ? tr("Page not found — Lucas Berdy")
-      : workspace
-        ? tr("Project desk — Lucas Berdy")
-        : atelierCase
-          ? tr("Atelier Pizza — Personal project · Lucas Berdy")
-          : ninaCase
-            ? tr("Nina Carducci — Case study · Lucas Berdy")
-            : kasaCase
-              ? tr("Kasa — Case study · Lucas Berdy")
-              : caseStudy
-                ? tr("Samantha Ramsey — Case study · Lucas Berdy")
-                : tr("Lucas Berdy — Your next chapter, online.");
-    const description = atelierCase
-      ? tr(
-          "Atelier Pizza: a personal restaurant website project with a custom WordPress menu editing interface by Lucas Berdy.",
-        )
-      : ninaCase
+      : landingId === "academic"
+        ? tr("Portfolio websites for researchers — Lucas Berdy")
+        : workspace
+          ? tr("Project desk — Lucas Berdy")
+          : atelierCase
+            ? tr("Atelier Pizza — Personal project · Lucas Berdy")
+            : ninaCase
+              ? tr("Nina Carducci — Case study · Lucas Berdy")
+              : kasaCase
+                ? tr("Kasa — Case study · Lucas Berdy")
+                : caseStudy
+                  ? tr("Samantha Ramsey — Case study · Lucas Berdy")
+                  : tr("Lucas Berdy — Your next chapter, online.");
+    const description =
+      landingId === "academic"
         ? tr(
-            "Nina Carducci: frontend performance, SEO and accessibility improvements by Lucas Berdy, presented as a training project.",
+            "Portfolio websites for PhD students, postdocs and researchers: research, publications, talks and CV in one distinctive site, designed and developed by Lucas Berdy.",
           )
-        : kasaCase
+        : atelierCase
           ? tr(
-              "Kasa: a responsive React rental interface built by Lucas Berdy as a frontend training project.",
+              "Atelier Pizza: a personal restaurant website project with a custom WordPress menu editing interface by Lucas Berdy.",
             )
-          : caseStudy
+          : ninaCase
             ? tr(
-                "A scientific portfolio designed and developed by Lucas Berdy: visual identity, responsive interface and orbital demonstrations.",
+                "Nina Carducci: frontend performance, SEO and accessibility improvements by Lucas Berdy, presented as a training project.",
               )
-            : tr("meta.description");
+            : kasaCase
+              ? tr(
+                  "Kasa: a responsive React rental interface built by Lucas Berdy as a frontend training project.",
+                )
+              : caseStudy
+                ? tr(
+                    "A scientific portfolio designed and developed by Lucas Berdy: visual identity, responsive interface and orbital demonstrations.",
+                  )
+                : tr("meta.description");
     setHead({ title, description, view, lang });
-  }, [view, lang, workspace, notFound, caseStudy, kasaCase, ninaCase, atelierCase]);
+  }, [
+    view,
+    lang,
+    workspace,
+    notFound,
+    caseStudy,
+    kasaCase,
+    ninaCase,
+    atelierCase,
+    landingId,
+  ]);
   // Première visite : le navigateur gère la position. Ensuite, une nouvelle page
   // commence en haut, sauf si le lien vise une section de l’accueil.
   const firstView = useRef(true);
@@ -492,6 +511,16 @@ function App() {
               {tr("Back to the services")} <ArrowRight size={16} />
             </a>
           </section>
+        ) : landingId ? (
+          <Suspense
+            fallback={
+              <section className="shell section" role="status">
+                {tr("Loading project…")}
+              </section>
+            }
+          >
+            <AcademicLanding onStart={() => start("portfolio")} />
+          </Suspense>
         ) : caseStudy ? (
           <Suspense
             fallback={

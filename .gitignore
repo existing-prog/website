@@ -11,3 +11,4 @@ test-results/
 # Outils de rendu Blender / Python
 __pycache__/
 *.blend1
+public/assets/sequence-test/

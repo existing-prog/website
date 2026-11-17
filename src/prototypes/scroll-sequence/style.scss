@@ -1,0 +1,105 @@
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("/fonts/space-grotesk.woff2") format("woff2");
+  font-weight: 300 700;
+}
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+body {
+  background: #151515;
+  color: #f4ede1;
+  font-family: "Space Grotesk", system-ui, sans-serif;
+}
+.intro,
+.outro {
+  min-height: 70vh;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  gap: 16px;
+  p {
+    font: 12px monospace;
+    letter-spacing: 1.5px;
+    color: #a99f92;
+  }
+  h1 {
+    font-size: clamp(40px, 8vw, 96px);
+    font-weight: 500;
+  }
+}
+.sequence-track {
+  height: 400vh;
+}
+.sequence-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+}
+canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: #151515;
+}
+.sequence-copy {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  text-align: center;
+}
+.sequence-title {
+  display: grid;
+  place-items: center;
+  grid-area: 1 / 1;
+  line-height: 1;
+  .outline {
+    font-size: clamp(56px, 13vw, 190px);
+    font-weight: 700;
+    letter-spacing: -2px;
+    color: transparent;
+    -webkit-text-stroke: 2px #fff8ee;
+  }
+  .solid {
+    margin-top: -0.2em;
+    font-size: clamp(20px, 3.4vw, 46px);
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #fff8ee;
+    text-shadow: 0 4px 30px #000a;
+  }
+}
+.sequence-end {
+  grid-area: 1 / 1;
+  align-self: end;
+  margin-bottom: 12vh;
+  padding: 18px 28px;
+  border-radius: 14px;
+  background: #151515cc;
+  backdrop-filter: blur(10px);
+  font-size: clamp(28px, 4.5vw, 60px);
+  em {
+    font-family: Georgia, serif;
+    color: #e0794f;
+  }
+}
+.sequence-meter {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  bottom: 18px;
+  height: 2px;
+  background: #ffffff22;
+  > span {
+    display: block;
+    height: 100%;
+    background: #e0794f;
+    transform: scaleX(var(--progress, 0));
+    transform-origin: left;
+  }
+}

@@ -1,0 +1,204 @@
+/* « Deux univers » : état statique par défaut (deux cartes-liens). Le mode animé
+ * réunit d’abord les deux moitiés en une seule carte sombre, puis les sépare. */
+.tw-section {
+  position: relative;
+}
+.tw-stage {
+  padding-block: 110px 40px;
+}
+.tw-question {
+  text-align: center;
+  margin-bottom: 40px;
+  h2 {
+    margin-top: 16px;
+    font-size: clamp(36px, 5vw, 76px);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    font-weight: 500;
+  }
+  p:not(.eyebrow) {
+    margin-top: 16px;
+    color: #9fb0cc;
+    font-size: 17px;
+  }
+}
+.tw-worlds {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.tw-world {
+  position: relative;
+  display: grid;
+  align-content: end;
+  min-height: 520px;
+  padding: clamp(24px, 3vw, 44px);
+  border-radius: 24px;
+  overflow: hidden;
+  color: #fff8ee;
+  text-decoration: none;
+  isolation: isolate;
+  transition: transform 0.4s ease;
+  &:hover .tw-link,
+  &:focus-visible .tw-link {
+    gap: 14px;
+  }
+}
+.tw-world-academic {
+  background: radial-gradient(ellipse at 60% 35%, #26336a 0%, #0c1222 65%);
+}
+.tw-world-restaurants {
+  background: radial-gradient(ellipse at 50% 35%, #a5161a 0%, #6d0c0f 75%);
+}
+.tw-art {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.tw-stars {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 72% 12%, #fff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 84% 46%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 30% 52%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 52% 8%, #fff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 8% 64%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 62% 70%, #fff 50%, transparent 51%);
+  opacity: 0.6;
+}
+.tw-orbits {
+  width: min(78%, 420px);
+  margin-top: -18%;
+  overflow: visible;
+  ellipse {
+    fill: none;
+    stroke: #c9d6ff40;
+    stroke-width: 0.35;
+  }
+  circle {
+    fill: #d9ccff;
+    filter: drop-shadow(0 0 1.2px #b9a6ff);
+  }
+  .tw-sun {
+    fill: #ffe1a3;
+    filter: drop-shadow(0 0 3px #ffb347);
+  }
+}
+.tw-pizza {
+  width: min(56%, 300px);
+  margin-top: -20%;
+  filter: drop-shadow(0 30px 40px #3a0406);
+}
+.tw-basil {
+  position: absolute;
+  width: 64px;
+  filter: drop-shadow(0 12px 14px #3a040699);
+}
+.tw-basil-1 {
+  top: 12%;
+  left: 14%;
+  rotate: -35deg;
+}
+.tw-basil-2 {
+  top: 38%;
+  right: 12%;
+  rotate: 130deg;
+  scale: -1 1;
+}
+.tw-copy {
+  display: grid;
+  gap: 12px;
+  .eyebrow {
+    color: #ffd9c9;
+  }
+  strong {
+    max-width: 16ch;
+    font-size: clamp(26px, 2.8vw, 42px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+  }
+}
+.tw-world-academic .tw-copy .eyebrow {
+  color: #b9a6ff;
+}
+.tw-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  transition: gap 0.3s ease;
+}
+.tw-veil {
+  display: none;
+}
+
+/* — Mode animé (grand écran) — */
+.tw-section[data-scene="animated"] {
+  .tw-track {
+    height: 260vh;
+  }
+  .tw-stage {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: grid;
+    place-items: center;
+    padding-block: 90px 40px;
+  }
+  .tw-question {
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    margin: 0;
+    pointer-events: none;
+  }
+  .tw-worlds {
+    width: 100%;
+    height: min(72vh, 640px);
+    gap: 0;
+  }
+  .tw-world {
+    min-height: 0;
+    height: 100%;
+  }
+  .tw-world-academic {
+    transform-origin: right center;
+  }
+  .tw-world-restaurants {
+    transform-origin: left center;
+  }
+  // Voile sombre commun : au départ, les deux moitiés forment une seule carte.
+  .tw-veil {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: #121a2e;
+  }
+}
+
+@media (max-width: 760px) {
+  .tw-stage {
+    padding-block: 80px 20px;
+  }
+  .tw-worlds {
+    grid-template-columns: 1fr;
+  }
+  .tw-world {
+    min-height: 440px;
+  }
+}
+
+/* Sans animation, l’invitation à défiler n’a pas de sens. */
+.tw-section[data-scene="static"] .tw-question p:not(.eyebrow) {
+  display: none;
+}

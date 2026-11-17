@@ -63,6 +63,7 @@ import { useScrollHeader } from "./useScrollHeader";
 import "./interaction-polish.scss";
 import "./readability.scss";
 import HeroProjectBackdrop from "./HeroProjectBackdrop";
+import TwoWorlds from "./TwoWorlds";
 
 const SamanthaCaseStudy = lazy(() => import("./SamanthaCaseStudy"));
 const KasaCaseStudy = lazy(() => import("./KasaCaseStudy"));
@@ -706,6 +707,7 @@ function App() {
                 <AtelierProjectTeaser />
               </div>
             </section>
+            <TwoWorlds />
             <section className="section shell services-section" id="services">
               <div className="section-heading reveal">
                 <div>
@@ -955,6 +957,12 @@ function App() {
           <small>{tr("INDEPENDENT BY CHOICE. INTENTIONAL BY DESIGN.")}</small>
         </span>
         <div>
+          <a href={pathFor({ kind: "landing", id: "academic" }, lang)}>
+            {tr("Research portfolios")}
+          </a>
+          <a href={pathFor({ kind: "landing", id: "restaurants" }, lang)}>
+            {tr("Restaurants & shops")}
+          </a>
           <a href="https://github.com/existing-prog" target="_blank" rel="noreferrer">
             {tr("GitHub")} <ArrowUpRight size={13} />
           </a>

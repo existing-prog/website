@@ -17,7 +17,6 @@ import { createRoot } from "react-dom/client";
 import {
   ArrowUpRight,
   ArrowRight,
-  ArrowDown,
   Plus,
   Check,
   X,
@@ -25,44 +24,23 @@ import {
   Layers,
   Monitor,
   RefreshCw,
-  MoveUpRight,
-  Sparkles,
-  ChevronLeft,
-  ChevronRight,
   FolderOpen,
   FileText,
-  Download,
-  Copy,
-  Mail,
   Trash2,
   ShieldCheck,
-  MousePointer2,
 } from "lucide-react";
-import {
-  asset,
-  briefText,
-  Draft,
-  emptyDraft,
-  loadDrafts,
-  projects,
-  projectHref,
-  isInternalHref,
-  serviceName,
-  services,
-  ServiceId,
-} from "./data";
+import { Draft, emptyDraft, loadDrafts, serviceName, services, ServiceId } from "./data";
 import "./styles.scss";
 import ProjectBuilder from "./ProjectBuilder";
 import ProjectStories from "./ProjectStories";
 import { useGlassMotion } from "./useGlassMotion";
 import "./glass-theme.scss";
 import LanguageSwitch from "./LanguageSwitch";
-import HeroWorkTransition from "./HeroWorkTransition";
 import { useScrollHeader } from "./useScrollHeader";
 import "./interaction-polish.scss";
 import "./readability.scss";
 import "./approach-person.scss";
-import HeroProjectBackdrop from "./HeroProjectBackdrop";
+import InkHero from "./InkHero";
 import TwoWorlds from "./TwoWorlds";
 
 const SamanthaCaseStudy = lazy(() => import("./SamanthaCaseStudy"));
@@ -119,7 +97,6 @@ function App() {
   }, [drafts]);
   const [editing, setEditing] = useState<Draft | null>(null);
   const [notice, setNotice] = useState("");
-  const [preview, setPreview] = useState(0);
   const previousFocus = useRef<HTMLElement | null>(null);
   // Routes réelles : popstate (retour arrière) et navigate() mettent la vue à jour.
   // Les anciens liens en hash (#project/kasa, #workspace) sont redirigés.
@@ -553,136 +530,7 @@ function App() {
           </Suspense>
         ) : (
           <>
-            <HeroWorkTransition />
-            <section className="hero shell" id="top">
-              <div className="studio-backdrop" aria-hidden="true">
-                <div className="studio-glow glow-one" />
-                <div className="studio-glow glow-two" />
-              </div>
-              <div className="hero-kicker">
-                <span className="eyebrow">
-                  <span className="status-dot" />{" "}
-                  {tr("INDEPENDENT DEVELOPER. PERSONAL APPROACH.")}
-                </span>
-                <span className="hero-location">
-                  {tr("BASED IN FRANCE / WORKING ONLINE")}
-                </span>
-              </div>
-              <div className="hero-grid">
-                <div className="hero-copy">
-                  <h1 aria-label={tr("Living websites. That stay in your hands.")}>
-                    <span className="hero-line">{tr("Living websites.")}</span>
-                    <span className="hero-line">{tr("That stay")}</span>
-                    <span className="hero-line">
-                      {tr("in")}{" "}
-                      <span className="hero-accent">
-                        {tr("your hands")}
-                        <svg
-                          viewBox="0 0 340 22"
-                          preserveAspectRatio="none"
-                          aria-hidden="true"
-                        >
-                          <path d="M4 14Q160-7 333 9M15 21Q180 4 326 15" />
-                        </svg>
-                        .
-                      </span>
-                    </span>
-                  </h1>
-                  <p>
-                    {tr(
-                      "I design and build websites that stand out from the first scroll, for independent businesses, restaurants and researchers.",
-                    )}
-                  </p>
-                  <div className="hero-actions">
-                    <button className="button primary" onClick={() => start()}>
-                      {tr("Start a project")} <ArrowUpRight size={19} />
-                    </button>
-                    <a className="understated-link" href="#work">
-                      {tr("See the work")} <ArrowDown size={15} />
-                    </a>
-                  </div>
-                  <div className="hero-footnote">
-                    <span className="mini-monogram">lb.</span>
-                    <span>
-                      {tr("Work directly with Lucas.")}
-                      <br />
-                      <strong>{tr("From the first idea to the final detail.")}</strong>
-                    </span>
-                  </div>
-                </div>
-                <div className="hero-stage">
-                  <HeroProjectBackdrop projectId={projects[preview].id} />
-                  <div className="showcase-window glass-interactive">
-                    <div className="window-toolbar">
-                      <span className="window-dots">
-                        <i />
-                        <i />
-                        <i />
-                      </span>
-                      <span>{new URL(projects[preview].url).hostname}</span>
-                      <ArrowUpRight size={12} />
-                    </div>
-                    <a
-                      className={`showcase-image ${projects[preview].color}`}
-                      href={projectHref(projects[preview])}
-                      target={
-                        isInternalHref(projectHref(projects[preview]))
-                          ? undefined
-                          : "_blank"
-                      }
-                      rel="noreferrer"
-                      aria-label={tr("Explore {{name}}", {
-                        name: projects[preview].name,
-                      })}
-                    >
-                      <img
-                        key={projects[preview].id}
-                        src={asset(projects[preview].image)}
-                        alt={tr("{{name}} website preview", {
-                          name: projects[preview].name,
-                        })}
-                        width="1200"
-                        height="630"
-                      />
-                      <span className="preview-live">
-                        {tr("Explore the project")} <ArrowUpRight size={15} />
-                      </span>
-                    </a>
-                    <div className="window-bottom">
-                      <div>
-                        <span className="eyebrow">{tr(projects[preview].kind)}</span>
-                        <h2>{projects[preview].name}</h2>
-                      </div>
-                      <span className="window-index">
-                        {String(preview + 1).padStart(2, "0")}
-                        <span>/ {String(projects.length).padStart(2, "0")}</span>
-                      </span>
-                    </div>
-                  </div>
-                  <div className="stage-note">
-                    <MousePointer2 size={17} />
-                    <span>{tr("Thoughtful on every screen.")}</span>
-                  </div>
-                  <div
-                    className="preview-controls"
-                    aria-label={tr("Choose a project preview")}
-                  >
-                    {projects.map((p, i) => (
-                      <button
-                        key={p.name}
-                        className={preview === i ? "selected" : ""}
-                        onClick={() => setPreview(i)}
-                        aria-label={tr("Preview {{name}}", { name: p.name })}
-                        aria-pressed={preview === i}
-                      >
-                        <span>{String(i + 1).padStart(2, "0")}</span>
-                        {i === preview && <span>{p.name}</span>}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </section>
+            <InkHero onStart={() => start()} />
             <section className="work-section section" id="work">
               <div className="shell">
                 <div className="section-heading reveal">

@@ -4,7 +4,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(ScrollTrigger);
 
 /** Le scroll reste natif. Le sticky est limité à la scène, sans pin plein écran.
- * Une seule chronologie synchronise déplacement, six états de bouchées et révélation.
+ * Le film de la pizza possède sa propre chronologie et son cycle de chargement.
  * matchMedia retire tous les styles/attributs lors d’un changement de mode.
  */
 export function useAtelierMotion(
@@ -19,12 +19,11 @@ export function useAtelierMotion(
     media.add(
       {
         desktop: "(min-width: 1024px) and (min-height: 700px)",
-        phone: "(max-width: 760px) and (min-height: 600px)",
         motion: "(prefers-reduced-motion: no-preference)",
         reduced: "(prefers-reduced-motion: reduce)",
       },
       (context) => {
-        const { desktop, phone, motion } = context.conditions!;
+        const { desktop, motion } = context.conditions!;
         if (!motion) return;
         page.dataset.motion = desktop ? "full" : "light";
         gsap.fromTo(
@@ -181,91 +180,6 @@ export function useAtelierMotion(
             },
           );
         }
-        if (desktop || phone) {
-          const scene = page.querySelector(
-            desktop ? ".atelier-unfold" : ".atelier-pizza-track",
-          );
-          const timeline = gsap.timeline({
-            scrollTrigger: {
-              trigger: scene,
-              start: desktop ? "top 110px" : "top 80px",
-              // Sur téléphone, seule la pizza reste sticky dans une courte piste.
-              // svh stabilise cette distance quand la barre d’adresse se rétracte.
-              end: desktop
-                ? "bottom bottom"
-                : () => {
-                    const track =
-                      page.querySelector<HTMLElement>(".atelier-pizza-track")!;
-                    const visual = page.querySelector<HTMLElement>(
-                      ".atelier-pizza-visual",
-                    )!;
-                    return `+=${Math.max(1, track.offsetHeight - visual.offsetHeight)}`;
-                  },
-              scrub: desktop ? 0.8 : 0.35,
-              invalidateOnRefresh: true,
-            },
-          });
-          // Pas de voyage latéral sur un écran étroit : la pizza reste centrée.
-          if (desktop) {
-            timeline.fromTo(
-              page.querySelector(".atelier-pizza-visual"),
-              { xPercent: 45, rotation: -8 },
-              { xPercent: 0, rotation: 0, duration: 0.5, ease: "power2.inOut" },
-              0,
-            );
-          }
-          const slice = page.querySelector<SVGGElement>(".atelier-pizza-slice")!;
-          const frames = page.querySelectorAll<SVGImageElement>(".atelier-slice-frame");
-          timeline.to(
-            slice,
-            { x: 48, y: 20, svgOrigin: "500 500", rotation: 6, duration: 0.22 },
-            0.15,
-          );
-          // Les pauses entre états font lire les bouchées ; aucun fondu de texture.
-          [0.38, 0.51, 0.64, 0.77, 0.9].forEach((time, i) => {
-            timeline.set(frames, { visibility: "hidden" }, time);
-            timeline.set(frames[i + 1], { visibility: "visible" }, time);
-            timeline.set(slice, { attr: { "data-bite-frame": i + 1 } }, time);
-            // Trois miettes discrètes suivent la même progression que la bouchée.
-            // Elles restent invisibles sans animation ou en mouvement réduit.
-            const crumbs = page.querySelector(`[data-burst="${i}"]`);
-            timeline.set(crumbs, { opacity: 1 }, time);
-            timeline.fromTo(
-              crumbs,
-              { x: 0, y: 0 },
-              { x: 15, y: 65, duration: 0.105, ease: "power1.in" },
-              time,
-            );
-            timeline.to(crumbs, { opacity: 0, duration: 0.035 }, time + 0.07);
-            timeline.to(
-              slice,
-              { x: 55, y: 23, duration: 0.035, ease: "power1.in" },
-              time - 0.035,
-            );
-            timeline.to(
-              slice,
-              { x: 48, y: 20, duration: 0.065, ease: "power2.out" },
-              time,
-            );
-          });
-          timeline.fromTo(
-            page.querySelectorAll(".atelier-reveal-copy .case-word"),
-            { yPercent: 110 },
-            { yPercent: 0, duration: 0.2, stagger: 0.035, ease: "power2.out" },
-            0.53,
-          );
-          timeline.fromTo(
-            page.querySelector(".atelier-reveal-copy"),
-            { opacity: 0, y: 30 },
-            { opacity: 1, y: 0, duration: 0.35 },
-            0.55,
-          );
-          timeline.to(
-            page.querySelector(".atelier-scroll-label"),
-            { opacity: 0, duration: 0.15 },
-            0,
-          );
-        }
         gsap.fromTo(
           page.querySelector(".case-reading-progress span"),
           { scaleX: 0 },
@@ -282,9 +196,6 @@ export function useAtelierMotion(
         );
         return () => {
           delete page.dataset.motion;
-          page
-            .querySelector(".atelier-pizza-slice")
-            ?.setAttribute("data-bite-frame", "0");
         };
       },
     );

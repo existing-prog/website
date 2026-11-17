@@ -1,117 +1,14 @@
 import AtelierGuidedDemo from "./AtelierGuidedDemo";
-import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft, ArrowUpRight, Check, PlayCircle } from "lucide-react";
 import { asset } from "./data";
 import { tr } from "./i18n";
 import CaseWords from "./CaseWords";
 import { useAtelierMotion } from "./useAtelierMotion";
+import { useAtelierPizzaFilm } from "./useAtelierPizzaFilm";
 import "./case-study.scss";
 import "./atelier-pizza.scss";
-
-/** Six états alignés sur la même photo : part entière, quatre bouchées et fin.
- * Les masques cumulent des découpes arrondies ; aucun fondu n’efface la part.
- * Le scroll choisit un état net, avec retour possible à chaque bouchée.
- */
-function PizzaIllustration() {
-  const id = useId().replace(/:/g, "");
-  const wedge = "M500 500 L1000 500 A500 500 0 0 1 853.55 853.55 Z";
-  const bites = [
-    { x: 540, y: 520, r: 85 },
-    { x: 635, y: 555, r: 115 },
-    { x: 755, y: 610, r: 140 },
-    { x: 650, y: 560, r: 300 },
-  ];
-  return (
-    <svg className="atelier-pizza-art" viewBox="0 0 1000 1000" aria-hidden="true">
-      <defs>
-        <clipPath id={`slice-${id}`}>
-          <path d={wedge} />
-        </clipPath>
-        <mask
-          id={`rest-${id}`}
-          maskUnits="userSpaceOnUse"
-          x="0"
-          y="0"
-          width="1000"
-          height="1000"
-        >
-          <rect width="1000" height="1000" fill="white" />
-          <path d={wedge} fill="black" />
-        </mask>
-        {[0, 1, 2, 3, 4, 5].map((frame) => (
-          <mask
-            key={frame}
-            id={`bite-frame-${frame}-${id}`}
-            maskUnits="userSpaceOnUse"
-            x="0"
-            y="0"
-            width="1000"
-            height="1000"
-          >
-            <rect width="1000" height="1000" fill={frame === 5 ? "black" : "white"} />
-            {bites.slice(0, frame).map((bite, i) => (
-              <g fill="black" key={i}>
-                <circle cx={bite.x} cy={bite.y} r={bite.r} />
-                {i < 3 && (
-                  <>
-                    <circle
-                      cx={bite.x + bite.r * 0.83}
-                      cy={bite.y - bite.r * 0.25}
-                      r={bite.r * 0.3}
-                    />
-                    <circle
-                      cx={bite.x + bite.r * 0.43}
-                      cy={bite.y + bite.r * 0.79}
-                      r={bite.r * 0.28}
-                    />
-                  </>
-                )}
-              </g>
-            ))}
-          </mask>
-        ))}
-      </defs>
-      <image
-        href={asset("atelier-pizza-whole.webp")}
-        width="1000"
-        height="1000"
-        mask={`url(#rest-${id})`}
-      />
-      <g className="atelier-pizza-slice" data-bite-frame="0">
-        <g clipPath={`url(#slice-${id})`}>
-          {[0, 1, 2, 3, 4, 5].map((frame) => (
-            <image
-              className="atelier-slice-frame"
-              data-frame={frame}
-              key={frame}
-              href={asset("atelier-pizza-whole.webp")}
-              width="1000"
-              height="1000"
-              mask={`url(#bite-frame-${frame}-${id})`}
-              style={{ visibility: frame === 0 ? "visible" : "hidden" }}
-            />
-          ))}
-        </g>
-        {[
-          { x: 610, y: 555 },
-          { x: 710, y: 600 },
-          { x: 815, y: 655 },
-          { x: 930, y: 695 },
-          { x: 970, y: 710 },
-        ].map((point, index) => (
-          <g key={index} transform={`translate(${point.x} ${point.y})`}>
-            <g className="atelier-crumb-burst" data-burst={index} opacity="0">
-              <path d="M-15 0 -9 -3 -5 2 -9 7 -15 5Z" fill="#cf963e" />
-              <path d="M3 4 9 0 14 4 11 10 5 9Z" fill="#9c6228" />
-              <path d="M-2 17 2 13 7 18 3 23 -2 21Z" fill="#e0b45a" />
-            </g>
-          </g>
-        ))}
-      </g>
-    </svg>
-  );
-}
 
 export default function AtelierPizzaCaseStudy({ onStart }: { onStart: () => void }) {
   const root = useRef<HTMLElement>(null);
@@ -121,6 +18,7 @@ export default function AtelierPizzaCaseStudy({ onStart }: { onStart: () => void
   const [error, setError] = useState(false);
   const { i18n } = useTranslation();
   useAtelierMotion(root, i18n.resolvedLanguage);
+  useAtelierPizzaFilm(root);
   useLayoutEffect(() => {
     heading.current?.focus({ preventScroll: true });
   }, []);
@@ -181,11 +79,42 @@ export default function AtelierPizzaCaseStudy({ onStart }: { onStart: () => void
         </p>
       </section>
 
-      <section className="atelier-unfold" aria-labelledby="atelier-menu-title">
+      <section
+        className="atelier-unfold"
+        data-film-mode="static"
+        aria-labelledby="atelier-menu-title"
+      >
         <div className="atelier-pizza-stage shell">
           <div className="atelier-pizza-track">
             <div className="atelier-pizza-visual">
-              <PizzaIllustration />
+              {/* Le film est décoratif : le contenu commercial reste du texte.
+               * Les deux images servent au chargement et au mouvement réduit. */}
+              <div className="atelier-pizza-media">
+                <img
+                  className="atelier-film-intro"
+                  src={asset("atelier-film/first-v1.webp")}
+                  width="768"
+                  height="512"
+                  alt=""
+                />
+                <img
+                  className="atelier-film-static"
+                  src={asset("atelier-film/final-v1.webp")}
+                  width="768"
+                  height="512"
+                  alt={tr(
+                    "A pizza on a wooden board, with one slice missing and a few crumbs",
+                  )}
+                />
+                <video
+                  className="atelier-pizza-film"
+                  muted
+                  playsInline
+                  preload="none"
+                  tabIndex={-1}
+                  aria-hidden="true"
+                />
+              </div>
               <span className="atelier-scroll-label" aria-hidden="true">
                 {tr("SCROLL FOR A TASTE")}
               </span>

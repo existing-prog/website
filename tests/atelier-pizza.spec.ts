@@ -1,4 +1,46 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
+
+/** Même distance que le sticky CSS, sans déclencher artificiellement la vidéo. */
+async function scrollFilm(page: Page, progress: number) {
+  await page.evaluate(
+    () =>
+      new Promise((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(resolve)),
+      ),
+  );
+  await page.locator(".atelier-unfold").evaluate((section, value) => {
+    const wide = matchMedia("(min-width: 1024px) and (min-height: 700px)").matches;
+    const track = section.querySelector<HTMLElement>(".atelier-pizza-track")!;
+    const visual = section.querySelector<HTMLElement>(".atelier-pizza-visual")!;
+    const start =
+      (wide ? section : track).getBoundingClientRect().top + scrollY - (wide ? 110 : 80);
+    const distance = wide
+      ? (section as HTMLElement).offsetHeight - innerHeight + 110
+      : track.offsetHeight - visual.offsetHeight;
+    scrollTo({ top: start + distance * value, behavior: "instant" });
+  }, progress);
+  await page.mouse.move(20 + progress * 10, 30);
+  await expect
+    .poll(async () =>
+      Math.abs(
+        Number(await page.locator(".atelier-unfold").getAttribute("data-film-progress")) -
+          progress,
+      ),
+    )
+    .toBeLessThan(0.005);
+  await expect
+    .poll(() =>
+      page
+        .locator(".atelier-pizza-film")
+        .evaluate(
+          (video: HTMLVideoElement, value) =>
+            Math.abs(video.currentTime - (video.duration - 1 / 30) * value),
+          progress,
+        ),
+    )
+    .toBeLessThan(0.09);
+}
+
 for (const width of [320, 390, 768, 1024, 1440]) {
   test(`Atelier Pizza fits ${width}px in FR and ENG`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
@@ -17,59 +59,70 @@ for (const width of [320, 390, 768, 1024, 1440]) {
     await expect(page).toHaveTitle(/Atelier Pizza/);
   });
 }
-test("the pizza slice is eaten with native scroll and comes back on reverse", async ({
+test("the Blender film follows the first scroll, completes and reverses without autoplay", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("#project/atelier-pizza");
-  await expect(page.locator(".atelier-study")).toHaveAttribute("data-motion", "full");
-  const frame = () =>
-    page.locator(".atelier-pizza-slice").getAttribute("data-bite-frame");
-  expect(await frame()).toBe("0");
-  for (const [index, progress] of [0, 0.44, 0.57, 0.7, 0.84, 1].entries()) {
-    await page.locator(".atelier-unfold").evaluate(
-      (el, p) =>
-        scrollTo({
-          top:
-            el.getBoundingClientRect().top +
-            scrollY -
-            110 +
-            (el.clientHeight - innerHeight + 110) * p,
-          behavior: "instant",
-        }),
-      progress,
-    );
-    await page.mouse.move(20 + index, 30);
-    await expect.poll(frame).toBe(String(index));
-    if (index === 1)
-      await expect(page.locator('.atelier-crumb-burst[data-burst="0"]')).toHaveCSS(
-        "opacity",
-        "1",
-      );
-    await expect(page.locator(`.atelier-slice-frame[data-frame="${index}"]`)).toHaveCSS(
-      "visibility",
-      "visible",
-    );
-    for (const other of [0, 1, 2, 3, 4, 5].filter((n) => n !== index))
-      await expect(page.locator(`.atelier-slice-frame[data-frame="${other}"]`)).toHaveCSS(
-        "visibility",
-        "hidden",
-      );
-  }
-  await expect(page.locator(".atelier-reveal-copy")).toHaveCSS("opacity", "1");
-  await page.evaluate(() => scrollTo({ top: 0, behavior: "instant" }));
-  await page.mouse.move(21, 30);
-  await expect.poll(frame).toBe("0");
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await expect(page.locator(".atelier-study")).not.toHaveAttribute(
-    "data-motion",
-    /full|light/,
+  await expect(page.locator(".atelier-unfold")).toHaveAttribute(
+    "data-film-mode",
+    "scroll",
   );
-  await expect(page.locator(".atelier-reveal-copy")).toHaveCSS("visibility", "visible");
-  for (const crumbs of await page.locator(".atelier-crumb-burst").all())
-    await expect(crumbs).toHaveCSS("opacity", "0");
+  // Le tout premier geste doit déjà changer l’image, même après un chargement lent.
+  for (const progress of [0.25, 0.55, 1, 0]) await scrollFilm(page, progress);
+  await expect(page.locator(".atelier-pizza-film")).toHaveJSProperty("paused", true);
+  await scrollFilm(page, 1);
+  await expect(page.locator(".atelier-reveal-copy")).toHaveCSS("opacity", "1");
+  await page.setViewportSize({ width: 1280, height: 650 });
+  await expect(page.locator(".atelier-unfold")).toHaveAttribute(
+    "data-film-mode",
+    "static",
+  );
+  await expect(page.locator(".atelier-pizza-film")).not.toHaveAttribute("src");
+  await expect(page.locator(".atelier-reveal-copy")).toHaveCSS("opacity", "1");
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await scrollFilm(page, 0.5);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expect(page.locator(".atelier-unfold")).toHaveAttribute(
+    "data-film-mode",
+    "static",
+  );
+  await expect(page.locator(".atelier-film-static")).toBeVisible();
+  await expect(page.locator(".atelier-pizza-film")).not.toHaveAttribute("src");
   await expect(page.locator(".atelier-pizza-stage")).not.toHaveCSS("position", "sticky");
+  await expect(page.locator(".atelier-reveal-copy")).toHaveCSS("opacity", "1");
 });
+
+test("reduced motion never downloads the decorative film", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  const movies: string[] = [];
+  page.on("request", (request) => {
+    if (request.url().includes("pizza-scroll-v1.mp4")) movies.push(request.url());
+  });
+  await page.goto("#project/atelier-pizza");
+  await page.locator(".atelier-reveal-copy").scrollIntoViewIfNeeded();
+  await expect(page.locator(".atelier-film-static")).toBeVisible();
+  await expect(page.locator(".atelier-pizza-film")).not.toHaveAttribute("src");
+  expect(movies).toHaveLength(0);
+});
+
+test("a failed film leaves a static image, readable copy and no long scroll track", async ({
+  page,
+}) => {
+  await page.route("**/atelier-film/pizza-scroll-v1.mp4", (route) => route.abort());
+  await page.goto("#project/atelier-pizza");
+  await expect(page.locator(".atelier-unfold")).toHaveAttribute(
+    "data-film-mode",
+    "fallback",
+  );
+  await expect(page.locator(".atelier-film-static")).toBeVisible();
+  await expect(page.locator(".atelier-pizza-film")).toBeHidden();
+  await expect(page.locator(".atelier-reveal-copy")).toHaveCSS("opacity", "1");
+  await expect(page.locator(".atelier-pizza-stage")).not.toHaveCSS("position", "sticky");
+  await page.locator(".case-back").first().click();
+  await expect(page.locator("#work .section-heading h2")).toBeInViewport();
+});
+
 test("personal project opens internally, video is click-to-load, and quote selects business website", async ({
   page,
 }) => {
@@ -208,73 +261,71 @@ test("editorial titles and capture reveal follow scroll and clean up in reduced 
 });
 
 for (const width of [320, 390]) {
-  test(`mobile pizza bites follow native scroll at ${width}px and reset safely`, async ({
+  test(`mobile film follows scroll at ${width}px, translates and releases above the copy`, async ({
     page,
   }) => {
     await page.setViewportSize({ width, height: 844 });
     await page.goto("#project/atelier-pizza");
-    await expect(page.locator(".atelier-study")).toHaveAttribute("data-motion", "light");
-    const frame = () =>
-      page.locator(".atelier-pizza-slice").getAttribute("data-bite-frame");
-    const scrollScene = async (progress: number) => {
-      await page.locator(".atelier-pizza-track").evaluate((track, p) => {
-        const visual = track.querySelector<HTMLElement>(".atelier-pizza-visual")!;
-        scrollTo({
-          top:
-            track.getBoundingClientRect().top +
-            scrollY -
-            80 +
-            ((track as HTMLElement).offsetHeight - visual.offsetHeight) * p,
-          behavior: "instant",
-        });
-      }, progress);
-      await page.mouse.move(20 + progress * 10, 30);
-    };
-    for (const [index, progress] of [0, 0.44, 0.57, 0.7, 0.84, 1].entries()) {
-      await scrollScene(progress);
-      await expect.poll(frame).toBe(String(index));
-      expect(
-        await page
-          .locator(".atelier-slice-frame")
-          .evaluateAll(
-            (frames) =>
-              frames.filter((el) => getComputedStyle(el).visibility === "visible").length,
-          ),
-      ).toBe(1);
-      expect(
-        await page.evaluate(() => document.documentElement.scrollWidth - innerWidth),
-      ).toBeLessThanOrEqual(1);
-    }
-    await expect(page.locator(".atelier-reveal-copy")).toHaveCSS("opacity", "1");
-    // La fin de la piste libère la pizza au-dessus du texte, sans le masquer.
-    expect(
-      await page
-        .locator(".atelier-pizza-visual")
-        .evaluate((el) => el.getBoundingClientRect().bottom),
-    ).toBeLessThan(
-      await page
-        .locator(".atelier-reveal-copy")
-        .evaluate((el) => el.getBoundingClientRect().top),
+    await expect(page.locator(".atelier-unfold")).toHaveAttribute(
+      "data-film-mode",
+      "scroll",
     );
-    await scrollScene(0);
-    await expect.poll(frame).toBe("0");
-    // Une variation de hauteur (barre d’adresse) conserve une progression complète.
+    for (const progress of [0.25, 0.6, 1, 0, 1]) await scrollFilm(page, progress);
+    const language = page
+      .locator("header")
+      .getByRole("button", { name: "Français", exact: true });
+    // Afficher le header masqué sans provoquer le scroll automatique d’un clic
+    // Playwright sur un élément situé hors écran.
+    await language.evaluate((button) => button.focus({ preventScroll: true }));
+    await expect
+      .poll(() => language.evaluate((button) => button.getBoundingClientRect().top))
+      .toBeGreaterThanOrEqual(0);
+    await page
+      .locator(".atelier-pizza-film")
+      .evaluate((video) =>
+        video.addEventListener(
+          "emptied",
+          () => video.setAttribute("data-reloaded", "true"),
+          { once: true },
+        ),
+      );
+    await language.click();
+    await expect(page.locator(".atelier-pizza-film")).not.toHaveAttribute(
+      "data-reloaded",
+      "true",
+    );
+    await scrollFilm(page, 1);
+    await expect
+      .poll(() =>
+        page
+          .locator(".atelier-pizza-film")
+          .evaluate((v: HTMLVideoElement) => v.currentTime),
+      )
+      .toBeGreaterThan(5.8);
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth - innerWidth),
+    ).toBeLessThanOrEqual(1);
+    const boxes = await page.evaluate(() => ({
+      film: document.querySelector(".atelier-pizza-visual")!.getBoundingClientRect()
+        .bottom,
+      copy: document.querySelector(".atelier-reveal-copy")!.getBoundingClientRect().top,
+    }));
+    expect(boxes.film).toBeLessThan(boxes.copy);
     await page.setViewportSize({ width, height: 740 });
-    await scrollScene(1);
-    await expect.poll(frame).toBe("5");
+    await scrollFilm(page, 0.5);
     await page.setViewportSize({ width: 844, height: 390 });
-    await expect.poll(frame).toBe("0");
+    await expect(page.locator(".atelier-unfold")).toHaveAttribute(
+      "data-film-mode",
+      "static",
+    );
     await expect(page.locator(".atelier-pizza-visual")).not.toHaveCSS(
       "position",
       "sticky",
     );
+    await expect(page.locator(".atelier-film-static")).toBeVisible();
     await page.setViewportSize({ width, height: 844 });
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await expect.poll(frame).toBe("0");
-    await expect(page.locator(".atelier-pizza-visual")).not.toHaveCSS(
-      "position",
-      "sticky",
-    );
     await expect(page.locator(".atelier-reveal-copy")).toHaveCSS("opacity", "1");
+    await expect(page.locator(".atelier-pizza-film")).not.toHaveAttribute("src");
   });
 }

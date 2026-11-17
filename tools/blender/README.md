@@ -45,3 +45,15 @@ Le rendu peut être partagé en plages d’images indépendantes (`-s 1 -e 48 -a
 L’assembleur conserve les PNG bruts, débruite les images puis produit `preview-v01.mp4` et `poster-v01.jpg`. Il reprend les images déjà débruitées après interruption. Le MP4 utilise H.264, des pixels YUV420 et un index placé en début de fichier pour les navigateurs mobiles. Il est muet. Toutes les images proviennent du rendu Blender ; aucune image intermédiaire n’est inventée par interpolation vidéo.
 
 Cet export de 768 × 512 et huit échantillons Cycles par image est destiné à valider la chorégraphie, pas à remplacer l’export final. La durée et la cadence sont vérifiées sur le MP4. Une fois le mouvement validé, il restera à choisir la résolution finale et les paramètres de rendu, puis à relier le temps de la vidéo au scroll.
+
+## Film livré au scroll dans l’étude Atelier Pizza
+
+Le fichier de travail des 144 images débruitées sert aussi à produire l’export web :
+
+```sh
+ffmpeg -framerate 24 -i /tmp/pizza-motion/clean/frame-%04d.png -frames:v 144 -c:v libx264 -crf 18 -g 6 -keyint_min 6 -bf 0 -sc_threshold 0 -pix_fmt yuv420p -an -movflags +faststart pizza-scroll-v1.mp4
+```
+
+Les images clés sont espacées d’un quart de seconde, sans images B, pour limiter le poids et faciliter les recherches de temps dans les décodeurs mobiles. Les images WebP `first-v1.webp` et `final-v1.webp` proviennent des images 1 et 144. Le film ne démarre jamais en lecture automatique : `useAtelierPizzaFilm.ts` fait suivre son temps au scroll et regroupe les recherches pendant les gestes rapides.
+
+Le composant est limité à l’étude Atelier Pizza. Le film ne charge qu’à proximité de la scène ; les préférences de mouvement réduit et les petits écrans en paysage montrent l’image finale sans charger le MP4. Une erreur réseau ou de décodage revient à cette même présentation statique, sans longue piste de scroll. La traduction garde le même élément vidéo et ne recharge pas le média.

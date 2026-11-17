@@ -13,6 +13,11 @@ parser = argparse.ArgumentParser(
 parser.add_argument("--stage", type=int, choices=[1, 2, 3], default=2)
 parser.add_argument("--output", type=Path, required=True)
 parser.add_argument("--samples", type=int, default=96)
+parser.add_argument(
+    "--build-only",
+    action="store_true",
+    help="Construire la scène sans lancer le rendu ni enregistrer de pose.",
+)
 parser.add_argument("--threads", type=int, default=3)
 args = parser.parse_args(
     sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else []
@@ -409,6 +414,7 @@ def view(stage):
 
 stage = args.stage
 view(stage)
-bpy.ops.wm.save_as_mainfile(filepath=OUT + "/pose-%02d.blend" % stage)
-scene.render.filepath = OUT + "/pose-%02d.png" % stage
-bpy.ops.render.render(write_still=True)
+if not args.build_only:
+    bpy.ops.wm.save_as_mainfile(filepath=OUT + "/pose-%02d.blend" % stage)
+    scene.render.filepath = OUT + "/pose-%02d.png" % stage
+    bpy.ops.render.render(write_still=True)

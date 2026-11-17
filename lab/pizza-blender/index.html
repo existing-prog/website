@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex,nofollow" />
-    <title>Étude Blender — Atelier Pizza / Lucas Berdy</title>
+    <title>Prévisualisation Blender — Atelier Pizza / Lucas Berdy</title>
     <link rel="icon" href="/assets/favicon.svg" />
     <style>
       @font-face {
@@ -96,6 +96,24 @@
         overflow: hidden;
         background: #e4ddce;
       }
+      video {
+        display: block;
+        width: 100%;
+        height: auto;
+        border-radius: 16px;
+        background: #e4ddce;
+      }
+      .motion {
+        padding: 20px 0;
+      }
+      .motion h2 {
+        font-weight: 500;
+        font-size: clamp(24px, 4vw, 36px);
+        letter-spacing: -0.035em;
+      }
+      .motion > p {
+        max-width: 75ch;
+      }
       img {
         display: block;
         width: 100%;
@@ -134,11 +152,41 @@
     <main>
       <section class="intro">
         <p class="eyebrow">Atelier Pizza / Étude de rendu 01</p>
-        <h1>Trois poses à valider.</h1>
+        <h1>Le geste en mouvement.</h1>
         <p>
-          Une première étude réalisée dans Blender pour juger les modèles, la prise et la
-          lumière avant de produire l’animation. Cliquez sur une image pour l’examiner en
-          grand.
+          Une prévisualisation de six secondes pour juger la prise et le rythme avant
+          l’intégration au scroll. Les trois vues fixes restent disponibles plus bas.
+        </p>
+      </section>
+      <section class="motion" id="motion" aria-labelledby="motion-title">
+        <p class="eyebrow">Prévisualisation / 6 secondes / Sans audio</p>
+        <h2 id="motion-title">Une prise. Une sortie. Puis place à la carte.</h2>
+        <p id="motion-description">
+          La main approche, saisit et soulève la part. Elle quitte le cadre une seule
+          fois. La caméra revient ensuite au-dessus de la pizza avec les miettes.
+        </p>
+        <video
+          controls
+          playsinline
+          muted
+          preload="metadata"
+          poster="/assets/pizza-blender-motion/poster-v01.jpg"
+          width="768"
+          height="512"
+          aria-describedby="motion-description"
+        >
+          <source src="/assets/pizza-blender-motion/preview-v01.mp4" type="video/mp4" />
+          Votre navigateur ne permet pas de lire cette vidéo. Le MP4 est disponible avec
+          le lien ci-dessous.
+        </video>
+        <p>
+          <a href="../../assets/pizza-blender-motion/preview-v01.mp4" download
+            >Télécharger la prévisualisation MP4</a
+          >
+        </p>
+        <p class="note">
+          Cette vidéo sert à valider le mouvement et les contacts avant l’export
+          définitif. Elle n’est pas encore pilotée par le scroll.
         </p>
       </section>
       <figure>
@@ -207,9 +255,9 @@
         /></a>
       </figure>
       <p class="note">
-        Ce sont des images de validation, pas encore une animation. La suite consiste à
-        ajuster le rendu choisi, puis à travailler le mouvement et son export pour le
-        scroll.
+        Les trois images ci-dessus restent les références de la première étude. La suite
+        consiste à ajuster la prévisualisation, puis à préparer son export et son pilotage
+        par le scroll.
       </p>
     </main>
     <footer>

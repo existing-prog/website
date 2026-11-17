@@ -27,3 +27,21 @@ python tools/blender/denoise_review.py --oidn /chemin/oidnDenoise --input /tmp/p
 ```
 
 Pour régénérer directement des images plus échantillonnées, le générateur Blender accepte `--samples 256`. Les trois images validées seront suivies d’une étape de travail du mouvement ; l’interpolation des poses n’est pas encore construite.
+
+## Prévisualisation du mouvement — six secondes
+
+`pizza_motion.py` réutilise la scène de revue, affine le raccord du poignet et crée une animation Blender native de 144 images à 24 images par seconde. Les quatre doigts restent sous la part ; le pouce se ferme sur la croûte. Une légère souplesse de la pointe accompagne la levée. La sortie est unique et ses bornes projetées sont vérifiées avant de masquer la part hors champ.
+
+```sh
+blender -b -t 3 --python tools/blender/pizza_motion.py -- --output /tmp/pizza-motion --width 768 --samples 8
+blender -b /tmp/pizza-motion/pizza-motion.blend -t 3 -a
+python tools/blender/encode_motion.py --output /tmp/pizza-motion --oidn /chemin/oidnDenoise
+```
+
+Le générateur enregistre `pizza-motion.blend` et `motion.json`. Les poses et la caméra sont des clés éditables dans Blender ; la lecture du fichier n’exige pas un script externe. Les repères de la timeline indiquent l’approche, la prise, la sortie et le retour de la caméra.
+
+Le rendu peut être partagé en plages d’images indépendantes (`-s 1 -e 48 -a`, puis `49–96` et `97–144`) dans des processus distincts, en adaptant le nombre de threads aux ressources disponibles. Les PNG sont nommés `raw/frame-0001.png` à `raw/frame-0144.png`.
+
+L’assembleur conserve les PNG bruts, débruite les images puis produit `preview-v01.mp4` et `poster-v01.jpg`. Il reprend les images déjà débruitées après interruption. Le MP4 utilise H.264, des pixels YUV420 et un index placé en début de fichier pour les navigateurs mobiles. Il est muet. Toutes les images proviennent du rendu Blender ; aucune image intermédiaire n’est inventée par interpolation vidéo.
+
+Cet export de 768 × 512 et huit échantillons Cycles par image est destiné à valider la chorégraphie, pas à remplacer l’export final. La durée et la cadence sont vérifiées sur le MP4. Une fois le mouvement validé, il restera à choisir la résolution finale et les paramètres de rendu, puis à relier le temps de la vidéo au scroll.

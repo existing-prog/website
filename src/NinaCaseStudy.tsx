@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { ArrowLeft, ArrowUpRight, Image, Search, Accessibility } from "lucide-react";
 import { asset } from "./data";
 import { tr } from "./i18n";
+import { currentLang, pathFor } from "./routes";
 import CaseWords from "./CaseWords";
 import { useNinaMotion } from "./useNinaMotion";
 import "./case-study.scss";
@@ -67,7 +68,10 @@ export default function NinaCaseStudy({ onStart }: { onStart: () => void }) {
         <span />
       </div>
       <section className="case-hero shell nina-intro">
-        <a className="case-back" href="#work">
+        <a
+          className="case-back"
+          href={`${pathFor({ kind: "home" }, currentLang())}#work`}
+        >
           <ArrowLeft size={16} /> {tr("Back to selected work")}
         </a>
         <p className="eyebrow nina-intro-reveal">
@@ -321,7 +325,10 @@ export default function NinaCaseStudy({ onStart }: { onStart: () => void }) {
               {tr("View the project code")} <ArrowUpRight size={16} />
             </a>
           </div>
-          <a className="case-back case-back-bottom" href="#work">
+          <a
+            className="case-back case-back-bottom"
+            href={`${pathFor({ kind: "home" }, currentLang())}#work`}
+          >
             <ArrowLeft size={16} /> {tr("Back to selected work")}
           </a>
         </div>

@@ -25,10 +25,11 @@ jobs:
         run: npm ci
       - name: Check formatting
         run: npm run format:check
-      - name: Typecheck and build
-        run: npm run build
-      - name: Install test browser
+      # Le build pré-rend les pages dans Chromium : le navigateur doit être installé avant.
+      - name: Install browsers
         run: npx playwright install --with-deps chromium firefox
+      - name: Typecheck, build and prerender
+        run: npm run build
       - name: Browser regression checks
         run: npm test
       - name: Firefox media suspension regression checks

@@ -1,4 +1,5 @@
 import { tr } from "./i18n";
+import { currentLang, pathFor } from "./routes";
 /**
  * Contrat de données : ne pas traduire les identifiants ni les valeurs enregistrées.
  * Les libellés anglais servent de clés vers FR.json / ENG.json au moment de l’affichage.
@@ -97,9 +98,10 @@ export const projects = [
 ];
 /** Un seul point pour les liens de projet : étude interne ou site externe. */
 export const projectHref = (project: (typeof projects)[number]) =>
-  ["samantha", "kasa", "nina"].includes(project.id)
-    ? `#project/${project.id}`
+  project.id === "samantha" || project.id === "kasa" || project.id === "nina"
+    ? pathFor({ kind: "case", id: project.id }, currentLang())
     : project.url;
+export const isInternalHref = (href: string) => !/^https?:/.test(href);
 
 /** Brouillon local uniquement : aucun état « payé » ou « reçu » n’est simulé. */
 export interface Draft {

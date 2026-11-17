@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { ArrowLeft, ArrowUpRight, Check, PlayCircle } from "lucide-react";
 import { asset } from "./data";
 import { tr } from "./i18n";
+import { currentLang, pathFor } from "./routes";
 import CaseWords from "./CaseWords";
 import { useAtelierMotion } from "./useAtelierMotion";
 import { useAtelierPizzaFilm } from "./useAtelierPizzaFilm";
@@ -43,7 +44,10 @@ export default function AtelierPizzaCaseStudy({ onStart }: { onStart: () => void
         <span />
       </div>
       <section className="case-hero shell atelier-intro">
-        <a className="case-back" href="#work">
+        <a
+          className="case-back"
+          href={`${pathFor({ kind: "home" }, currentLang())}#work`}
+        >
           <ArrowLeft size={16} /> {tr("Back to selected work")}
         </a>
         <p className="eyebrow">{tr("ATELIER PIZZA / PERSONAL WORDPRESS PROJECT")}</p>
@@ -303,7 +307,10 @@ export default function AtelierPizzaCaseStudy({ onStart }: { onStart: () => void
             <button className="button primary" onClick={onStart}>
               {tr("Let’s talk about your restaurant website")} <ArrowUpRight size={18} />
             </button>
-            <a className="understated-link" href="#work">
+            <a
+              className="understated-link"
+              href={`${pathFor({ kind: "home" }, currentLang())}#work`}
+            >
               {tr("Back to selected work")} <ArrowLeft size={16} />
             </a>
           </div>

@@ -27,6 +27,14 @@ To accept real on-site orders, the next implementation needs:
 
 Keep secret keys out of `VITE_*` variables, frontend code and GitHub Pages. GitHub Pages serves static files; server functions must run on a separate supported backend. These integrations are intentionally not simulated by local draft statuses.
 
+## URLs, languages and SEO
+
+- French is the default language at `/website/`; English lives under `/website/en/`. The URL decides the language, and the switch keeps you on the equivalent page.
+- Each case study has its own URL (`/website/projets/kasa/`, `/website/en/projects/kasa/`). The project desk is at `/website/bureau/` (`noindex`) and only appears in the menu once a draft exists. Old hash links (`#project/kasa`, `#workspace`) are redirected.
+- `npm run build` runs `scripts/prerender.mjs` after Vite: every page is rendered in Chromium and saved as static HTML (title, description, canonical, `hreflang`, Open Graph), along with `404.html`, `sitemap.xml` and `robots.txt`.
+- Set `VITE_SITE_URL` (e.g. `https://lucasberdy.fr`) when a custom domain is ready; canonical URLs, the sitemap and JSON-LD follow it. Change `base` in `vite.config.ts` too if the site moves to the domain root.
+- Prerendering needs a Playwright Chromium (`npx playwright install chromium`) or `CHROMIUM_PATH`. `SKIP_PRERENDER=1` skips it for a quick local build.
+
 ## Development
 
 ```sh
@@ -50,6 +58,8 @@ npx playwright install --with-deps chromium
 npm run build
 npm test
 ```
+
+The build itself needs that browser for prerendering.
 
 Tests start the production preview automatically. Set `CHROMIUM_PATH` to use an existing Chromium executable. Set `TEST_WEBKIT=1` to also test WebKit after installing it with `npx playwright install --with-deps webkit`. `TEST_URL` can point tests at an already running deployment.
 

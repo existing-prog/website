@@ -1,13 +1,14 @@
 import { ArrowUpRight } from "lucide-react";
 import { asset } from "./data";
 import { tr } from "./i18n";
+import { currentLang, pathFor } from "./routes";
 import "./atelier-teaser.scss";
 /** Projet personnel complémentaire : son lien ne modifie pas les trois scènes existantes. */
 export default function AtelierProjectTeaser() {
   return (
     <a
       className="atelier-project-teaser reveal"
-      href="#project/atelier-pizza"
+      href={pathFor({ kind: "case", id: "atelier-pizza" }, currentLang())}
       aria-labelledby="atelier-teaser-title"
     >
       <div className="atelier-teaser-art" aria-hidden="true">

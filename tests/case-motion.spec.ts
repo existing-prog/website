@@ -4,7 +4,7 @@ test("case choreography follows native scroll and reverses its reading progress"
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("#project/samantha");
+  await page.goto("en/projects/samantha/");
   const study = page.locator(".case-study");
   await expect(study).toHaveAttribute("data-motion", "full");
   await expect(
@@ -71,7 +71,7 @@ test("case choreography follows native scroll and reverses its reading progress"
 test("reduced motion restores every title and frame and route exit removes progress", async ({
   page,
 }) => {
-  await page.goto("#project/samantha");
+  await page.goto("en/projects/samantha/");
   await expect(page.locator(".case-study")).toHaveAttribute("data-motion", /full|light/);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await expect(page.locator(".case-reading-progress")).toBeHidden();

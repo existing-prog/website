@@ -1,3 +1,4 @@
+import { currentLang, pathFor } from "./routes";
 import { deliverRequest, directDeliveryEnabled } from "./requestDelivery";
 import LanguageSwitch from "./LanguageSwitch";
 import { useTranslation } from "react-i18next";
@@ -167,7 +168,11 @@ export default function ProjectBuilder({
     >
       <div className="builder-shell">
         <aside className="builder-sidebar">
-          <a className="brand-symbol" href="#top" onClick={onClose}>
+          <a
+            className="brand-symbol"
+            href={`${pathFor({ kind: "home" }, currentLang())}#top`}
+            onClick={onClose}
+          >
             lb<span>.</span>
           </a>
           <span className="eyebrow">{tr("A GOOD PLACE TO BEGIN")}</span>

@@ -40,7 +40,7 @@ async function scrollFilm(page: Page, progress: number) {
 for (const width of [320, 390, 768, 1024, 1440]) {
   test(`Atelier Pizza fits ${width}px in FR and ENG`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto("#project/atelier-pizza");
+    await page.goto("en/projects/atelier-pizza/");
     await expect(page.locator(".case-title")).toBeFocused();
     for (const language of ["Français", "English"]) {
       await page
@@ -59,7 +59,7 @@ test("the Blender film follows the first scroll, completes and reverses without 
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.goto("#project/atelier-pizza");
+  await page.goto("en/projects/atelier-pizza/");
   await expect(page.locator(".atelier-unfold")).toHaveAttribute(
     "data-film-mode",
     "scroll",
@@ -106,7 +106,7 @@ test("reduced motion never downloads the decorative film", async ({ page }) => {
   page.on("request", (request) => {
     if (request.url().includes("pizza-scroll-v1.mp4")) movies.push(request.url());
   });
-  await page.goto("#project/atelier-pizza");
+  await page.goto("en/projects/atelier-pizza/");
   await page.locator(".atelier-reveal-copy").scrollIntoViewIfNeeded();
   await expect(page.locator(".atelier-film-static")).toBeVisible();
   await expect(page.locator(".atelier-pizza-film")).not.toHaveAttribute("src");
@@ -121,7 +121,7 @@ test("mobile film resumes a discarded decoder at the current scroll position", a
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("#project/atelier-pizza");
+  await page.goto("en/projects/atelier-pizza/");
   await scrollFilm(page, 0.55);
   const film = page.locator(".atelier-pizza-film");
   await film.evaluate((node: HTMLVideoElement) => {
@@ -175,7 +175,7 @@ test("mobile film resumes after a page-cache restore and ignores ordinary focus"
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("#project/atelier-pizza");
+  await page.goto("en/projects/atelier-pizza/");
   await scrollFilm(page, 0.35);
   const film = page.locator(".atelier-pizza-film");
   await film.evaluate((v) =>
@@ -216,7 +216,7 @@ test("a stalled decoder recovers and uses the static fallback if it stays blocke
 }) => {
   test.setTimeout(45000);
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("#project/atelier-pizza");
+  await page.goto("en/projects/atelier-pizza/");
   await scrollFilm(page, 0.35);
   await page.locator(".atelier-pizza-film").evaluate((v) => {
     Object.defineProperty(v, "seeking", { configurable: true, value: true });
@@ -248,7 +248,7 @@ test("a failed film leaves a static image, readable copy and no long scroll trac
   page,
 }) => {
   await page.route("**/atelier-film/pizza-scroll-v1.mp4", (route) => route.abort());
-  await page.goto("#project/atelier-pizza");
+  await page.goto("en/projects/atelier-pizza/");
   await expect(page.locator(".atelier-unfold")).toHaveAttribute(
     "data-film-mode",
     "fallback",
@@ -269,7 +269,7 @@ test("personal project opens internally, video is click-to-load, and quote selec
   page.on("request", (r) => {
     if (r.url().endsWith("atelier-wordpress-demo.mp4")) videos.push(r.url());
   });
-  await page.goto("");
+  await page.goto("en/");
   await page.locator(".atelier-project-teaser").click();
   await expect(page.locator(".case-title")).toBeFocused();
   expect(videos).toHaveLength(0);
@@ -306,7 +306,7 @@ test("guided captures compare three real updates and keep their state when trans
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("#project/atelier-pizza");
+  await page.goto("en/projects/atelier-pizza/");
   const demo = page.locator(".atelier-guided-demo");
   for (const [id, label, result] of [
     ["price", "Change a price", "€10.50"],
@@ -355,7 +355,7 @@ test("editorial titles and capture reveal follow scroll and clean up in reduced 
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.goto("#project/atelier-pizza");
+  await page.goto("en/projects/atelier-pizza/");
   await expect(page.locator(".atelier-study")).toHaveAttribute("data-motion", "full");
   const word = page.locator(".atelier-web h2 .case-word").first();
   const offset = () =>
@@ -403,7 +403,7 @@ for (const width of [320, 390, 768]) {
     page,
   }) => {
     await page.setViewportSize({ width, height: 844 });
-    await page.goto("#project/atelier-pizza");
+    await page.goto("en/projects/atelier-pizza/");
     await expect(page.locator(".atelier-unfold")).toHaveAttribute(
       "data-film-mode",
       "scroll",

@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 for (const width of [320, 390, 768, 1024, 1440]) {
   test(`Nina fits ${width}px in both languages`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto("#project/nina");
+    await page.goto("en/projects/nina/");
     await expect(page.locator(".case-title")).toBeFocused();
     for (const language of ["Français", "English"]) {
       await page
@@ -28,9 +28,9 @@ for (const width of [320, 390, 768, 1024, 1440]) {
 test("Nina opens internally, survives reload and starts a website-care quote", async ({
   page,
 }) => {
-  await page.goto("");
+  await page.goto("en/");
   const link = page.locator("#chapter-nina .story-card");
-  await expect(link).toHaveAttribute("href", "#project/nina");
+  await expect(link).toHaveAttribute("href", "/website/en/projects/nina/");
   await expect(link).not.toHaveAttribute("target", "_blank");
   await link.click();
   await page.reload();
@@ -46,7 +46,7 @@ test("Nina opens internally, survives reload and starts a website-care quote", a
 
 test("photo prints assemble with native scroll and reverse", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("#project/nina");
+  await page.goto("en/projects/nina/");
   await expect(page.locator(".nina-study")).toHaveAttribute("data-motion", "full");
   const print = page.locator(".nina-print").nth(1);
   const y = () =>
@@ -77,7 +77,7 @@ test("photo prints assemble with native scroll and reverse", async ({ page }) =>
 test("reduced motion restores photos and preserves sourced audit results", async ({
   page,
 }) => {
-  await page.goto("#project/nina");
+  await page.goto("en/projects/nina/");
   await expect(page.locator(".nina-study")).toHaveAttribute("data-motion", /full|light/);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await expect(page.locator(".nina-study")).not.toHaveAttribute(

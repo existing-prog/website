@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 for (const width of [390, 1440]) {
   test(`navigation hides down and returns up at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto("");
+    await page.goto("en/");
     const header = page.locator(".site-header");
     await expect(header).toHaveAttribute("data-hidden", "false");
     await page.evaluate(() => document.fonts.ready);
@@ -26,7 +26,7 @@ for (const width of [390, 1440]) {
 test("primary button has a colored hover and visible keyboard focus", async ({
   page,
 }) => {
-  await page.goto("");
+  await page.goto("en/");
   const button = page.locator(".hero-actions .button.primary");
   const initial = await button.evaluate((el) => getComputedStyle(el).backgroundImage);
   await button.hover();

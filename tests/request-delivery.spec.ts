@@ -1,7 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 
 async function completeBrief(page: Page) {
-  await page.goto("");
+  await page.goto("en/");
   await page.getByRole("button", { name: "Start a business website project" }).click();
   await page.getByRole("button", { name: "Continue", exact: true }).click();
   await page

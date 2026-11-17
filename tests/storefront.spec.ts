@@ -4,7 +4,7 @@ for (const width of [320, 360, 375, 390, 430, 768, 1024, 1440, 1920]) {
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(e.message));
     await page.setViewportSize({ width, height: 900 });
-    await page.goto("");
+    await page.goto("en/");
     await page.evaluate(() => document.fonts.ready);
     await expect(
       page.getByRole("heading", { name: /Your business.*Impossible/ }),
@@ -41,7 +41,7 @@ test("project request validates, saves, reloads, resumes and exports", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("");
+  await page.goto("en/");
   await page.getByRole("button", { name: "Start a business website project" }).click();
   await page.getByRole("button", { name: "Continue", exact: true }).click();
   await page.getByRole("button", { name: "Continue", exact: true }).click();
@@ -100,20 +100,22 @@ test("project request validates, saves, reloads, resumes and exports", async ({
   await expect(page.getByLabel("How many pages?")).toHaveValue("2–5 pages");
   await page.getByRole("button", { name: "Close project planner" }).click();
   await expect(page.getByRole("button", { name: "Continue project" })).toBeFocused();
-  await page.getByRole("button", { name: "Delete Studio Taylor draft" }).click();
+  await page.getByRole("button", { name: "Delete the draft Studio Taylor" }).click();
   await expect(page.locator(".draft-card")).toHaveCount(0);
   await page.reload();
   await expect(page.locator(".empty-desk")).toBeVisible();
 });
 test("mobile menu, filters, preview switching, and Escape", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
-  await page.goto("");
+  await page.goto("en/");
   await page.getByRole("button", { name: "Open navigation" }).click();
   await expect(page.getByRole("navigation")).toBeVisible();
-  await page.getByRole("link", { name: "Project desk", exact: true }).click();
-  await expect(page.locator(".empty-desk")).toBeVisible();
-  await page.getByRole("link", { name: "Back to the services" }).click();
-  await expect(page.locator("#services")).toBeInViewport();
+  await expect(page.getByRole("link", { name: "Project desk", exact: true })).toHaveCount(
+    0,
+  );
+  await page.getByRole("link", { name: "Contact", exact: true }).click();
+  await expect(page.locator("#contact")).toBeInViewport();
+  await expect(page.getByRole("navigation")).toBeHidden();
   await page.getByRole("button", { name: "Portfolios", exact: true }).click();
   await expect(page.locator(".project-card")).toHaveCount(1);
   await page.getByRole("button", { name: "Frontend & performance" }).click();
@@ -135,14 +137,14 @@ test("corrupt local drafts fail safely and reduced motion is respected", async (
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("");
+  await page.goto("en/");
   await page.evaluate(() =>
     localStorage.setItem(
       "lb-project-drafts-v1",
       '[{"service":"website","id":"x","updatedAt":"invalid"}]',
     ),
   );
-  await page.goto("#workspace");
+  await page.goto("en/desk/");
   await expect(page.locator(".empty-desk")).toBeVisible();
   await page.getByRole("link", { name: "Lucas Berdy home", exact: true }).first().click();
   expect(
@@ -155,7 +157,7 @@ test("corrupt local drafts fail safely and reduced motion is respected", async (
 
 test("storage failure never claims a draft was saved", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("");
+  await page.goto("en/");
   await page.evaluate(() => {
     localStorage.setItem(
       "lb-project-drafts-v1",
@@ -177,7 +179,7 @@ test("storage failure never claims a draft was saved", async ({ page }) => {
     );
   });
   await page.reload();
-  await page.goto("#workspace");
+  await page.goto("en/desk/");
   await page.getByRole("button", { name: "Continue project" }).click();
   for (let i = 0; i < 3; i++)
     await page.getByRole("button", { name: "Continue", exact: true }).click();
@@ -202,7 +204,7 @@ test("storage failure never claims a draft was saved", async ({ page }) => {
 for (const width of [390, 1440]) {
   test(`offer hierarchy and accessible project cards at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto("");
+    await page.goto("en/");
     await page.evaluate(() => document.fonts.ready);
     await expect(page.locator(".hero-copy > p")).toHaveText(
       "I design and build websites for independent businesses and professionals.",
@@ -275,7 +277,7 @@ test("desktop project sequence follows scroll and preselects the right services"
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("");
+  await page.goto("en/");
   const story = page.locator(".project-stories");
   await expect(story).toHaveAttribute("data-enhanced", "true");
   const cases = [
@@ -312,7 +314,7 @@ test("phone project animations remain inline and allow skipping to services", as
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("");
+  await page.goto("en/");
   await expect(page.locator(".project-stories")).toHaveAttribute(
     "data-enhanced",
     "false",
@@ -336,7 +338,7 @@ test("reduced motion shows every project without a sticky animation", async ({
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("");
+  await page.goto("en/");
   await expect(page.locator(".project-stories")).toHaveAttribute(
     "data-reduced-motion",
     "true",

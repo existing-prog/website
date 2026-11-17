@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 for (const width of [320, 390, 768, 1024, 1440]) {
   test(`Kasa fits ${width}px in both languages`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto("#project/kasa");
+    await page.goto("en/projects/kasa/");
     await expect(page.locator(".case-title")).toBeFocused();
     for (const language of ["Français", "English"]) {
       await page
@@ -22,7 +22,7 @@ for (const width of [320, 390, 768, 1024, 1440]) {
 
 test("Kasa scroll chapters update forwards and backwards", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("#project/kasa");
+  await page.goto("en/projects/kasa/");
   await expect(page.locator(".kasa-study")).toHaveAttribute("data-motion", "full");
   for (const index of [0, 1, 2, 1]) {
     await page
@@ -38,9 +38,9 @@ test("Kasa scroll chapters update forwards and backwards", async ({ page }) => {
 });
 
 test("Kasa internal navigation and website quote", async ({ page }) => {
-  await page.goto("");
+  await page.goto("en/");
   const link = page.locator("#chapter-kasa .story-card");
-  await expect(link).toHaveAttribute("href", "#project/kasa");
+  await expect(link).toHaveAttribute("href", "/website/en/projects/kasa/");
   await expect(link).not.toHaveAttribute("target", "_blank");
   await link.click();
   await page.reload();
@@ -56,7 +56,7 @@ test("Kasa internal navigation and website quote", async ({ page }) => {
 
 test("reduced motion keeps all Kasa steps inline", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("#project/kasa");
+  await page.goto("en/projects/kasa/");
   await expect(page.locator(".kasa-flow-stage")).toBeHidden();
   await expect(page.locator(".kasa-flow-chapter img")).toHaveCount(3);
   await expect(page.locator(".kasa-hero-browser")).toHaveCSS("transform", "none");

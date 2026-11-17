@@ -11,7 +11,7 @@ for (const viewport of [
     page,
   }) => {
     await page.setViewportSize(viewport);
-    await page.goto("");
+    await page.goto("en/");
     await page.evaluate(() => document.fonts.ready);
     const layouts = [];
     for (const name of ["English", "Français"]) {
@@ -48,7 +48,7 @@ for (const viewport of [
 for (const width of [1475, 1024, 768, 390]) {
   test(`closing ornament never overlaps the heading at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto("");
+    await page.goto("en/");
     await page.evaluate(() => document.fonts.ready);
     for (const name of ["Français", "English"]) {
       await page.locator("header").getByRole("button", { name, exact: true }).click();

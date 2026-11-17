@@ -4,6 +4,11 @@ import "./project-questions.scss";
 
 const questions = [
   {
+    question: "How much will my project cost?",
+    answer:
+      "As a guide, a focused portfolio is €600–€1,200, a small business website €1,200–€2,400, and frontend care €45/hour. Project guides use a €300/day development basis. Your actual scope, features, any applicable taxes and external costs are confirmed in a written quote, which you approve before work begins.",
+  },
+  {
     question: "How long will my project take?",
     answer:
       "The timeline depends on the pages, features and content available. After our first exchange, your quote sets out the planned stages and dates. If the scope changes, we agree on the impact before continuing.",
@@ -72,7 +77,7 @@ export default function ProjectQuestions({ onStart }: { onStart: () => void }) {
           <details className="project-question reveal" key={question}>
             <summary>
               <span className="question-number" aria-hidden="true">
-                0{index + 1}
+                {String(index + 1).padStart(2, "0")}
               </span>
               <span>{tr(question)}</span>
               <Plus size={18} aria-hidden="true" />

@@ -5,7 +5,7 @@ for (const width of [320, 390, 768, 1440]) {
     page,
   }) => {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto("#project/samantha");
+    await page.goto("en/projects/samantha/");
     await expect(page.locator(".case-title")).toContainText("Research takes on a new");
     for (const language of ["Français", "English"]) {
       await page
@@ -29,9 +29,9 @@ for (const width of [320, 390, 768, 1440]) {
 test("Samantha opens internally, the portfolio CTA selects the right service, and navigation survives reload", async ({
   page,
 }) => {
-  await page.goto("");
+  await page.goto("en/");
   const project = page.locator("#chapter-samantha .story-card");
-  await expect(project).toHaveAttribute("href", "#project/samantha");
+  await expect(project).toHaveAttribute("href", "/website/en/projects/samantha/");
   await expect(project).not.toHaveAttribute("target", "_blank");
   await project.click();
   await expect(page.locator(".case-title")).toBeFocused();
@@ -45,9 +45,11 @@ test("Samantha opens internally, the portfolio CTA selects the right service, an
   await expect(
     page.getByRole("button", { name: "Start a portfolio project", exact: true }),
   ).toBeFocused();
-  await page.locator("header a[href='#workspace']").click();
+  // Sans brouillon, le bureau n’est plus dans le menu, mais son URL reste accessible.
+  await expect(page.locator("header a.desk-link")).toHaveCount(0);
+  await page.goto("en/desk/");
   await expect(page.locator(".empty-desk")).toBeVisible();
-  await page.locator("header a[href='#work']").click();
+  await page.locator("header a[href='/website/en/#work']").click();
   await expect(page.locator("#work .section-heading h2")).toBeInViewport();
 });
 
@@ -59,7 +61,7 @@ test("recorded demonstration plays locally on demand with reduced motion", async
   page.on("request", (request) => {
     if (request.url().endsWith(".mp4")) requested.push(request.url());
   });
-  await page.goto("#project/samantha");
+  await page.goto("en/projects/samantha/");
   const video = page.locator(".case-demo video");
   await expect(page.locator(".case-title")).toBeVisible();
   expect(requested).toHaveLength(0);

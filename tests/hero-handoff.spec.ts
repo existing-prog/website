@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 for (const width of [390, 1440]) {
   test(`hero stays in its column while scrolling at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto("");
+    await page.goto("en/");
     await page.evaluate(() => document.fonts.ready);
     const initial = await page
       .locator(".showcase-window")
@@ -36,7 +36,7 @@ for (const width of [390, 1440]) {
 test("direct work links expose projects without covering their titles", async ({
   page,
 }) => {
-  await page.goto("#work");
+  await page.goto("en/#work");
   await expect(page.locator("#work .section-heading h2")).toBeInViewport();
   await expect(page.locator(".hero-handoff")).toHaveCount(0);
   await page.getByRole("button", { name: "Portfolios", exact: true }).click();

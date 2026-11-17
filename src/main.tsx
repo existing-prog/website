@@ -1,7 +1,18 @@
 import AtelierProjectTeaser from "./AtelierProjectTeaser";
 import ProjectQuestions from "./ProjectQuestions";
 import { useTranslation } from "react-i18next";
-import { tr, dateLocale } from "./i18n";
+import { tr, dateLocale, i18nReady, setLanguage } from "./i18n";
+import { setHead } from "./head";
+import {
+  BASE,
+  currentLang,
+  legacyHashView,
+  navigate,
+  parsePath,
+  pathFor,
+  sameView,
+  type View,
+} from "./routes";
 import React, { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
@@ -9,7 +20,6 @@ import {
   ArrowRight,
   ArrowDown,
   Plus,
-  Minus,
   Check,
   X,
   Menu,
@@ -37,6 +47,7 @@ import {
   loadDrafts,
   projects,
   projectHref,
+  isInternalHref,
   serviceName,
   services,
   ServiceId,
@@ -50,6 +61,7 @@ import LanguageSwitch from "./LanguageSwitch";
 import HeroWorkTransition from "./HeroWorkTransition";
 import { useScrollHeader } from "./useScrollHeader";
 import "./interaction-polish.scss";
+import "./readability.scss";
 import HeroProjectBackdrop from "./HeroProjectBackdrop";
 
 const SamanthaCaseStudy = lazy(() => import("./SamanthaCaseStudy"));
@@ -82,14 +94,20 @@ function App() {
   const { i18n } = useTranslation();
   useGlassMotion();
   const [menu, setMenu] = useState(false);
+  const menuRef = useRef(menu);
+  menuRef.current = menu;
   // Routes en hash : liens partageables et rechargements compatibles GitHub Pages.
-  const [route, setRoute] = useState(location.hash);
-  const workspace = route === "#workspace";
-  const kasaCase = route === "#project/kasa";
-  const ninaCase = route === "#project/nina";
-  const atelierCase = route === "#project/atelier-pizza";
-  const caseStudy = route === "#project/samantha" || kasaCase || ninaCase || atelierCase;
-  useScrollHeader(menu, workspace || caseStudy);
+  const [view, setView] = useState<View>(() => parsePath(location.pathname).view);
+  const workspace = view.kind === "desk";
+  const notFound = view.kind === "notfound";
+  const caseId = view.kind === "case" ? view.id : null;
+  const kasaCase = caseId === "kasa";
+  const ninaCase = caseId === "nina";
+  const atelierCase = caseId === "atelier-pizza";
+  const caseStudy = caseId !== null;
+  const lang = i18n.resolvedLanguage === "en" ? "en" : "fr";
+  const home = pathFor({ kind: "home" }, lang);
+  useScrollHeader(menu, workspace || caseStudy || notFound);
   const [drafts, setDrafts] = useState<Draft[]>(loadDrafts);
   const draftsRef = useRef(drafts);
   useEffect(() => {
@@ -99,41 +117,72 @@ function App() {
   const [notice, setNotice] = useState("");
   const [preview, setPreview] = useState(0);
   const previousFocus = useRef<HTMLElement | null>(null);
-  // Conserver les ancres partageables et prendre en compte un hash chargé très tôt.
+  // Routes réelles : popstate (retour arrière) et navigate() mettent la vue à jour.
+  // Les anciens liens en hash (#project/kasa, #workspace) sont redirigés.
   useEffect(() => {
     const change = () => {
-      setRoute(location.hash);
+      const parsed = parsePath(location.pathname);
+      setView((previous) => (sameView(previous, parsed.view) ? previous : parsed.view));
       setMenu(false);
-      if (
-        [
-          "#workspace",
-          "#project/samantha",
-          "#project/kasa",
-          "#project/nina",
-          "#project/atelier-pizza",
-        ].includes(location.hash)
-      )
-        window.scrollTo({ top: 0, behavior: "instant" });
+      void setLanguage(parsed.lang);
     };
-    change();
-    window.addEventListener("hashchange", change);
-    return () => window.removeEventListener("hashchange", change);
+    const closeMenu = () => setMenu(false);
+    window.addEventListener("popstate", change);
+    window.addEventListener("lb:navigate", change);
+    window.addEventListener("hashchange", closeMenu);
+    const legacy = legacyHashView(location.hash);
+    if (legacy) navigate(pathFor(legacy, currentLang()), true);
+    return () => {
+      window.removeEventListener("popstate", change);
+      window.removeEventListener("lb:navigate", change);
+      window.removeEventListener("hashchange", closeMenu);
+    };
+  }, []);
+  // Liens internes vers une autre page : navigation sans rechargement.
+  // Les ancres de la page courante, les nouveaux onglets et le laboratoire restent natifs.
+  useEffect(() => {
+    const click = (e: MouseEvent) => {
+      if (e.defaultPrevented || e.button !== 0) return;
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const a = (e.target as Element | null)?.closest?.("a");
+      if (!a || (a.target && a.target !== "_self") || a.hasAttribute("download")) return;
+      const url = new URL(a.href, location.href);
+      if (url.origin !== location.origin || !url.pathname.startsWith(BASE)) return;
+      if (url.pathname.startsWith(`${BASE}lab/`)) return;
+      if (url.pathname === location.pathname) {
+        // Depuis le menu mobile, sa fermeture interromprait le défilement natif :
+        // fermer d’abord, puis rejoindre la section.
+        const target = url.hash && document.getElementById(url.hash.slice(1));
+        if (!menuRef.current || !target) return;
+        e.preventDefault();
+        history.pushState(history.state, "", url.hash);
+        setMenu(false);
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => target.scrollIntoView({ behavior: "instant" })),
+        );
+        return;
+      }
+      if (parsePath(url.pathname).view.kind === "notfound") return;
+      e.preventDefault();
+      navigate(url.pathname + url.search + url.hash);
+    };
+    document.addEventListener("click", click);
+    return () => document.removeEventListener("click", click);
   }, []);
   useEffect(() => {
-    document.title = workspace
-      ? tr("Project desk — Lucas Berdy")
-      : atelierCase
-        ? tr("Atelier Pizza — Personal project · Lucas Berdy")
-        : ninaCase
-          ? tr("Nina Carducci — Case study · Lucas Berdy")
-          : kasaCase
-            ? tr("Kasa — Case study · Lucas Berdy")
-            : caseStudy
-              ? tr("Samantha Ramsey — Case study · Lucas Berdy")
-              : tr("Lucas Berdy — Your next chapter, online.");
-    document
-      .querySelector('meta[property="og:title"]')
-      ?.setAttribute("content", document.title);
+    const title = notFound
+      ? tr("Page not found — Lucas Berdy")
+      : workspace
+        ? tr("Project desk — Lucas Berdy")
+        : atelierCase
+          ? tr("Atelier Pizza — Personal project · Lucas Berdy")
+          : ninaCase
+            ? tr("Nina Carducci — Case study · Lucas Berdy")
+            : kasaCase
+              ? tr("Kasa — Case study · Lucas Berdy")
+              : caseStudy
+                ? tr("Samantha Ramsey — Case study · Lucas Berdy")
+                : tr("Lucas Berdy — Your next chapter, online.");
     const description = atelierCase
       ? tr(
           "Atelier Pizza: a personal restaurant website project with a custom WordPress menu editing interface by Lucas Berdy.",
@@ -151,15 +200,18 @@ function App() {
                 "A scientific portfolio designed and developed by Lucas Berdy: visual identity, responsive interface and orbital demonstrations.",
               )
             : tr("meta.description");
-    document
-      .querySelector('meta[name="description"]')
-      ?.setAttribute("content", description);
-    document
-      .querySelector('meta[property="og:description"]')
-      ?.setAttribute("content", description);
-  }, [workspace, caseStudy, kasaCase, ninaCase, atelierCase, i18n.resolvedLanguage]);
+    setHead({ title, description, view, lang });
+  }, [view, lang, workspace, notFound, caseStudy, kasaCase, ninaCase, atelierCase]);
+  // Première visite : le navigateur gère la position. Ensuite, une nouvelle page
+  // commence en haut, sauf si le lien vise une section de l’accueil.
+  const firstView = useRef(true);
   useEffect(() => {
-    if (workspace || caseStudy || !location.hash) return;
+    const first = firstView.current;
+    firstView.current = false;
+    if (view.kind !== "home" || !location.hash) {
+      if (!first) window.scrollTo({ top: 0, behavior: "instant" });
+      return;
+    }
     const anchor = location.hash;
     let cancelled = false;
     // Les refresh initiaux de ScrollTrigger peuvent interrompre un scroll animé.
@@ -176,7 +228,7 @@ function App() {
     return () => {
       cancelled = true;
     };
-  }, [workspace, caseStudy]);
+  }, [view]);
   useEffect(() => {
     const escape = (e: KeyboardEvent) => {
       if (e.key === "Escape") setMenu(false);
@@ -277,9 +329,7 @@ function App() {
   };
   const showDesk = () => {
     close();
-    location.hash = "workspace";
-    setRoute("#workspace");
-    window.scrollTo({ top: 0 });
+    navigate(pathFor({ kind: "desk" }, lang));
   };
   return (
     <>
@@ -288,7 +338,7 @@ function App() {
       </a>
       <header className="site-header">
         <div className="shell header-inner">
-          <a className="brand" href="#top" aria-label={tr("Lucas Berdy home")}>
+          <a className="brand" href={`${home}#top`} aria-label={tr("Lucas Berdy home")}>
             <span className="brand-symbol">
               lb<span>.</span>
             </span>
@@ -301,13 +351,20 @@ function App() {
             id="main-nav"
             aria-label={tr("Main navigation")}
           >
-            <a href="#services">{tr("Services")}</a>
-            <a href="#work">{tr("Selected work")}</a>
-            <a href="#approach">{tr("The approach")}</a>
-            <a className={workspace ? "desk-link active" : "desk-link"} href="#workspace">
-              <FolderOpen size={15} /> {tr("Project desk")}{" "}
-              {drafts.length > 0 && <span className="count">{drafts.length}</span>}
-            </a>
+            <a href={`${home}#services`}>{tr("Services")}</a>
+            <a href={`${home}#work`}>{tr("Selected work")}</a>
+            <a href={`${home}#approach`}>{tr("The approach")}</a>
+            <a href={`${home}#contact`}>{tr("Contact")}</a>
+            {/* Le bureau n’apparaît que s’il contient des brouillons à reprendre. */}
+            {(drafts.length > 0 || workspace) && (
+              <a
+                className={workspace ? "desk-link active" : "desk-link"}
+                href={pathFor({ kind: "desk" }, lang)}
+              >
+                <FolderOpen size={15} /> {tr("Project desk")}{" "}
+                {drafts.length > 0 && <span className="count">{drafts.length}</span>}
+              </a>
+            )}
           </nav>
           <LanguageSwitch />
           <button className="header-cta" onClick={() => start()}>
@@ -325,7 +382,18 @@ function App() {
         </div>
       </header>
       <main id="main">
-        {workspace ? (
+        {notFound ? (
+          <section className="desk-page shell not-found">
+            <span className="eyebrow">404</span>
+            <h1>{tr("This page doesn’t exist.")}</h1>
+            <p>
+              {tr("The link may be outdated. The rest of the website is still here.")}
+            </p>
+            <a className="button primary" href={home}>
+              {tr("Back to the home page")} <ArrowRight size={18} />
+            </a>
+          </section>
+        ) : workspace ? (
           <section className="desk-page shell">
             <div className="desk-top">
               <div>
@@ -408,7 +476,9 @@ function App() {
                       </button>
                       <button
                         className="icon-button"
-                        aria-label={`Delete ${d.company || d.name || tr("untitled")} draft`}
+                        aria-label={tr("Delete the draft {{name}}", {
+                          name: d.company || d.name || tr("Untitled project"),
+                        })}
                         onClick={() => remove(d.id)}
                       >
                         <Trash2 size={16} />
@@ -418,7 +488,7 @@ function App() {
                 ))}
               </div>
             )}
-            <a className="inline-link" href="#services">
+            <a className="inline-link" href={`${home}#services`}>
               {tr("Back to the services")} <ArrowRight size={16} />
             </a>
           </section>
@@ -508,17 +578,14 @@ function App() {
                         <i />
                         <i />
                       </span>
-                      <span>
-                        {projects[preview].name.toLowerCase().replaceAll(" ", "-")}
-                        .design
-                      </span>
+                      <span>{new URL(projects[preview].url).hostname}</span>
                       <ArrowUpRight size={12} />
                     </div>
                     <a
                       className={`showcase-image ${projects[preview].color}`}
                       href={projectHref(projects[preview])}
                       target={
-                        projectHref(projects[preview]).startsWith("#")
+                        isInternalHref(projectHref(projects[preview]))
                           ? undefined
                           : "_blank"
                       }
@@ -546,8 +613,8 @@ function App() {
                         <h2>{projects[preview].name}</h2>
                       </div>
                       <span className="window-index">
-                        0{preview + 1}
-                        <span>/ 03</span>
+                        {String(preview + 1).padStart(2, "0")}
+                        <span>/ {String(projects.length).padStart(2, "0")}</span>
                       </span>
                     </div>
                   </div>
@@ -567,7 +634,7 @@ function App() {
                         aria-label={tr("Preview {{name}}", { name: p.name })}
                         aria-pressed={preview === i}
                       >
-                        <span>0{i + 1}</span>
+                        <span>{String(i + 1).padStart(2, "0")}</span>
                         {i === preview && <span>{p.name}</span>}
                       </button>
                     ))}
@@ -669,7 +736,7 @@ function App() {
                   <ShieldCheck size={15} />{" "}
                   {tr("Scope, price and timeline agreed before we start.")}
                 </span>
-                <a href="#faq">
+                <a href="#questions">
                   {tr("A few questions?")} <ArrowUpRight size={14} />
                 </a>
               </div>
@@ -741,20 +808,6 @@ function App() {
                   {tr("Questions about content, hosting or revisions?")}
                 </a>
               </div>
-              <div className="process-banner glass-interactive">
-                <div>
-                  <FolderOpen size={25} />
-                  <span>
-                    {tr("Ideas need a little room.")}
-                    <small>
-                      {tr("Start a brief now. Pick it up later in your project desk.")}
-                    </small>
-                  </span>
-                </div>
-                <a href="#workspace">
-                  {tr("Take a look")} <ArrowUpRight size={18} />
-                </a>
-              </div>
             </section>
             <ProjectQuestions onStart={() => start("website")} />
             <section className="about-section">
@@ -817,50 +870,7 @@ function App() {
                 </div>
               </div>
             </section>
-            <section className="section shell faq-section" id="faq">
-              <div>
-                <span className="eyebrow">{tr("BEFORE WE GET STARTED")}</span>
-                <h2>
-                  {tr("Good questions.")}
-                  <br />
-                  <span>{tr("Straight answers.")}</span>
-                </h2>
-              </div>
-              <div className="faq-list">
-                {[
-                  {
-                    q: "How much will my project cost?",
-                    a: "As a guide, a focused portfolio is €600–€1,200, a small business website €1,200–€2,400, and frontend care €45/hour. Project guides use a €300/day development basis. Your actual scope, features, any applicable taxes and external costs are confirmed in a written quote, which you approve before work begins.",
-                  },
-                  {
-                    q: "Can I order and pay directly here?",
-                    a: "You can configure a project, save a draft and email a request from this site today. Online payment and confirmed bookings are not connected yet. Sending a request does not commit you to a purchase.",
-                  },
-                  {
-                    q: "What happens in the project desk?",
-                    a: "It keeps your project drafts in this browser, so you can revisit and edit them. It isn’t an online account: drafts do not sync across devices, and clearing your browser storage removes them. Download a copy if you’d like to keep a backup.",
-                  },
-                  {
-                    q: "What if I already have a website?",
-                    a: "That’s a good starting point. Choose Website care and share the URL, what’s working and what needs attention. I can help with content updates, frontend fixes, responsive layouts and performance improvements.",
-                  },
-                  {
-                    q: "What will you need from me?",
-                    a: "Your goals, a little about your audience and any text, images or brand material you already have. Reference websites and a preferred launch date help too. You don’t need a fully formed plan to start a conversation.",
-                  },
-                ].map((f) => (
-                  <details key={f.q}>
-                    <summary>
-                      {tr(f.q)}
-                      <Plus className="faq-plus" size={18} />
-                      <Minus className="faq-minus" size={18} />
-                    </summary>
-                    <p>{tr(f.a)}</p>
-                  </details>
-                ))}
-              </div>
-            </section>
-            <section className="closing-section">
+            <section className="closing-section" id="contact">
               <div className="shell closing-inner">
                 <span className="eyebrow">
                   <span className="status-dot" /> {tr("YOUR NEXT CHAPTER STARTS HERE")}
@@ -892,7 +902,11 @@ function App() {
         )}
       </main>
       <footer className="site-footer shell">
-        <a href="#top" className="brand-symbol" aria-label={tr("Lucas Berdy home")}>
+        <a
+          href={`${home}#top`}
+          className="brand-symbol"
+          aria-label={tr("Lucas Berdy home")}
+        >
           lb<span>.</span>
         </a>
         <span>
@@ -930,8 +944,12 @@ function App() {
   );
 }
 
-createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+// Le HTML pré-rendu reste affiché pendant le chargement du catalogue de langue,
+// puis React prend le relais en remplaçant ce contenu.
+void i18nReady.then(() =>
+  createRoot(document.getElementById("root")!).render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>,
+  ),
 );

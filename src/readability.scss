@@ -1,0 +1,72 @@
+// Couche de lisibilité, chargée en dernier : aucun texte utile sous 12 px,
+// et 13 px minimum pour les éléments sur lesquels on clique.
+// Les maquettes décoratives (aria-hidden) gardent leur échelle réduite.
+// !important est volontaire : c’est un plancher qui doit primer sur les règles
+// imbriquées des thèmes et des études de cas chargées plus tard.
+
+:root {
+  .eyebrow,
+  .hero-location,
+  .brand-label,
+  .brand-label span,
+  .project-tags span,
+  .services-note,
+  .services-note span,
+  .services-note a,
+  .identity-top,
+  .identity-top span,
+  .identity-bottom,
+  .identity-bottom small,
+  .about-principles span,
+  .site-footer,
+  .site-footer span,
+  .site-footer small,
+  .chapter-number span,
+  .case-hero dt,
+  dl dt,
+  .atelier-menu-example span,
+  .atelier-demo-label,
+  .atelier-pane-heading span,
+  .atelier-zoom-label,
+  .window-bottom .eyebrow,
+  .preview-live,
+  .preview-controls button span {
+    font-size: 12px !important;
+  }
+
+  .main-nav a,
+  .header-cta,
+  .language-switch button,
+  .understated-link,
+  .work-filters button,
+  .story-skip,
+  .closing-bottom a,
+  .closing-bottom .button,
+  .site-footer a,
+  .services-note a {
+    font-size: 13px !important;
+  }
+
+  .hero-footnote span,
+  .hero-footnote strong,
+  .service-tagline,
+  .service-card li {
+    font-size: 13px !important;
+  }
+
+  .stage-note {
+    font-size: 12px !important;
+  }
+
+  // L’étiquette « Pensé pour tous les écrans » ne masque plus le nom du projet :
+  // elle se place au-dessus de la fenêtre d’aperçu plutôt que sur son pied.
+  .hero-stage .stage-note {
+    top: 14%;
+    bottom: auto;
+  }
+  @media (max-width: 760px) {
+    .hero-stage .stage-note {
+      top: 8%;
+    }
+  }
+}

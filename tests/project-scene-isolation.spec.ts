@@ -4,7 +4,7 @@ for (const mode of ["desktop", "mobile", "reduced"] as const) {
   test(`project artwork stays isolated in ${mode} scenes`, async ({ page }) => {
     await page.setViewportSize({ width: mode === "mobile" ? 390 : 1440, height: 900 });
     if (mode === "reduced") await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("");
+    await page.goto("en/");
     await expect(page.locator(".project-stories")).toHaveAttribute(
       "data-enhanced",
       mode === "desktop" ? "true" : "false",
@@ -32,7 +32,7 @@ for (const mode of ["desktop", "mobile", "reduced"] as const) {
     for (const id of ["samantha", "kasa", "nina"])
       await expect(page.locator(`#chapter-${id} .story-card`)).toHaveAttribute(
         "href",
-        `#project/${id}`,
+        `/website/en/projects/${id}/`,
       );
   });
 }

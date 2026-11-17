@@ -4,7 +4,7 @@ test("project selection changes the artwork with its image without replacing the
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("");
+  await page.goto("en/");
   const card = await page.locator(".showcase-window").elementHandle();
   for (const [id, name, image] of [
     ["kasa", "Kasa", "kasa.webp"],
@@ -38,7 +38,7 @@ test("mobile project scenery changes without motion when reduced motion is reque
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("");
+  await page.goto("en/");
   await page.getByRole("button", { name: "Preview Kasa", exact: true }).click();
   await expect(page.locator(".backdrop-kasa")).toHaveCSS("opacity", "1");
   await expect(page.locator(".backdrop-samantha")).toHaveCSS("opacity", "0");

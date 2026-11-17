@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 test("native planner options have explicit contrasting text and backgrounds", async ({
   page,
 }) => {
-  await page.goto("");
+  await page.goto("en/");
   await page.getByRole("button", { name: "Start a business website project" }).click();
   await page.getByRole("button", { name: "Continue", exact: true }).click();
   const select = page.getByLabel("How many pages?");

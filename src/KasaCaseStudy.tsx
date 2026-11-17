@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { ArrowLeft, ArrowUpRight, Layers, Route, PanelTop } from "lucide-react";
 import { asset } from "./data";
 import { tr } from "./i18n";
+import { currentLang, pathFor } from "./routes";
 import CaseWords from "./CaseWords";
 import { useKasaMotion } from "./useKasaMotion";
 import "./case-study.scss";
@@ -70,7 +71,10 @@ export default function KasaCaseStudy({ onStart }: { onStart: () => void }) {
         <span />
       </div>
       <section className="case-hero shell kasa-intro">
-        <a className="case-back" href="#work">
+        <a
+          className="case-back"
+          href={`${pathFor({ kind: "home" }, currentLang())}#work`}
+        >
           <ArrowLeft size={16} /> {tr("Back to selected work")}
         </a>
         <p className="eyebrow kasa-intro-reveal">{tr("KASA / REACT RENTAL INTERFACE")}</p>
@@ -316,7 +320,10 @@ export default function KasaCaseStudy({ onStart }: { onStart: () => void }) {
               {tr("Explore the Kasa demo")} <ArrowUpRight size={16} />
             </a>
           </div>
-          <a className="case-back case-back-bottom" href="#work">
+          <a
+            className="case-back case-back-bottom"
+            href={`${pathFor({ kind: "home" }, currentLang())}#work`}
+          >
             <ArrowLeft size={16} /> {tr("Back to selected work")}
           </a>
         </div>

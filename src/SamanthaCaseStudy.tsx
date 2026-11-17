@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { ArrowLeft, ArrowUpRight, Check, PlayCircle } from "lucide-react";
 import { asset, projects } from "./data";
 import { tr } from "./i18n";
+import { currentLang, pathFor } from "./routes";
 import "./case-study.scss";
 import { useCaseStudyMotion } from "./useCaseStudyMotion";
 
@@ -41,7 +42,10 @@ export default function SamanthaCaseStudy({ onStart }: { onStart: () => void }) 
         <span />
       </div>
       <section className="case-hero shell">
-        <a className="case-back" href="#work">
+        <a
+          className="case-back"
+          href={`${pathFor({ kind: "home" }, currentLang())}#work`}
+        >
           <ArrowLeft size={16} /> {tr("Back to selected work")}
         </a>
         <p className="eyebrow case-intro-reveal">
@@ -285,7 +289,10 @@ export default function SamanthaCaseStudy({ onStart }: { onStart: () => void }) 
               {tr("Visit Samantha’s portfolio")} <ArrowUpRight size={16} />
             </a>
           </div>
-          <a className="case-back case-back-bottom" href="#work">
+          <a
+            className="case-back case-back-bottom"
+            href={`${pathFor({ kind: "home" }, currentLang())}#work`}
+          >
             <ArrowLeft size={16} /> {tr("Back to selected work")}
           </a>
         </div>

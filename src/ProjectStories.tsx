@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { asset, projects, projectHref, ServiceId } from "./data";
+import { asset, isInternalHref, projects, projectHref, ServiceId } from "./data";
 import "./project-stories.scss";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -436,7 +436,7 @@ export default function ProjectStories({
                 </span>
                 <a
                   href={projectHref(project)}
-                  target={projectHref(project).startsWith("#") ? undefined : "_blank"}
+                  target={isInternalHref(projectHref(project)) ? undefined : "_blank"}
                   rel="noreferrer"
                   className={`story-card project-card ${project.color} ${project.id === "samantha" ? "featured" : ""}`}
                   aria-labelledby={`project-${project.id}-title`}
@@ -451,7 +451,7 @@ export default function ProjectStories({
                       <p id={`project-${project.id}-description`}>
                         {tr(project.description)}
                       </p>
-                      {projectHref(project).startsWith("#") && (
+                      {isInternalHref(projectHref(project)) && (
                         <span className="case-study-link-label">
                           {tr("Read the case study")} <ArrowRight size={15} />
                         </span>

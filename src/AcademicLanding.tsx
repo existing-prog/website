@@ -94,7 +94,7 @@ export default function AcademicLanding({ onStart }: { onStart: () => void }) {
       <section className="lp-example shell" id="academic-example">
         <div className="lp-example-copy">
           <p className="eyebrow">{tr("A REAL PROJECT")}</p>
-          <h2>{tr("Samantha Ramsey, planetary scientist.")}</h2>
+          <h2>{tr("Samantha Ramsey, PhD candidate in astrodynamics.")}</h2>
           <p>
             {tr(
               "A research portfolio with its own visual identity, publications, and interactive orbital demonstrations that make her work tangible.",

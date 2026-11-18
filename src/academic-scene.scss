@@ -2,10 +2,11 @@
  * animation et dans le HTML pré-rendu. Le mode animé ajoute une piste haute. */
 .ac-scene {
   --ac-ink: #e9eefb;
-  --ac-muted: #9fb0cc;
-  --ac-accent: #b9a6ff;
+  --ac-muted: #9cc3bd;
+  --ac-accent: #f1c27d;
+  --ac-coral: #ff8a65;
   position: relative;
-  background: radial-gradient(ellipse at 70% 40%, #1a2547 0%, #0b0f17 62%);
+  background: radial-gradient(ellipse at 70% 40%, #0f3b3e 0%, #0b0f17 62%);
   overflow: clip;
 }
 .ac-stage {
@@ -61,7 +62,7 @@
   position: relative;
   container-type: inline-size;
   aspect-ratio: 0.78;
-  background: #0c1222;
+  background: #0b2a2c;
   border-radius: 16px;
   overflow: hidden;
   box-shadow:
@@ -70,11 +71,11 @@
   color: #1d1d1f;
 }
 /* Ordre d’empilement : article < nuit < site, à travers tous les blocs. */
-.ac-night {
+.ac-tide {
   position: absolute;
   inset: 0;
   z-index: 2;
-  background: radial-gradient(circle at 50% 66%, #18234a 0%, #0c1222 55%);
+  background: linear-gradient(180deg, #13474a 0%, #0b2a2c 45%, #08201f 100%);
 }
 .ac-chrome {
   z-index: 4;
@@ -85,7 +86,7 @@
   align-items: center;
   gap: 4cqi;
   padding-inline: 3.5cqi;
-  background: #161e35;
+  background: #0f3335;
   border-bottom: 1px solid #ffffff12;
   overflow: hidden;
 }
@@ -139,15 +140,15 @@
 }
 .ac-head {
   left: 5%;
-  top: 19%;
+  top: 18%;
   width: 52%;
-  height: 25%;
+  height: 26%;
 }
 .ac-abstract {
   left: 5%;
-  top: 45%;
+  top: 44%;
   width: 50%;
-  height: 16%;
+  height: 20%;
 }
 .ac-figure {
   left: 58%;
@@ -157,9 +158,9 @@
 }
 .ac-refs {
   left: 5%;
-  top: 64%;
+  top: 66%;
   width: 90%;
-  height: 32%;
+  height: 31%;
 }
 
 /* — Version « article » — */
@@ -227,40 +228,44 @@
     font-size: 2.2cqi;
   }
 }
-.ac-orbits {
+.ac-chart {
   width: 100%;
   height: 100%;
   overflow: visible;
-  ellipse {
-    fill: none;
-    stroke: #1d1d1f55;
+  .ac-axis {
+    stroke: #1d1d1f;
     stroke-width: 0.35;
   }
-  line {
+  .ac-chart-line {
+    fill: none;
     stroke: #1d1d1f;
-    stroke-width: 0.4;
+    stroke-width: 0.6;
   }
-  .ac-orbit-dot,
-  .ac-orbit-sun {
-    fill: #1d1d1f;
+  .ac-chart-label {
+    font:
+      3px Georgia,
+      serif;
+    fill: #555;
   }
   &.is-live {
-    ellipse {
-      stroke: #c9d6ff40;
+    .ac-axis {
+      stroke: #9cc3bd55;
     }
-    .ac-orbit-dot {
-      fill: #d9ccff;
-      filter: drop-shadow(0 0 1.2px #b9a6ff);
+    .ac-chart-line {
+      stroke: var(--ac-accent);
+      stroke-width: 1.1;
+      stroke-linecap: round;
     }
-    .ac-orbit-sun {
-      fill: #ffe1a3;
-      filter: drop-shadow(0 0 3px #ffb347);
+    .ac-chart-dot {
+      fill: var(--ac-coral);
+      stroke: #0b2a2c;
+      stroke-width: 0.6;
+    }
+    .ac-chart-label {
+      font-family: "Space Grotesk", sans-serif;
+      fill: #9cc3bd;
     }
   }
-}
-.ac-orbit-glow {
-  fill: #6f5bd633;
-  filter: blur(6px);
 }
 
 /* — Version « site » — */
@@ -273,7 +278,7 @@
   align-items: center;
   gap: 4cqi;
   font-size: 2.2cqi;
-  color: #b8c4de;
+  color: #9cc3bd;
   b {
     margin-right: auto;
     font-size: 2.8cqi;
@@ -290,7 +295,7 @@
   }
   h3 {
     margin: 2cqi 0 0;
-    font-size: 6.4cqi;
+    font-size: 6cqi;
     line-height: 1.02;
     letter-spacing: -0.3cqi;
     font-weight: 500;
@@ -306,7 +311,7 @@
     font-family: "DM Sans", system-ui, sans-serif;
     font-size: 2.5cqi;
     line-height: 1.5;
-    color: #b8c4de;
+    color: #9cc3bd;
   }
 }
 .ac-button {
@@ -314,8 +319,8 @@
   margin-top: 2.4cqi;
   padding: 1.3cqi 2.6cqi;
   border-radius: 99px;
-  background: #e8e2ff;
-  color: #17162b;
+  background: var(--ac-accent);
+  color: #0b2a2c;
   font-size: 2.1cqi;
   font-weight: 600;
 }
@@ -350,7 +355,7 @@
   }
   em {
     font-size: 1.9cqi;
-    color: #9fb0cc;
+    color: #9cc3bd;
   }
 }
 

@@ -2,17 +2,18 @@ import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { tr } from "./i18n";
 import { useAcademicScene } from "./useAcademicScene";
-import { ORBITS, orbitPoint } from "./academicOrbits";
+import { CHART, HEATWAVES, chartArea, chartLine, chartPoints } from "./academicChart";
 
 /* Contenu de la maquette : un article fictif, volontairement en anglais (langue
  * de publication courante). Toute la maquette est décorative (aria-hidden) ; le
  * message de la scène est porté par les légendes, qui sont du vrai texte. */
 const ABSTRACT =
-  "We investigate the long-term dynamical evolution of distant trans-Neptunian objects with numerical integrations over four billion years. A small population of detached orbits remains remarkably stable, shaped by resonances with Neptune and by the galactic tide.";
+  "We combine thirty years of sea surface temperature records with repeated reef surveys across the western Pacific. Reefs exposed to frequent but moderate heat stress recover faster than reefs hit by rare, extreme events, suggesting that thermal history shapes resilience.";
+// Types de publication génériques : aucune revue réelle n’est attribuée à un travail fictif.
 const PUBLICATIONS = [
-  ["2026", "Detached orbits and the galactic tide", "Icarus"],
-  ["2025", "Resonant sticking beyond Neptune", "AJ"],
-  ["2024", "A census of stable distant objects", "MNRAS"],
+  ["2026", "Thermal history and reef recovery", "Journal article"],
+  ["2025", "Thirty years of reef surveys, openly shared", "Dataset"],
+  ["2024", "When heatwaves repeat", "Preprint"],
 ];
 const BEATS = [
   ["It starts as a paper.", "Dense, precise, and read by a handful of specialists."],
@@ -26,38 +27,45 @@ const BEATS = [
   ],
 ];
 
-function Orbits({ live }: { live: boolean }) {
+/** Courbe de température : version article (traits fins, axes) ou site (vivante). */
+function Chart({ live }: { live: boolean }) {
   return (
-    <svg viewBox="0 0 100 100" className={live ? "ac-orbits is-live" : "ac-orbits"}>
-      {live && <circle className="ac-orbit-glow" cx="50" cy="50" r="30" />}
-      {ORBITS.map((orbit, i) => {
-        const point = orbitPoint(orbit, 0);
-        return (
-          <g key={i}>
-            <ellipse
-              cx="50"
-              cy="50"
-              rx={orbit.rx}
-              ry={orbit.ry}
-              transform={`rotate(${orbit.tilt} 50 50)`}
-            />
-            <circle
-              className="ac-orbit-dot"
-              data-orbit={i}
-              cx={point.x}
-              cy={point.y}
-              r={live ? 1.8 : 1.3}
-            />
-          </g>
-        );
-      })}
-      <circle className="ac-orbit-sun" cx="50" cy="50" r={live ? 4 : 2.4} />
-      {!live && (
-        <>
-          <line x1="4" y1="96" x2="96" y2="96" />
-          <line x1="4" y1="96" x2="4" y2="4" />
-        </>
+    <svg viewBox="0 0 100 60" className={live ? "ac-chart is-live" : "ac-chart"}>
+      {live && (
+        <defs>
+          <linearGradient id="ac-area" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#f1c27d" stopOpacity="0.45" />
+            <stop offset="1" stopColor="#f1c27d" stopOpacity="0" />
+          </linearGradient>
+        </defs>
       )}
+      <line className="ac-axis" x1={CHART.X0} y1={CHART.Y0} x2={CHART.X1} y2={CHART.Y0} />
+      {!live && (
+        <line
+          className="ac-axis"
+          x1={CHART.X0}
+          y1={CHART.Y0}
+          x2={CHART.X0}
+          y2={CHART.Y1 - 2}
+        />
+      )}
+      {live && <path className="ac-chart-area" d={chartArea} fill="url(#ac-area)" />}
+      <path className="ac-chart-line" d={chartLine} pathLength={1} />
+      {(live ? HEATWAVES : []).map((i) => (
+        <circle
+          className="ac-chart-dot"
+          key={i}
+          cx={chartPoints[i].x}
+          cy={chartPoints[i].y}
+          r="1.6"
+        />
+      ))}
+      <text className="ac-chart-label" x={CHART.X0} y={CHART.Y0 + 6}>
+        1995
+      </text>
+      <text className="ac-chart-label" x={CHART.X1} y={CHART.Y0 + 6} textAnchor="end">
+        2025
+      </text>
     </svg>
   );
 }
@@ -96,40 +104,42 @@ export default function AcademicPaperScene() {
           </div>
           <div className="ac-sheet-wrap" aria-hidden="true">
             <div className="ac-sheet">
-              {/* La nuit se répand depuis le soleil de la figure et recouvre l’article. */}
-              <div className="ac-night" />
+              {/* La marée monte depuis le bas de la feuille et recouvre l’article. */}
+              <div className="ac-tide" />
               <div className="ac-chrome">
                 <span className="ac-chrome-dots">
                   <i />
                   <i />
                   <i />
                 </span>
-                <span className="ac-chrome-url">ada-lin.science</span>
+                <span className="ac-chrome-url">ines-morel.science</span>
               </div>
               <div className="ac-block ac-nav">
-                <div className="ac-paper">PREPRINT · DEPARTMENT OF ASTRONOMY · 2026</div>
+                <div className="ac-paper">
+                  PREPRINT · MARINE SCIENCES INSTITUTE · 2026
+                </div>
                 <div className="ac-site">
-                  <b>A. Lin</b>
+                  <b>I. Morel</b>
                   <span>Research</span>
                   <span>Publications</span>
-                  <span>Talks</span>
+                  <span>Fieldwork</span>
                   <span>CV</span>
                 </div>
               </div>
               <div className="ac-block ac-head">
                 <div className="ac-paper">
-                  <h3>Long-term stability of distant trans-Neptunian orbits</h3>
+                  <h3>Coral reef resilience under three decades of ocean warming</h3>
                   <p>
-                    A. Lin<sup>1</sup>, M. Okafor<sup>2</sup>, J. Duval<sup>1</sup>
+                    I. Morel<sup>1</sup>, K. Tanaka<sup>2</sup>, A. Diallo<sup>1</sup>
                   </p>
                   <small>
-                    ¹ Department of Astronomy · ² Institute for Planetary Science
+                    ¹ Marine Sciences Institute · ² Department of Oceanography
                   </small>
                 </div>
                 <div className="ac-site">
-                  <small>PLANETARY DYNAMICS · PHD CANDIDATE</small>
+                  <small>MARINE ECOLOGY · POSTDOCTORAL RESEARCHER</small>
                   <h3>
-                    Exploring the edge of the <em>Solar System.</em>
+                    Reading the ocean’s <em>long memory.</em>
                   </h3>
                 </div>
               </div>
@@ -144,19 +154,19 @@ export default function AcademicPaperScene() {
                 </div>
                 <div className="ac-site">
                   <p>
-                    I study how distant objects beyond Neptune keep, or lose, their orbits
-                    over billions of years.
+                    I study how coral reefs respond to decades of warming, from field
+                    surveys to long-term data.
                   </p>
                   <span className="ac-button">Download CV</span>
                 </div>
               </div>
               <div className="ac-block ac-figure">
                 <div className="ac-paper">
-                  <Orbits live={false} />
-                  <small>Fig. 1. Orbits of selected objects (simulation).</small>
+                  <Chart live={false} />
+                  <small>Fig. 1. Sea surface temperature anomaly, 1995–2025.</small>
                 </div>
                 <div className="ac-site">
-                  <Orbits live />
+                  <Chart live />
                 </div>
               </div>
               <div className="ac-block ac-refs">
@@ -164,7 +174,7 @@ export default function AcademicPaperScene() {
                   <b>References</b>
                   {PUBLICATIONS.map(([year, title, journal]) => (
                     <span key={title}>
-                      Lin A. et al. ({year}) {title}. <i>{journal}</i>.
+                      Morel I. et al. ({year}) {title}. <i>{journal}</i>.
                     </span>
                   ))}
                 </div>

@@ -126,3 +126,34 @@ test("calls to action open the planner with a business website selected", async 
   await page.getByRole("link", { name: "Read the case study" }).first().click();
   await expect(page).toHaveURL(/\/website\/en\/projects\/atelier-pizza\/$/);
 });
+
+test("decor leaves are ready before the scroll and stay visible at the end", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("restaurants-commerces/");
+  await expect(page.locator(".rb-scene")).toHaveAttribute("data-scene", "animated");
+  // Aucun filtre CSS sur les feuilles : l’ombre et le flou sont intégrés aux images.
+  const filters = await page
+    .locator(".rb-leaf, .rb-leaf img")
+    .evaluateAll((els) => els.map((e) => getComputedStyle(e).filter));
+  expect(filters.every((f) => f === "none")).toBe(true);
+  await expect
+    .poll(() =>
+      page
+        .locator(".rb-leaf img")
+        .evaluateAll((imgs) =>
+          imgs.every((i) => (i as HTMLImageElement).naturalWidth > 0),
+        ),
+    )
+    .toBe(true);
+  await scrollBurst(page, 1);
+  const visible = await page.locator(".rb-leaf").evaluateAll(
+    (leaves) =>
+      leaves.filter((l) => {
+        const r = l.getBoundingClientRect();
+        return r.right > 0 && r.left < innerWidth && r.bottom > 0 && r.top < innerHeight;
+      }).length,
+  );
+  expect(visible).toBeGreaterThanOrEqual(4);
+});

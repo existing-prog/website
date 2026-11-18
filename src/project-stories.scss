@@ -306,8 +306,8 @@
 .atelier-scene-glow {
   position: absolute;
   inset: 10% 20% 40%;
-  background: radial-gradient(circle, #ff8a5c55, transparent 70%);
-  filter: blur(20px);
+  // Halo large et doux sans filtre de flou (coûteux sur téléphone).
+  background: radial-gradient(circle, #ff8a5c4d 0%, #ff8a5c1a 45%, transparent 75%);
 }
 .atelier-scene-pizza {
   position: absolute;
@@ -315,12 +315,14 @@
   left: 50%;
   width: 40%;
   margin-left: -20%;
-  filter: drop-shadow(0 25px 30px #3a0406);
+  // Ombre ronde plutôt qu’un filtre : même rendu, mieux géré par Safari.
+  border-radius: 50%;
+  box-shadow: 0 25px 40px #3a0406cc;
 }
+// Ombre intégrée à l’image (marge incluse) : un peu plus large qu’avant.
 .atelier-scene-basil {
   position: absolute;
-  width: 9%;
-  filter: drop-shadow(0 10px 12px #3a040699);
+  width: 12.4%;
   &.basil-0 {
     top: 10%;
     left: 14%;
@@ -333,7 +335,7 @@
   &.basil-2 {
     top: 6%;
     right: 26%;
-    width: 6%;
+    width: 8.3%;
   }
 }
 /* Photographies du projet Nina : le masque de révélation est animé par GSAP. */

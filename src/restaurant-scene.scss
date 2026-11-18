@@ -41,20 +41,20 @@
 .rb-leaf {
   position: absolute;
   translate: -50% -50%;
+  // Calque dédié : Safari garde la feuille affichée pendant qu’elle bouge.
+  will-change: transform;
   img {
     display: block;
     max-width: none;
-    // Ombre portée sur le fond rouge : la feuille flotte au-dessus de la scène.
-    filter: drop-shadow(0 14px 16px #3a040699);
     user-select: none;
   }
 }
 .rb-flour {
   position: absolute;
   border-radius: 50%;
-  background: #fff6e8;
-  opacity: 0.55;
-  filter: blur(1px);
+  // Bord adouci par un dégradé plutôt qu’un filtre flou (plus léger sur téléphone).
+  background: radial-gradient(circle, #fff6e8 35%, #fff6e800 70%);
+  opacity: 0.7;
 }
 .rb-title {
   position: relative;

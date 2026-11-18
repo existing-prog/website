@@ -28,13 +28,20 @@ const FLOUR = Array.from({ length: 18 }, (_, i) => {
   };
 });
 
-/** Feuille de basilic photographiée (détourée), retournée une fois sur deux. */
-function Leaf({ size, flip }: { size: number; flip: boolean }) {
+/**
+ * Feuille de basilic photographiée, retournée une fois sur deux. L’ombre, le flou
+ * de profondeur et l’assombrissement sont intégrés aux images : aucun filtre CSS,
+ * que Safari (iPhone) affiche parfois en retard ou plus du tout pendant le scroll.
+ * Chaque image fait 290 × 440 px : la feuille (210 × 360) et une marge pour l’ombre.
+ */
+function Leaf({ size, flip, depth }: { size: number; flip: boolean; depth: number }) {
+  const variant = depth >= 1 ? "-near" : depth < 0.35 ? "-far" : "";
+  const scale = (size * 1.3) / 360;
   return (
     <img
-      src={asset("pizza-burst/basil.webp")}
-      width={Math.round(size * 0.58 * 1.3)}
-      height={Math.round(size * 1.3)}
+      src={asset(`pizza-burst/basil-leaf${variant}.webp`)}
+      width={Math.round(290 * scale)}
+      height={Math.round(440 * scale)}
       alt=""
       draggable={false}
       style={flip ? { scale: "-1 1" } : undefined}
@@ -93,15 +100,9 @@ export default function RestaurantBurstScene({ onStart }: { onStart: () => void 
                   left: `${leaf.x}%`,
                   top: `${leaf.y}%`,
                   rotate: `${leaf.rotate}deg`,
-                  filter:
-                    leaf.depth >= 1
-                      ? "blur(1.5px)"
-                      : leaf.depth < 0.35
-                        ? "blur(1px) brightness(0.75)"
-                        : undefined,
                 }}
               >
-                <Leaf size={leaf.size} flip={i % 2 === 1} />
+                <Leaf size={leaf.size} flip={i % 2 === 1} depth={leaf.depth} />
               </span>
             ))}
           </div>

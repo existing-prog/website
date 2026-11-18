@@ -127,15 +127,15 @@ test("mobile menu, filters, preview switching, and Escape", async ({ page }) => 
   await page.getByRole("button", { name: "Frontend & performance" }).click();
   await expect(page.locator(".project-card")).toHaveCount(2);
   await page.getByRole("button", { name: "All work", exact: true }).click();
-  await page
-    .getByRole("button", { name: "Start a project", exact: true })
-    .first()
-    .click();
+  const contact = page.locator("#contact").getByRole("button", {
+    name: "Tell me what you’re building",
+    exact: true,
+  });
+  await contact.click();
+  await expect(page.getByRole("dialog")).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  await expect(
-    page.getByRole("button", { name: "Start a project", exact: true }).first(),
-  ).toBeFocused();
+  await expect(contact).toBeFocused();
 });
 test("corrupt local drafts fail safely and reduced motion is respected", async ({
   page,

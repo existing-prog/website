@@ -1,0 +1,176 @@
+/* Ouverture « logo en particules » de l’accueil. État statique par défaut (logo
+ * fixe, pas de piste) ; le mode animé colle la scène et dessine les particules. */
+.lh-hero {
+  --lh-bg: #0b0f17;
+  position: relative;
+  padding-top: 0;
+  background: var(--lh-bg);
+}
+.lh-stage {
+  position: relative;
+  display: grid;
+  align-content: center;
+  min-height: 100svh;
+  overflow: hidden;
+}
+/* Le logo occupe la droite sur grand écran : l’accroche reste sur un fond calme. */
+.lh-media {
+  position: absolute;
+  inset: 0 0 0 26%;
+}
+.lh-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+/* Zone du logo, lue par l’animation : les particules s’y rassemblent. */
+.lh-logo-area {
+  position: absolute;
+  left: 40%;
+  top: 16%;
+  width: 54%;
+  height: 50%;
+  display: grid;
+  place-items: center;
+}
+.lh-poster {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.92;
+}
+// Halo discret derrière le logo (dégradé, sans filtre).
+.lh-glow {
+  position: absolute;
+  left: 38%;
+  top: 6%;
+  width: 60%;
+  height: 72%;
+  background: radial-gradient(
+    ellipse at center,
+    #5468a833 0%,
+    #5468a812 40%,
+    transparent 70%
+  );
+}
+.lh-canvas {
+  display: none;
+}
+// Fondu vers la couleur de page côté texte : aucune couture visible.
+.lh-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--lh-bg) 0%, #0b0f1799 22%, transparent 48%);
+  pointer-events: none;
+}
+// Les marges latérales viennent de .shell (même alignement que le reste du site).
+.lh-content {
+  position: relative;
+  z-index: 1;
+  padding-top: 110px;
+}
+.lh-end,
+.lh-hint {
+  display: none;
+}
+
+.lh-hero[data-scene="animated"] {
+  .lh-track {
+    height: 230vh;
+  }
+  .lh-stage {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+  .lh-poster {
+    visibility: hidden;
+  }
+  .lh-canvas {
+    display: block;
+  }
+  .lh-end {
+    display: block;
+    position: absolute;
+    right: clamp(20px, 5vw, 100px);
+    bottom: 13vh;
+    max-width: 560px;
+    text-align: right;
+    font-size: clamp(30px, 3.6vw, 58px);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    font-weight: 500;
+    color: #eef2f8;
+    text-shadow: 0 4px 30px #0b0f17;
+    opacity: 0;
+    em {
+      font-family: Georgia, serif;
+      color: #c6d4e9;
+    }
+  }
+  .lh-hint {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: absolute;
+    left: 50%;
+    bottom: 24px;
+    translate: -50% 0;
+    font: 12px monospace;
+    letter-spacing: 1.2px;
+    color: #8d9bb8;
+  }
+}
+
+@media (max-width: 1023px) {
+  .lh-media {
+    inset: 0;
+  }
+  .lh-logo-area {
+    left: 12%;
+    top: 9%;
+    width: 76%;
+    height: 26%;
+  }
+  .lh-glow {
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 45%;
+  }
+  .lh-shade {
+    background: linear-gradient(0deg, var(--lh-bg) 0%, #0b0f17dd 38%, transparent 72%);
+  }
+  .lh-stage {
+    align-content: end;
+  }
+  .lh-content {
+    padding-block: 120px 40px;
+  }
+  .lh-hero[data-scene="animated"] .lh-end {
+    left: 20px;
+    right: 20px;
+    bottom: 18vh;
+    text-align: left;
+  }
+}
+@media (max-width: 760px) {
+  .lh-hero[data-scene="animated"] {
+    .lh-track {
+      // La scène conserve un écran de hauteur ; le logo se forme sur 65 svh.
+      height: 165svh;
+    }
+    .lh-stage {
+      height: 100svh;
+    }
+  }
+}
+/* Téléphone : l’écran est trop court pour tout afficher ; on garde l’essentiel
+ * (titre, texte, boutons) et on retire la petite ligne du haut et l’indication. */
+@media (max-width: 760px) {
+  .lh-hero .hero-kicker,
+  .lh-hero[data-scene="animated"] .lh-hint {
+    display: none;
+  }
+}

@@ -42,7 +42,7 @@ import { useScrollHeader } from "./useScrollHeader";
 import "./interaction-polish.scss";
 import "./readability.scss";
 import "./approach-person.scss";
-import InkHero from "./InkHero";
+import LogoHero from "./LogoHero";
 import TwoWorlds from "./TwoWorlds";
 
 const SamanthaCaseStudy = lazy(() => import("./SamanthaCaseStudy"));
@@ -532,7 +532,7 @@ function App() {
           </Suspense>
         ) : (
           <>
-            <InkHero onStart={() => start()} />
+            <LogoHero onStart={() => start()} />
             <section className="work-section section" id="work">
               <div className="shell">
                 <div className="section-heading reveal">

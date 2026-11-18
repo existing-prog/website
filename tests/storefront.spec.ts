@@ -152,8 +152,8 @@ test("corrupt local drafts fail safely and reduced motion is respected", async (
   await expect(page.locator(".empty-desk")).toBeVisible();
   await page.getByRole("link", { name: "Lucas Berdy home", exact: true }).first().click();
   // Mouvement réduit : l’ouverture reste une image fixe, sans piste de scroll.
-  await expect(page.locator(".ink-hero")).toHaveAttribute("data-scene", "static");
-  await expect(page.locator(".ink-poster")).toBeVisible();
+  await expect(page.locator(".lh-hero")).toHaveAttribute("data-scene", "static");
+  await expect(page.locator(".lh-poster")).toBeVisible();
 });
 
 test("storage failure never claims a draft was saved", async ({ page }) => {

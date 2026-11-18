@@ -3,21 +3,19 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useTranslation } from "react-i18next";
 import { ArrowDown, ArrowUpRight } from "lucide-react";
-import { asset } from "./data";
 import { tr } from "./i18n";
-import { ScrollSequence } from "./scrollSequence";
-import "./ink-hero.scss";
+import { LogoParticles } from "./logoParticles";
+import "./logo-hero.scss";
 gsap.registerPlugin(ScrollTrigger);
 
-const FRAMES = 37;
-
 /**
- * Ouverture de l’accueil : une encre indigo et lavande éclot au scroll (vidéo
- * Kling découpée en images, à partir du moment où le nuage s’ouvre), derrière
- * l’accroche. Le titre s’efface en douceur, puis une phrase prend le relais.
- * Mouvement réduit, écran bas et pré-rendu : image fixe, sans piste de scroll.
+ * Ouverture de l’accueil : une poussière de particules se rassemble au scroll
+ * pour former le logo « lb. », derrière l’accroche. Le titre s’efface en douceur,
+ * puis une phrase prend le relais. Les particules dérivent doucement et
+ * s’écartent au passage de la souris.
+ * Mouvement réduit, écran bas et pré-rendu : logo fixe, sans piste de scroll.
  */
-export default function InkHero({ onStart }: { onStart: () => void }) {
+export default function LogoHero({ onStart }: { onStart: () => void }) {
   const root = useRef<HTMLElement>(null);
   const { i18n } = useTranslation();
 
@@ -37,27 +35,41 @@ export default function InkHero({ onStart }: { onStart: () => void }) {
         hero.dataset.scene = "animated";
         const copyFadeStart = 0.25;
         const copyFadeDuration = 0.35;
-        const folder = `${import.meta.env.BASE_URL}assets/ink-bloom/${phone ? "mobile" : "desktop"}/`;
-        const sequence = new ScrollSequence({
-          canvas: q(".ink-canvas") as unknown as HTMLCanvasElement,
-          frameCount: FRAMES,
-          src: (i) => `${folder}${String(i + 1).padStart(3, "0")}.webp`,
-          fit: "cover",
-          edgeFade: phone ? 0 : 0.12,
-          onReady: () => (hero.dataset.ready = "true"),
+        // La zone du logo est définie une seule fois, en CSS (.lh-logo-area) :
+        // le logo fixe et les particules arrivent exactement au même endroit.
+        const canvas = q(".lh-canvas") as unknown as HTMLCanvasElement;
+        const zone = q(".lh-logo-area").getBoundingClientRect();
+        const frame = canvas.getBoundingClientRect();
+        const particles = new LogoParticles({
+          canvas,
+          area: {
+            x: (zone.left - frame.left) / frame.width,
+            y: (zone.top - frame.top) / frame.height,
+            width: zone.width / frame.width,
+            height: zone.height / frame.height,
+          },
+          step: phone ? 5 : 6,
+          pointer: !phone,
         });
-        sequence.render(0);
+        particles.setProgress(0);
+        hero.dataset.ready = "true";
+        // La dérive ne tourne que lorsque l’ouverture est à l’écran.
+        const visibility = new IntersectionObserver(([entry]) =>
+          entry.isIntersecting ? particles.start() : particles.stop(),
+        );
+        visibility.observe(q(".lh-stage"));
         const tl = gsap.timeline({
           defaults: { ease: "none" },
           scrollTrigger: {
-            trigger: q(".ink-track"),
+            trigger: q(".lh-track"),
             start: "top top",
             end: "bottom bottom",
             scrub: phone ? 0.3 : 0.5,
             invalidateOnRefresh: true,
             onUpdate: ({ progress }) => {
-              sequence.render(progress);
-              hero.style.setProperty("--ink-progress", progress.toFixed(3));
+              // Le logo est entièrement formé aux trois quarts de la piste.
+              particles.setProgress(progress / 0.75);
+              hero.style.setProperty("--lh-progress", progress.toFixed(3));
             },
           },
         });
@@ -75,18 +87,19 @@ export default function InkHero({ onStart }: { onStart: () => void }) {
             copyFadeStart + copyFadeDuration,
           )
           .fromTo(
-            q(".ink-end"),
+            q(".lh-end"),
             { y: 40, opacity: 0 },
             { y: 0, opacity: 1, duration: 0.2, ease: "power2.out" },
             0.62,
           )
-          .to(q(".ink-hint"), { opacity: 0, duration: 0.08 }, 0.2)
+          .to(q(".lh-hint"), { opacity: 0, duration: 0.08 }, 0.2)
           .to({}, { duration: 0.1 }, 0.9);
         return () => {
-          sequence.destroy();
+          visibility.disconnect();
+          particles.destroy();
           hero.dataset.scene = "static";
           delete hero.dataset.ready;
-          hero.style.removeProperty("--ink-progress");
+          hero.style.removeProperty("--lh-progress");
         };
       },
     );
@@ -95,15 +108,22 @@ export default function InkHero({ onStart }: { onStart: () => void }) {
   }, [i18n.resolvedLanguage]);
 
   return (
-    <section className="hero ink-hero" id="top" ref={root} data-scene="static">
-      <div className="ink-track">
-        <div className="ink-stage">
-          <div className="ink-media" aria-hidden="true">
-            <img className="ink-poster" src={asset("ink-bloom/poster.webp")} alt="" />
-            <canvas className="ink-canvas" />
-            <span className="ink-shade" />
+    <section className="hero lh-hero" id="top" ref={root} data-scene="static">
+      <div className="lh-track">
+        <div className="lh-stage">
+          <div className="lh-media" aria-hidden="true">
+            <span className="lh-glow" />
+            <span className="lh-logo-area">
+              <img
+                className="lh-poster"
+                src={`${import.meta.env.BASE_URL}brand/lb-logo-dark-bg.svg`}
+                alt=""
+              />
+            </span>
+            <canvas className="lh-canvas" />
+            <span className="lh-shade" />
           </div>
-          <div className="shell ink-content">
+          <div className="shell lh-content">
             <div className="hero-kicker">
               <span className="eyebrow">
                 <span className="status-dot" />{" "}
@@ -156,11 +176,11 @@ export default function InkHero({ onStart }: { onStart: () => void }) {
                 </div>
               </div>
             </div>
-            <p className="ink-end" aria-hidden="true">
+            <p className="lh-end" aria-hidden="true">
               {tr("A website that comes alive")} <em>{tr("with every scroll.")}</em>
             </p>
           </div>
-          <span className="ink-hint" aria-hidden="true">
+          <span className="lh-hint" aria-hidden="true">
             <ArrowDown size={14} /> {tr("SCROLL TO EXPLORE")}
           </span>
         </div>

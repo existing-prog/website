@@ -136,3 +136,27 @@ for (const width of [320, 390, 1440]) {
     for (const value of overflow) expect(value).toBeLessThanOrEqual(0);
   });
 }
+
+for (const width of [320, 390, 1440]) {
+  test(`no text of the paper is cut off before the scroll at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("en/academic-portfolios/");
+    await expect(page.locator(".ac-scene")).toHaveAttribute("data-scene", "animated");
+    await page.evaluate(() => document.fonts.ready);
+    await scrollScene(page, 0);
+    const overflow = await page.evaluate(() =>
+      [...document.querySelectorAll<HTMLElement>(".ac-block")].map((block) => {
+        const box = block.getBoundingClientRect();
+        const bottom = Math.max(
+          ...[...block.querySelectorAll(".ac-paper > *")].map(
+            (e) => e.getBoundingClientRect().bottom,
+          ),
+        );
+        return Math.round(bottom - box.bottom);
+      }),
+    );
+    for (const value of overflow) expect(value).toBeLessThanOrEqual(0);
+  });
+}

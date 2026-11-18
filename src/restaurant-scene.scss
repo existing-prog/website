@@ -102,6 +102,20 @@
 .rb-hint {
   display: none;
 }
+.rb-actions {
+  position: absolute;
+  z-index: 3;
+  inset-inline: 20px;
+  // L’en-tête occupe sa place dans le flux avant le début de la scène.
+  top: calc(100svh - var(--header-inner-height) - 1px - clamp(24px, 4svh, 42px));
+  transform: translateY(-100%);
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  > button {
+    pointer-events: auto;
+  }
+}
 
 /* — Mode animé : piste haute, scène collée, canvas à la place de l’image. — */
 .rb-scene[data-scene="animated"] {

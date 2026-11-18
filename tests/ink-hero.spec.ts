@@ -40,10 +40,16 @@ test("the ink blooms with the scroll behind the headline, then rewinds", async (
   await scrollInk(page, 1);
   await expect.poll(() => frame(page), { timeout: 10000 }).toBe(36);
   await expect.poll(() => opacity(page, ".hero-copy")).toBeLessThan(0.05);
+  await expect(page.locator(".hero-actions .button")).toBeHidden();
+  await expect(page.locator(".hero-actions a")).toBeHidden();
+  await expect(page.locator(".hero-copy h1")).toHaveAccessibleName(
+    "Living websites. That stay in your hands.",
+  );
   await expect.poll(() => opacity(page, ".ink-end")).toBeGreaterThan(0.95);
   await scrollInk(page, 0);
   await expect.poll(() => frame(page)).toBe(0);
   await expect.poll(() => opacity(page, ".hero-copy")).toBeGreaterThan(0.95);
+  await expect(page.locator(".hero-actions a")).toBeVisible();
   // Le bouton principal reste utilisable au chargement.
   await page.locator(".hero-actions .button").click();
   await expect(page.getByRole("dialog")).toBeVisible();
@@ -68,6 +74,8 @@ for (const width of [320, 390]) {
     await expect(page.locator(".ink-hero")).toHaveAttribute("data-scene", "animated");
     const actions = (await page.locator(".hero-actions").boundingBox())!;
     expect(actions.y + actions.height).toBeLessThanOrEqual(700);
+    const track = (await page.locator(".ink-track").boundingBox())!;
+    expect(track.height - 700).toBeLessThan(700);
     await scrollInk(page, 1);
     await expect.poll(() => frame(page), { timeout: 10000 }).toBe(36);
     expect(

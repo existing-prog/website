@@ -98,7 +98,7 @@ export default function RestaurantLanding({ onStart }: { onStart: () => void }) 
   const atelier = pathFor({ kind: "case", id: "atelier-pizza" }, lang);
   return (
     <article className="landing restaurant-landing" aria-labelledby="restaurants-title">
-      <RestaurantBurstScene />
+      <RestaurantBurstScene onStart={onStart} />
 
       <section className="lp-reveal" ref={reveal} aria-labelledby="restaurants-statement">
         <div className="shell">
@@ -183,6 +183,11 @@ export default function RestaurantLanding({ onStart }: { onStart: () => void }) 
         <div>
           <p className="eyebrow">{tr("BUDGET")}</p>
           <h2>{tr("€1,200–€2,400")}</h2>
+          <p>
+            {tr(
+              "Example at around €1,200: a mobile-friendly site with opening hours, contact details and a WordPress menu you can update yourself. At handover, I show you how to edit the menu.",
+            )}
+          </p>
           <p>
             {tr(
               "Indicative budget for a restaurant or shop website. Your scope, timeline and final price are set out in a written quote, which you approve before work begins.",

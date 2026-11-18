@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { ArrowUpRight } from "lucide-react";
 import { asset } from "./data";
 import { tr } from "./i18n";
 import { useRestaurantBurst } from "./useRestaurantBurst";
@@ -47,7 +48,7 @@ function Leaf({ size, flip }: { size: number; flip: boolean }) {
  * s’écarte et la pizza éclate (vidéo découpée en images, dessinée dans un canvas).
  * La section suivante glisse ensuite par-dessus la scène restée en place.
  */
-export default function RestaurantBurstScene() {
+export default function RestaurantBurstScene({ onStart }: { onStart: () => void }) {
   const root = useRef<HTMLElement>(null);
   const { i18n } = useTranslation();
   useRestaurantBurst(root, i18n.resolvedLanguage);
@@ -126,6 +127,13 @@ export default function RestaurantBurstScene() {
             </span>
           </span>
         </div>
+      </div>
+      {/* Ancré au premier écran de la piste : le bouton défile naturellement
+       * pendant que la pizza reste collée et que le titre s’efface. */}
+      <div className="rb-actions">
+        <button className="button primary" onClick={onStart}>
+          {tr("Talk about my restaurant")} <ArrowUpRight size={18} />
+        </button>
       </div>
     </section>
   );

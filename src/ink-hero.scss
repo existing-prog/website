@@ -119,7 +119,8 @@
 @media (max-width: 760px) {
   .ink-hero[data-scene="animated"] {
     .ink-track {
-      height: 210svh;
+      // La scène conserve un écran de hauteur et l’encre se déploie sur 65 svh.
+      height: 165svh;
     }
     .ink-stage {
       height: 100svh;

@@ -27,9 +27,11 @@ test("restaurants page is prerendered in both languages", async ({ request }) =>
   const fr = await (await request.get("restaurants-commerces/")).text();
   expect(fr).toContain('<html lang="fr"');
   expect(fr).toContain("Des sites qui donnent faim.");
+  expect(fr).toContain("Exemple autour de 1 200 €");
   expect(fr).toContain("pizza-burst/final.webp");
   const en = await (await request.get("en/restaurants-shops/")).text();
   expect(en).toContain("<title>Websites for restaurants and shops — Lucas Berdy</title>");
+  expect(en).toContain("Example at around €1,200");
   const sitemap = await (await request.get("sitemap.xml")).text();
   expect(sitemap).toContain("/website/restaurants-commerces/</loc>");
 });
@@ -98,6 +100,7 @@ for (const width of [320, 390]) {
     const box = await page.locator(".rb-outline").boundingBox();
     expect(box!.x).toBeGreaterThanOrEqual(0);
     expect(box!.x + box!.width).toBeLessThanOrEqual(width + 1);
+    await expect(page.locator(".rb-actions button")).toBeInViewport({ ratio: 1 });
     await scrollBurst(page, 1);
     await expect.poll(() => frame(page), { timeout: 10000 }).toBe(60);
     expect(
@@ -112,11 +115,14 @@ test("calls to action open the planner with a business website selected", async 
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("en/restaurants-shops/");
   await expect(page.locator("#restaurants-title")).toBeFocused();
-  await page.getByRole("button", { name: "Get a quote" }).click();
+  const openingButton = page.locator(".rb-actions").getByRole("button");
+  await expect(openingButton).toBeInViewport({ ratio: 1 });
+  await openingButton.press("Enter");
   await expect(page.locator(".service-option.chosen strong")).toHaveText(
     "Business website",
   );
   await page.getByRole("button", { name: "Close project planner" }).click();
+  await expect(openingButton).toBeFocused();
   await page.getByRole("link", { name: "Read the case study" }).first().click();
   await expect(page).toHaveURL(/\/website\/en\/projects\/atelier-pizza\/$/);
 });

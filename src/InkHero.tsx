@@ -35,6 +35,8 @@ export default function InkHero({ onStart }: { onStart: () => void }) {
         const { phone, motion } = context.conditions!;
         if (!motion) return;
         hero.dataset.scene = "animated";
+        const copyFadeStart = 0.25;
+        const copyFadeDuration = 0.35;
         const folder = `${import.meta.env.BASE_URL}assets/ink-bloom/${phone ? "mobile" : "desktop"}/`;
         const sequence = new ScrollSequence({
           canvas: q(".ink-canvas") as unknown as HTMLCanvasElement,
@@ -62,9 +64,16 @@ export default function InkHero({ onStart }: { onStart: () => void }) {
         // L’accroche reste lisible au début, puis s’efface en remontant légèrement.
         tl.to(
           hero.querySelectorAll(".hero-copy, .hero-kicker"),
-          { y: -60, opacity: 0, duration: 0.35, ease: "power1.in" },
-          0.25,
+          { y: -60, opacity: 0, duration: copyFadeDuration, ease: "power1.in" },
+          copyFadeStart,
         )
+          // Retirer les boutons du parcours clavier quand ils deviennent invisibles,
+          // puis les restaurer au retour. Le titre reste exposé aux lecteurs d’écran.
+          .set(
+            q(".hero-actions"),
+            { visibility: "hidden" },
+            copyFadeStart + copyFadeDuration,
+          )
           .fromTo(
             q(".ink-end"),
             { y: 40, opacity: 0 },

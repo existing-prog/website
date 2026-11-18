@@ -23,6 +23,7 @@ $paper: #eef2f8;
 $muted: #a7afbf;
 $line: #303846;
 :root {
+  --header-inner-height: 92px;
   font-family: "DM Sans", Arial, sans-serif;
   color: $paper;
   background: $ink;
@@ -219,7 +220,7 @@ p {
   z-index: 20;
 }
 .header-inner {
-  height: 92px;
+  height: var(--header-inner-height);
   display: flex;
   align-items: center;
   gap: 28px;
@@ -2125,6 +2126,9 @@ p {
   }
 }
 @media (max-width: 760px) {
+  :root {
+    --header-inner-height: 77px;
+  }
   .shell {
     width: calc(100% - 40px);
   }
@@ -2139,7 +2143,6 @@ p {
     letter-spacing: -1.9px;
   }
   .header-inner {
-    height: 77px;
     gap: 14px;
     position: relative;
   }

@@ -14,6 +14,8 @@ import {
 } from "./routes";
 import React, { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   ArrowUpRight,
   ArrowRight,
@@ -804,6 +806,12 @@ function App() {
     </>
   );
 }
+
+// Sur téléphone, la barre d’adresse change la hauteur de l’écran pendant le
+// défilement : sans ce réglage, toutes les animations recalculent leurs
+// positions à chaque fois, ce qui provoque des sauts visibles.
+gsap.registerPlugin(ScrollTrigger);
+ScrollTrigger.config({ ignoreMobileResize: true });
 
 // Le HTML pré-rendu reste affiché pendant le chargement du catalogue de langue,
 // puis React prend le relais en remplaçant ce contenu.

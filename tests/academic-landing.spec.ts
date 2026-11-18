@@ -113,3 +113,26 @@ test("calls to action open the planner with a portfolio selected", async ({ page
   await page.getByRole("link", { name: "Read the case study" }).first().click();
   await expect(page).toHaveURL(/\/website\/en\/projects\/samantha\/$/);
 });
+
+for (const width of [320, 390, 1440]) {
+  test(`no text of the finished mock website is cut off at ${width}px`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("en/academic-portfolios/");
+    await page.evaluate(() => document.fonts.ready);
+    const overflow = await page.evaluate(() =>
+      [...document.querySelectorAll<HTMLElement>(".ac-block")].map((block) => {
+        const box = block.getBoundingClientRect();
+        const bottom = Math.max(
+          ...[...block.querySelectorAll(".ac-site *")].map(
+            (e) => e.getBoundingClientRect().bottom,
+          ),
+        );
+        return Math.round(bottom - box.bottom);
+      }),
+    );
+    for (const value of overflow) expect(value).toBeLessThanOrEqual(0);
+  });
+}

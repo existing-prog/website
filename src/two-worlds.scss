@@ -45,7 +45,7 @@
   }
 }
 .tw-world-academic {
-  background: radial-gradient(ellipse at 60% 35%, #26336a 0%, #0c1222 65%);
+  background: radial-gradient(ellipse at 60% 30%, #145055 0%, #0b2a2c 70%);
 }
 .tw-world-restaurants {
   background: radial-gradient(ellipse at 50% 35%, #a5161a 0%, #6d0c0f 75%);
@@ -58,46 +58,32 @@
   place-items: center;
   pointer-events: none;
 }
-.tw-stars {
-  position: absolute;
-  inset: 0;
-  background-image:
-    radial-gradient(1px 1px at 12% 18%, #fff 50%, transparent 51%),
-    radial-gradient(1px 1px at 72% 12%, #fff 50%, transparent 51%),
-    radial-gradient(1.5px 1.5px at 84% 46%, #fff 50%, transparent 51%),
-    radial-gradient(1px 1px at 30% 52%, #fff 50%, transparent 51%),
-    radial-gradient(1px 1px at 52% 8%, #fff 50%, transparent 51%),
-    radial-gradient(1.5px 1.5px at 8% 64%, #fff 50%, transparent 51%),
-    radial-gradient(1px 1px at 62% 70%, #fff 50%, transparent 51%);
-  opacity: 0.6;
-}
-.tw-orbits {
-  width: min(78%, 420px);
-  margin-top: -18%;
+.tw-chart {
+  width: min(82%, 440px);
+  margin-top: -20%;
   overflow: visible;
-  ellipse {
+  .tw-chart-line {
     fill: none;
-    stroke: #c9d6ff40;
-    stroke-width: 0.35;
+    stroke: #f1c27d;
+    stroke-width: 1.1;
+    stroke-linecap: round;
   }
   circle {
-    fill: #d9ccff;
-    filter: drop-shadow(0 0 1.2px #b9a6ff);
-  }
-  .tw-sun {
-    fill: #ffe1a3;
-    filter: drop-shadow(0 0 3px #ffb347);
+    fill: #ff8a65;
+    stroke: #0b2a2c;
+    stroke-width: 0.6;
   }
 }
 .tw-pizza {
   width: min(56%, 300px);
   margin-top: -20%;
-  filter: drop-shadow(0 30px 40px #3a0406);
+  border-radius: 50%;
+  box-shadow: 0 30px 50px #3a0406cc;
 }
+// Ombre intégrée à l’image de la feuille (marge incluse).
 .tw-basil {
   position: absolute;
-  width: 64px;
-  filter: drop-shadow(0 12px 14px #3a040699);
+  width: 88px;
 }
 .tw-basil-1 {
   top: 12%;
@@ -125,7 +111,7 @@
   }
 }
 .tw-world-academic .tw-copy .eyebrow {
-  color: #b9a6ff;
+  color: #f1c27d;
 }
 .tw-link {
   display: inline-flex;

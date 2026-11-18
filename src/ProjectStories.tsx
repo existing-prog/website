@@ -161,7 +161,7 @@ function ProjectVisual({
             <img
               className={`atelier-scene-basil basil-${i}`}
               key={i}
-              src={asset("pizza-burst/basil.webp")}
+              src={asset("pizza-burst/basil-leaf.webp")}
               alt=""
               loading="lazy"
             />

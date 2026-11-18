@@ -6,7 +6,7 @@ import { ArrowUpRight } from "lucide-react";
 import { asset } from "./data";
 import { tr } from "./i18n";
 import { currentLang, pathFor } from "./routes";
-import { ORBITS, orbitPoint } from "./academicOrbits";
+import { HEATWAVES, chartArea, chartLine, chartPoints } from "./academicChart";
 import "./two-worlds.scss";
 gsap.registerPlugin(ScrollTrigger);
 
@@ -103,7 +103,7 @@ export default function TwoWorlds() {
             0.3,
           )
           .fromTo(
-            q(".tw-orbits"),
+            q(".tw-chart"),
             { rotation: 30, scale: 0.7 },
             { rotation: 0, scale: 1, duration: 0.5 },
             0.3,
@@ -139,24 +139,19 @@ export default function TwoWorlds() {
               href={pathFor({ kind: "landing", id: "academic" }, lang)}
             >
               <span className="tw-art" aria-hidden="true">
-                <span className="tw-stars" />
-                <svg className="tw-orbits" viewBox="0 0 100 100">
-                  {ORBITS.map((orbit, i) => {
-                    const point = orbitPoint(orbit, 0.15);
-                    return (
-                      <g key={i}>
-                        <ellipse
-                          cx="50"
-                          cy="50"
-                          rx={orbit.rx}
-                          ry={orbit.ry}
-                          transform={`rotate(${orbit.tilt} 50 50)`}
-                        />
-                        <circle cx={point.x} cy={point.y} r="1.6" />
-                      </g>
-                    );
-                  })}
-                  <circle className="tw-sun" cx="50" cy="50" r="4" />
+                {/* Même univers que la maquette de la page chercheurs : une courbe de données. */}
+                <svg className="tw-chart" viewBox="0 0 100 60">
+                  <defs>
+                    <linearGradient id="tw-area" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0" stopColor="#f1c27d" stopOpacity="0.4" />
+                      <stop offset="1" stopColor="#f1c27d" stopOpacity="0" />
+                    </linearGradient>
+                  </defs>
+                  <path d={chartArea} fill="url(#tw-area)" />
+                  <path className="tw-chart-line" d={chartLine} />
+                  {HEATWAVES.map((i) => (
+                    <circle key={i} cx={chartPoints[i].x} cy={chartPoints[i].y} r="1.6" />
+                  ))}
                 </svg>
               </span>
               <span className="tw-copy">
@@ -184,13 +179,13 @@ export default function TwoWorlds() {
                 />
                 <img
                   className="tw-basil tw-basil-1"
-                  src={asset("pizza-burst/basil.webp")}
+                  src={asset("pizza-burst/basil-leaf.webp")}
                   alt=""
                   loading="lazy"
                 />
                 <img
                   className="tw-basil tw-basil-2"
-                  src={asset("pizza-burst/basil.webp")}
+                  src={asset("pizza-burst/basil-leaf.webp")}
                   alt=""
                   loading="lazy"
                 />

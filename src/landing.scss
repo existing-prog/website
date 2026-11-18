@@ -281,3 +281,14 @@
     margin-top: 36px;
   }
 }
+
+/* — Page chercheurs : océan et sable, une identité distincte du portfolio de Samantha — */
+.academic-landing {
+  --lp-accent: #f1c27d;
+  .lp-closing {
+    background: radial-gradient(ellipse at 50% 100%, #145055 0%, #0b0f17 70%);
+  }
+  .lp-price {
+    background: linear-gradient(135deg, #12393b, #0f1517);
+  }
+}

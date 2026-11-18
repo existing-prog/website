@@ -175,8 +175,11 @@ export default function TwoWorlds() {
               <span className="tw-art" aria-hidden="true">
                 <img
                   className="tw-pizza"
-                  src={asset("atelier-pizza-whole.webp")}
+                  src={asset("atelier-pizza-600.webp")}
                   alt=""
+                  width="560"
+                  height="560"
+                  decoding="async"
                   loading="lazy"
                 />
                 <img

@@ -127,8 +127,6 @@ test("mobile menu, filters, preview switching, and Escape", async ({ page }) => 
   await page.getByRole("button", { name: "Frontend & performance" }).click();
   await expect(page.locator(".project-card")).toHaveCount(2);
   await page.getByRole("button", { name: "All work", exact: true }).click();
-  await page.getByRole("button", { name: "Preview Kasa", exact: true }).click();
-  await expect(page.locator(".window-bottom h2")).toHaveText("Kasa");
   await page
     .getByRole("button", { name: "Start a project", exact: true })
     .first()
@@ -153,12 +151,9 @@ test("corrupt local drafts fail safely and reduced motion is respected", async (
   await page.goto("en/desk/");
   await expect(page.locator(".empty-desk")).toBeVisible();
   await page.getByRole("link", { name: "Lucas Berdy home", exact: true }).first().click();
-  expect(
-    await page
-      .locator(".glass-halo span")
-      .first()
-      .evaluate((e) => getComputedStyle(e).animationName),
-  ).toBe("none");
+  // Mouvement réduit : l’ouverture reste une image fixe, sans piste de scroll.
+  await expect(page.locator(".ink-hero")).toHaveAttribute("data-scene", "static");
+  await expect(page.locator(".ink-poster")).toBeVisible();
 });
 
 test("storage failure never claims a draft was saved", async ({ page }) => {
@@ -233,11 +228,6 @@ for (const width of [390, 1440]) {
     await expect(page.locator("#project-samantha-description")).toContainText(
       "I designed and developed",
     );
-    for (const button of await page.locator(".preview-controls button").all()) {
-      const r = await button.boundingBox();
-      expect(r!.width).toBeGreaterThanOrEqual(44);
-      expect(r!.height).toBeGreaterThanOrEqual(44);
-    }
     const result = await page.locator("#project-samantha-description").evaluate((e) => {
       const style = getComputedStyle(e);
       let parent: Element | null = e;

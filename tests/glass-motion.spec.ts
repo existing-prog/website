@@ -6,7 +6,8 @@ test("glass light follows a mouse and clears when motion is reduced", async ({
 }) => {
   await page.setViewportSize({ width: 1440, height: 950 });
   await page.goto("en/");
-  const card = page.locator(".showcase-window");
+  const card = page.locator(".service-card").first();
+  await card.scrollIntoViewIfNeeded();
   await card.hover();
   await expect
     .poll(() => card.evaluate((el) => el.style.getPropertyValue("--light-x")))
@@ -43,7 +44,7 @@ test("touch input leaves glass effects at rest", async ({ browser, baseURL }) =>
   });
   const page = await context.newPage();
   await page.goto("en/");
-  const card = page.locator(".showcase-window");
+  const card = page.locator(".service-card").first();
   await card.dispatchEvent("pointermove", {
     pointerType: "touch",
     clientX: 120,

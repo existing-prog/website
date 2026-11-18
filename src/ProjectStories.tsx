@@ -150,8 +150,11 @@ function ProjectVisual({
           <div className="atelier-scene-glow" />
           <img
             className="atelier-scene-pizza"
-            src={asset("atelier-pizza-whole.webp")}
+            src={asset("atelier-pizza-600.webp")}
             alt=""
+            width="560"
+            height="560"
+            decoding="async"
             loading="lazy"
           />
           {[0, 1, 2].map((i) => (

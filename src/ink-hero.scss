@@ -1,0 +1,136 @@
+/* Ouverture « encre » de l’accueil. État statique par défaut (image fixe, pas de
+ * piste) ; le mode animé colle la scène et dessine la vidéo dans le canvas. */
+.ink-hero {
+  --ink-bg: #0e131b;
+  position: relative;
+  padding-top: 0;
+  background: var(--ink-bg);
+}
+.ink-stage {
+  position: relative;
+  display: grid;
+  align-content: center;
+  min-height: 100svh;
+  overflow: hidden;
+}
+/* L’encre occupe la droite sur grand écran : l’accroche reste sur un fond calme. */
+.ink-media {
+  position: absolute;
+  inset: 0 0 0 26%;
+}
+.ink-poster,
+.ink-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: var(--ink-bg);
+}
+.ink-canvas {
+  display: none;
+}
+// Fondu vers la couleur de page côté texte : aucune couture visible.
+.ink-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--ink-bg) 0%, #0e131b99 22%, transparent 48%);
+  pointer-events: none;
+}
+// Les marges latérales viennent de .shell (même alignement que le reste du site).
+.ink-content {
+  position: relative;
+  z-index: 1;
+  padding-top: 110px;
+}
+.ink-end,
+.ink-hint {
+  display: none;
+}
+
+.ink-hero[data-scene="animated"] {
+  .ink-track {
+    height: 230vh;
+  }
+  .ink-stage {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+  .ink-poster {
+    display: none;
+  }
+  .ink-canvas {
+    display: block;
+  }
+  .ink-end {
+    display: block;
+    position: absolute;
+    right: clamp(20px, 5vw, 100px);
+    bottom: 13vh;
+    max-width: 560px;
+    text-align: right;
+    font-size: clamp(30px, 3.6vw, 58px);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    font-weight: 500;
+    color: #f2f0ff;
+    text-shadow: 0 4px 30px #0e131b;
+    opacity: 0;
+    em {
+      font-family: Georgia, serif;
+      color: #c9bcff;
+    }
+  }
+  .ink-hint {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: absolute;
+    left: 50%;
+    bottom: 24px;
+    translate: -50% 0;
+    font: 12px monospace;
+    letter-spacing: 1.2px;
+    color: #8d9bb8;
+  }
+}
+
+@media (max-width: 1023px) {
+  .ink-media {
+    inset: 0;
+  }
+  .ink-shade {
+    background: linear-gradient(0deg, var(--ink-bg) 0%, #0e131bdd 38%, transparent 72%);
+  }
+  .ink-stage {
+    align-content: end;
+  }
+  .ink-content {
+    padding-block: 120px 40px;
+  }
+  .ink-hero[data-scene="animated"] .ink-end {
+    left: 20px;
+    right: 20px;
+    bottom: 18vh;
+    text-align: left;
+  }
+}
+@media (max-width: 760px) {
+  .ink-hero[data-scene="animated"] {
+    .ink-track {
+      height: 210svh;
+    }
+    .ink-stage {
+      height: 100svh;
+    }
+  }
+}
+/* Téléphone : l’écran est trop court pour tout afficher ; on garde l’essentiel
+ * (titre, texte, boutons) et on retire la petite ligne du haut et l’indication. */
+@media (max-width: 760px) {
+  .ink-hero .hero-kicker,
+  .ink-hero[data-scene="animated"] .ink-hint {
+    display: none;
+  }
+}

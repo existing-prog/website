@@ -7,9 +7,11 @@ gsap.registerPlugin(ScrollTrigger);
  * finale dans le site : c’est l’état affiché sans animation et dans le pré-rendu. */
 const PAPER_LAYOUT: Record<string, gsap.TweenVars> = {
   ".ac-nav": { left: "8%", top: "4%", width: "84%", height: "4%" },
-  ".ac-head": { left: "8%", top: "10%", width: "84%", height: "17%" },
-  ".ac-abstract": { left: "8%", top: "28%", width: "84%", height: "21%" },
-  ".ac-figure": { left: "18%", top: "51%", width: "64%", height: "31%" },
+  // Hauteurs réglées pour que la ligne d’affiliations et la légende de la figure
+  // tiennent entières dans leur bloc (sinon elles apparaissent coupées).
+  ".ac-head": { left: "8%", top: "10%", width: "84%", height: "19.5%" },
+  ".ac-abstract": { left: "8%", top: "30.5%", width: "84%", height: "19%" },
+  ".ac-figure": { left: "18%", top: "50.5%", width: "64%", height: "32.5%" },
   ".ac-refs": { left: "8%", top: "84%", width: "84%", height: "13%" },
 };
 const PAPER = "#fbfaf6";

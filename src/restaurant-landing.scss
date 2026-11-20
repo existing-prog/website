@@ -1,0 +1,159 @@
+/* L’ouverture associe une devanture au contenu d’un site de commerce.
+ * La photo reste présente dans le flux sur tous les formats. */
+.restaurant-landing {
+  --lp-accent: #edbc85;
+  .lp-closing {
+    background: radial-gradient(ellipse at 50% 100%, #47301f, #0b0f17 72%);
+  }
+  .lp-price {
+    background: linear-gradient(135deg, #2b211a, #14151a);
+  }
+}
+.restaurant-hero {
+  background: radial-gradient(ellipse at 75% 30%, #2a221b 0%, #0b0f17 72%);
+  border-bottom: 1px solid #ffffff15;
+}
+.restaurant-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  align-items: center;
+  gap: clamp(32px, 6vw, 90px);
+  padding-block: clamp(55px, 8vw, 126px);
+}
+.restaurant-hero-copy {
+  .eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.09em;
+  }
+  h1 {
+    margin-top: 18px;
+    max-width: 13ch;
+    font-size: clamp(46px, 5.5vw, 86px);
+    line-height: 1;
+    letter-spacing: -0.042em;
+    font-weight: 500;
+    text-wrap: balance;
+    &:focus {
+      outline: none;
+    }
+    em {
+      color: var(--lp-accent);
+      font-family: Georgia, serif;
+      font-weight: 400;
+    }
+  }
+  .lp-lead {
+    max-width: 44ch;
+    margin-top: 22px;
+    font-size: clamp(16px, 1.55vw, 19px);
+  }
+  .lp-actions {
+    margin-top: 28px;
+    row-gap: 16px;
+  }
+}
+.restaurant-window {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid #edbc853d;
+  background: #181716;
+  box-shadow: 0 24px 60px #0006;
+}
+.restaurant-photo {
+  position: relative;
+  overflow: hidden;
+  picture,
+  img {
+    display: block;
+    width: 100%;
+  }
+  img {
+    height: auto;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    object-position: center;
+  }
+}
+/* Deux vitrages légers glissent vers les bords. Ils n’apparaissent que lorsque
+ * ScrollTrigger applique sa transformation, donc l’état fixe reste dégagé. */
+.restaurant-pane {
+  position: absolute;
+  inset-block: 0;
+  width: 50%;
+  visibility: hidden;
+  background: linear-gradient(145deg, #13181944, #1318190a 48%, #13181955);
+  pointer-events: none;
+}
+.restaurant-pane-left {
+  left: 0;
+  border-right: 1px solid #edbc8570;
+}
+.restaurant-pane-right {
+  right: 0;
+  border-left: 1px solid #10141ac0;
+}
+.restaurant-visitor-details {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-top: 1px solid #edbc853d;
+}
+.restaurant-visitor-detail {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 8px;
+  font-size: clamp(12px, 1.2vw, 15px);
+  line-height: 1.35;
+  color: #f7eee4;
+  & + & {
+    border-left: 1px solid #ffffff1a;
+  }
+  svg {
+    color: var(--lp-accent);
+    flex-shrink: 0;
+  }
+}
+.restaurant-example {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 26px;
+  margin-block: 20px 65px;
+  padding-block: 34px;
+  border-block: 1px solid #ffffff1f;
+  h2 {
+    margin-block: 12px;
+    font-size: clamp(27px, 3vw, 40px);
+  }
+  p:not(.eyebrow) {
+    max-width: 60ch;
+    color: var(--lp-muted);
+    line-height: 1.65;
+  }
+}
+@media (max-width: 850px) {
+  .restaurant-hero-grid {
+    grid-template-columns: 1fr;
+    padding-block: 40px;
+  }
+  .restaurant-hero-copy h1 {
+    font-size: clamp(37px, 8vw, 62px);
+  }
+  .restaurant-window {
+    max-width: 680px;
+  }
+}
+@media (max-width: 480px) {
+  .restaurant-visitor-detail {
+    flex-direction: column;
+    gap: 6px;
+    text-align: center;
+    padding-block: 12px;
+  }
+}

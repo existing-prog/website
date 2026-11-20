@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-// Entrée indépendante : Three.js ne se charge que dans le laboratoire 3D.
-// Le site commercial conserve son parcours et son animation de production.
+// Entrées du laboratoire 3D. Sur le site, Three.js est chargé à la demande
+// (import dynamique de src/world/worldScene.ts) : jamais au premier affichage.
 export default defineConfig({
   plugins: [react()],
   base: "/website/",

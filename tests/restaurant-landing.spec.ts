@@ -1,34 +1,14 @@
-import { test, expect, type Page } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 
-/** Défile jusqu’à une progression de l’éclatement (0 → 1), puis attend l’image affichée. */
-async function scrollBurst(page: Page, progress: number) {
-  await page.evaluate((value) => {
-    const track = document.querySelector<HTMLElement>(".rb-track")!;
-    const start = track.getBoundingClientRect().top + scrollY;
-    const distance = track.offsetHeight - 2 * innerHeight;
-    scrollTo({ top: start + distance * value, behavior: "instant" });
-  }, progress);
-  await expect
-    .poll(async () =>
-      Math.abs(
-        Number(
-          await page
-            .locator(".rb-scene")
-            .evaluate((el) => getComputedStyle(el).getPropertyValue("--rb-progress")),
-        ) - progress,
-      ),
-    )
-    .toBeLessThan(0.01);
-}
-const frame = (page: Page) =>
-  page.locator(".rb-canvas").evaluate((c) => Number(c.dataset.frame ?? -1));
-
-test("restaurants page is prerendered in both languages", async ({ request }) => {
+test("the restaurant offer is prerendered in both languages around a storefront", async ({
+  request,
+}) => {
   const fr = await (await request.get("restaurants-commerces/")).text();
   expect(fr).toContain('<html lang="fr"');
-  expect(fr).toContain("Des sites qui donnent faim.");
+  expect(fr).toContain("de pousser la porte.");
   expect(fr).toContain("Exemple autour de 1 200 €");
-  expect(fr).toContain("pizza-burst/final.webp");
+  expect(fr).toContain("local-storefront.webp");
+  expect(fr).not.toContain("pizza-burst/");
   const en = await (await request.get("en/restaurants-shops/")).text();
   expect(en).toContain("<title>Websites for restaurants and shops — Lucas Berdy</title>");
   expect(en).toContain("Example at around €1,200");
@@ -36,124 +16,63 @@ test("restaurants page is prerendered in both languages", async ({ request }) =>
   expect(sitemap).toContain("/website/restaurants-commerces/</loc>");
 });
 
-test("the pizza bursts with the scroll, rewinds, and the next section slides over it", async ({
-  page,
-}) => {
+test("the storefront opens and rewinds with ordinary scrolling", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("en/restaurants-shops/");
-  const scene = page.locator(".rb-scene");
-  await expect(scene).toHaveAttribute("data-scene", "animated");
-  await expect(scene).toHaveAttribute("data-ready", "true");
-  await expect(page.locator(".rb-poster")).toBeHidden();
-  await expect.poll(() => frame(page)).toBe(0);
-  await scrollBurst(page, 0.5);
-  await expect.poll(() => frame(page)).toBeGreaterThan(20);
-  await expect.poll(() => frame(page)).toBeLessThan(40);
-  await scrollBurst(page, 1);
-  await expect.poll(() => frame(page), { timeout: 10000 }).toBe(60);
-  await expect
-    .poll(() =>
-      page.locator(".rb-outline").evaluate((el) => Number(getComputedStyle(el).opacity)),
-    )
-    .toBeLessThan(0.05);
-  // Dernier écran de la piste : la section crème recouvre la scène restée en place.
-  await page.evaluate(() => {
-    const track = document.querySelector<HTMLElement>(".rb-track")!;
-    scrollTo({
-      top: track.getBoundingClientRect().bottom + scrollY - innerHeight,
-      behavior: "instant",
-    });
-  });
-  await expect
-    .poll(() =>
-      page.locator(".lp-reveal").evaluate((el) => el.getBoundingClientRect().top),
-    )
-    .toBeLessThanOrEqual(1);
-  await scrollBurst(page, 0);
-  await expect.poll(() => frame(page)).toBe(0);
-  await expect
-    .poll(() =>
-      page.locator(".rb-outline").evaluate((el) => Number(getComputedStyle(el).opacity)),
-    )
-    .toBeGreaterThan(0.95);
+  await expect(page.locator("#restaurants-title")).toBeFocused();
+  const detail = page.locator(".restaurant-visitor-detail").first();
+  await expect(detail).toHaveCSS("opacity", "0");
+  await page.evaluate(() => scrollTo({ top: 230, behavior: "instant" }));
+  await expect(detail).toHaveCSS("opacity", "1");
+  await page.evaluate(() => scrollTo({ top: 0, behavior: "instant" }));
+  await expect(detail).toHaveCSS("opacity", "0");
 });
 
-test("reduced motion shows the final picture without a scroll track", async ({
-  page,
-}) => {
+test("reduced motion shows the open storefront immediately", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("en/restaurants-shops/");
-  await expect(page.locator(".rb-scene")).toHaveAttribute("data-scene", "static");
-  await expect(page.locator(".rb-poster")).toBeVisible();
-  await expect(page.locator(".rb-canvas")).toBeHidden();
-  await expect(page.locator(".lp-reveal")).toHaveCSS("margin-top", "0px");
-  await expect(page.locator("#restaurants-title")).toHaveAccessibleName(
-    "RESTAURANTS — Websites that make people hungry.",
+  await expect(page.locator(".restaurant-pane-left")).toBeHidden();
+  await expect(page.locator(".restaurant-visitor-detail").first()).toHaveCSS(
+    "opacity",
+    "1",
   );
 });
 
 for (const width of [320, 390]) {
-  test(`restaurants scene fits a ${width}px phone`, async ({ page }) => {
-    await page.setViewportSize({ width, height: 700 });
+  test(`the restaurant offer fits a ${width}px phone and keeps the quote in view`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 667 });
     await page.goto("restaurants-commerces/");
-    await expect(page.locator(".rb-scene")).toHaveAttribute("data-scene", "animated");
-    const box = await page.locator(".rb-outline").boundingBox();
-    expect(box!.x).toBeGreaterThanOrEqual(0);
-    expect(box!.x + box!.width).toBeLessThanOrEqual(width + 1);
-    await expect(page.locator(".rb-actions button")).toBeInViewport({ ratio: 1 });
-    await scrollBurst(page, 1);
-    await expect.poll(() => frame(page), { timeout: 10000 }).toBe(60);
+    await expect(page.locator(".restaurant-hero button")).toBeInViewport({ ratio: 1 });
+    await expect
+      .poll(() =>
+        page.locator(".restaurant-photo img").evaluate((img: HTMLImageElement) => ({
+          loaded: img.naturalWidth > 0,
+          mobile: img.currentSrc.endsWith("local-storefront-640.webp"),
+        })),
+      )
+      .toEqual({ loaded: true, mobile: true });
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth - innerWidth),
     ).toBeLessThanOrEqual(1);
   });
 }
 
-test("calls to action open the planner with a business website selected", async ({
+test("the hero opens a preselected quote and the text link reaches Atelier Pizza", async ({
   page,
 }) => {
-  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("en/restaurants-shops/");
   await expect(page.locator("#restaurants-title")).toBeFocused();
-  const openingButton = page.locator(".rb-actions").getByRole("button");
-  await expect(openingButton).toBeInViewport({ ratio: 1 });
-  await openingButton.press("Enter");
+  const cta = page.locator(".restaurant-hero").getByRole("button");
+  await cta.press("Enter");
   await expect(page.locator(".service-option.chosen strong")).toHaveText(
     "Business website",
   );
   await page.getByRole("button", { name: "Close project planner" }).click();
-  await expect(openingButton).toBeFocused();
-  await page.getByRole("link", { name: "Read the case study" }).first().click();
+  await expect(cta).toBeFocused();
+  await expect(page.locator("#restaurants-example img")).toHaveCount(0);
+  await page.getByRole("link", { name: "Explore Atelier Pizza" }).click();
   await expect(page).toHaveURL(/\/website\/en\/projects\/atelier-pizza\/$/);
-});
-
-test("decor leaves are ready before the scroll and stay visible at the end", async ({
-  page,
-}) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("restaurants-commerces/");
-  await expect(page.locator(".rb-scene")).toHaveAttribute("data-scene", "animated");
-  // Aucun filtre CSS sur les feuilles : l’ombre et le flou sont intégrés aux images.
-  const filters = await page
-    .locator(".rb-leaf, .rb-leaf img")
-    .evaluateAll((els) => els.map((e) => getComputedStyle(e).filter));
-  expect(filters.every((f) => f === "none")).toBe(true);
-  await expect
-    .poll(() =>
-      page
-        .locator(".rb-leaf img")
-        .evaluateAll((imgs) =>
-          imgs.every((i) => (i as HTMLImageElement).naturalWidth > 0),
-        ),
-    )
-    .toBe(true);
-  await scrollBurst(page, 1);
-  const visible = await page.locator(".rb-leaf").evaluateAll(
-    (leaves) =>
-      leaves.filter((l) => {
-        const r = l.getBoundingClientRect();
-        return r.right > 0 && r.left < innerWidth && r.bottom > 0 && r.top < innerHeight;
-      }).length,
-  );
-  expect(visible).toBeGreaterThanOrEqual(4);
+  await expect(page.locator(".atelier-bite")).toBeVisible();
 });

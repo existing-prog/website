@@ -57,6 +57,19 @@ const rand = (i: number, salt: number) => {
   return v - Math.floor(v);
 };
 
+/** État transmis à chaque jalon de la démarche, à chaque image. */
+interface MilestoneState {
+  /** Progression globale en sections (0 → 6). */
+  s: number;
+  time: number;
+  /** 0 → 1 quand la tête du fil atteint le jalon. */
+  reached: number;
+  /** Bref éclat au moment du passage. */
+  flash: number;
+  /** Fondu d’entrée et de sortie de la section. */
+  visible: number;
+}
+
 export interface WorldOptions {
   canvas: HTMLCanvasElement;
   /** Écran étroit : moins de particules, pas de bloom, pas de parallaxe souris. */
@@ -200,11 +213,7 @@ export class WorldScene {
   private threadMat: THREE.ShaderMaterial;
   private strands: { mat: THREE.ShaderMaterial; from: number; to: number }[] = [];
   private crystals: { group: THREE.Group; mats: THREE.Material[]; spin: number }[] = [];
-  private milestones: {
-    sprite: THREE.Sprite;
-    material: THREE.SpriteMaterial;
-    s: number;
-  }[] = [];
+  private milestones: { s: number; update: (state: MilestoneState) => void }[] = [];
   private glows: {
     sprite: THREE.Sprite;
     zone: [number, number, number, number];
@@ -429,26 +438,218 @@ export class WorldScene {
   }
 
   /**
-   * Démarche : quatre jalons posés sur le fil, un par étape. Chacun s’allume
-   * quand la tête du fil l’atteint, puis reste doucement éclairé (étape franchie).
+   * Démarche : un motif différent par étape, posé sur le fil. Chacun se forme
+   * quand la tête du fil l’atteint, puis reste discret (étape franchie).
+   * 01 échange : deux lueurs qui se rejoignent et dialoguent.
+   * 02 cadre clair : un carré qui se trace côté après côté.
+   * 03 créer, affiner : une poussière qui s’assemble en petite structure.
+   * 04 lancement : une étincelle qui s’élève avec sa traînée.
    */
   private makeMilestones() {
     const texture = this.glowTexture();
-    [3.85, 4.2, 4.55, 4.9].forEach((s) => {
-      const material = new THREE.SpriteMaterial({
+    const additive = {
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    };
+    const glowSprite = (scale: number) => {
+      const sprite = new THREE.Sprite(
+        new THREE.SpriteMaterial({
+          map: texture,
+          color: SILVER,
+          opacity: 0,
+          ...additive,
+        }),
+      );
+      sprite.scale.setScalar(scale);
+      return sprite;
+    };
+    const anchorAt = (s: number) => {
+      const group = new THREE.Group();
+      group.position.copy(this.threadCurve.getPoint(Math.min(1, s / LAST + 0.02)));
+      // Un peu au-dessus du fil, pour que le motif ne se confonde pas avec lui.
+      // Au-dessus du fil et décalé vers la droite : à l’écart des titres centrés.
+      group.position.x += 3.4;
+      group.position.y += 0.5;
+      // Assez grand pour être lu, mais un seul motif est visible à la fois.
+      group.scale.setScalar(2.2);
+      this.scene.add(group);
+      return group;
+    };
+
+    // 01 — Échange : deux lueurs éloignées se rapprochent et tournent ensemble.
+    {
+      const s = 3.85;
+      const group = anchorAt(s);
+      const a = glowSprite(0.3);
+      const b = glowSprite(0.3);
+      const linkGeo = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(),
+        new THREE.Vector3(),
+      ]);
+      const linkMat = new THREE.LineBasicMaterial({
+        color: BLUE,
+        opacity: 0,
+        ...additive,
+      });
+      group.add(a, b, new THREE.Line(linkGeo, linkMat));
+      const link = linkGeo.attributes.position as THREE.BufferAttribute;
+      this.milestones.push({
+        s,
+        update: ({ reached, flash, time, visible }) => {
+          const radius = 1.3 - reached * 0.95;
+          const angle = time * 0.9;
+          a.position.set(Math.cos(angle) * radius, Math.sin(angle) * radius * 0.5, 0);
+          b.position.copy(a.position).negate();
+          link.setXYZ(0, a.position.x, a.position.y, 0);
+          link.setXYZ(1, b.position.x, b.position.y, 0);
+          link.needsUpdate = true;
+          const o = (0.25 + reached * 0.25 + flash * 0.3) * visible;
+          a.material.opacity = b.material.opacity = o;
+          linkMat.opacity = reached * 0.35 * visible;
+          group.lookAt(this.camera.position);
+        },
+      });
+    }
+
+    // 02 — Cadre clair : un carré dont les côtés se tracent l’un après l’autre.
+    {
+      const s = 4.2;
+      const group = anchorAt(s);
+      const half = 0.6;
+      const corners = [
+        [-half, -half],
+        [half, -half],
+        [half, half],
+        [-half, half],
+        [-half, -half],
+      ];
+      const points: THREE.Vector3[] = [];
+      for (let i = 0; i < 4; i++) {
+        for (let k = 0; k < 12; k++) {
+          const f = k / 12;
+          const [x0, y0] = corners[i];
+          const [x1, y1] = corners[i + 1];
+          points.push(new THREE.Vector3(x0 + (x1 - x0) * f, y0 + (y1 - y0) * f, 0));
+        }
+      }
+      points.push(points[0].clone());
+      const frameGeo = new THREE.BufferGeometry().setFromPoints(points);
+      const frameMat = new THREE.LineBasicMaterial({
+        color: SILVER,
+        opacity: 0,
+        ...additive,
+      });
+      const corner = glowSprite(0.22);
+      group.add(new THREE.Line(frameGeo, frameMat), corner);
+      this.milestones.push({
+        s,
+        update: ({ reached, flash, visible }) => {
+          const drawn = Math.round(reached * points.length);
+          frameGeo.setDrawRange(0, Math.max(drawn, 0));
+          // Une petite lueur suit la pointe du tracé.
+          corner.position.copy(
+            points[Math.min(points.length - 1, Math.max(0, drawn - 1))],
+          );
+          frameMat.opacity = (0.28 + flash * 0.25) * visible;
+          corner.material.opacity = (reached < 1 ? 0.6 : 0.2) * reached * visible;
+          group.lookAt(this.camera.position);
+          group.rotateZ(Math.PI / 12);
+        },
+      });
+    }
+
+    // 03 — Créer, affiner : des grains dispersés s’assemblent en petit cube.
+    {
+      const s = 4.55;
+      const group = anchorAt(s);
+      const grid: THREE.Vector3[] = [];
+      const scatter: THREE.Vector3[] = [];
+      let i = 0;
+      for (let x = -1; x <= 1; x++)
+        for (let y = -1; y <= 1; y++)
+          for (let z = -1; z <= 1; z++, i++) {
+            grid.push(new THREE.Vector3(x, y, z).multiplyScalar(0.32));
+            scatter.push(
+              new THREE.Vector3(
+                rand(i, 21) - 0.5,
+                rand(i, 22) - 0.5,
+                rand(i, 23) - 0.5,
+              ).multiplyScalar(3.2),
+            );
+          }
+      const positions = new Float32Array(grid.length * 3);
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+      const mat = new THREE.PointsMaterial({
         map: texture,
         color: SILVER,
-        transparent: true,
+        size: 0.32,
         opacity: 0,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
+        ...additive,
       });
-      const sprite = new THREE.Sprite(material);
-      sprite.position.copy(this.threadCurve.getPoint(Math.min(1, s / LAST + 0.02)));
-      sprite.scale.setScalar(0.4);
-      this.scene.add(sprite);
-      this.milestones.push({ sprite, material, s });
-    });
+      group.add(new THREE.Points(geo, mat));
+      const attr = geo.attributes.position as THREE.BufferAttribute;
+      const p = new THREE.Vector3();
+      this.milestones.push({
+        s,
+        update: ({ reached, flash, time, visible }) => {
+          // Chaque grain arrive à son rythme (décalage pseudo-aléatoire).
+          grid.forEach((target, k) => {
+            const f = smooth(rand(k, 24) * 0.4, 0.6 + rand(k, 25) * 0.4, reached);
+            p.copy(scatter[k]).lerp(target, f);
+            attr.setXYZ(k, p.x, p.y, p.z);
+          });
+          attr.needsUpdate = true;
+          group.rotation.y = time * 0.3;
+          group.rotation.x = 0.5;
+          mat.opacity = (0.3 + reached * 0.3 + flash * 0.3) * visible;
+        },
+      });
+    }
+
+    // 04 — Lancement : une étincelle s’élève en laissant une traînée.
+    {
+      const s = 4.9;
+      const group = anchorAt(s);
+      const head = glowSprite(0.3);
+      const trailCount = 24;
+      const trailGeo = new THREE.BufferGeometry();
+      const trailPos = new Float32Array(trailCount * 3);
+      const trailCol = new Float32Array(trailCount * 3);
+      for (let k = 0; k < trailCount; k++) {
+        // Dégradé : transparente à la base, argentée près de l’étincelle.
+        const c = SILVER.clone().multiplyScalar(Math.pow(k / (trailCount - 1), 2));
+        trailCol.set([c.r, c.g, c.b], k * 3);
+      }
+      trailGeo.setAttribute("position", new THREE.BufferAttribute(trailPos, 3));
+      trailGeo.setAttribute("color", new THREE.BufferAttribute(trailCol, 3));
+      const trailMat = new THREE.LineBasicMaterial({
+        vertexColors: true,
+        opacity: 0,
+        ...additive,
+      });
+      group.add(new THREE.Line(trailGeo, trailMat), head);
+      const attr = trailGeo.attributes.position as THREE.BufferAttribute;
+      this.milestones.push({
+        s,
+        update: ({ s: progress, reached, visible }) => {
+          // Montée liée au scroll : elle part quand le fil arrive et finit en hauteur.
+          const rise = smooth(s - 0.25, s + 0.25, progress);
+          const top = rise * 1.5;
+          const bottom = Math.max(0, top - 0.9);
+          for (let k = 0; k < trailCount; k++) {
+            const f = k / (trailCount - 1);
+            const y = bottom + (top - bottom) * f;
+            attr.setXYZ(k, Math.sin(y * 2.2) * 0.12 * (1 - rise), y, 0);
+          }
+          attr.needsUpdate = true;
+          head.position.set(0, top, 0);
+          head.material.opacity = reached * (0.45 + rise * 0.35) * visible;
+          trailMat.opacity = reached * (1 - rise * 0.6) * 0.8 * visible;
+        },
+      });
+    }
   }
 
   private glowTexture() {
@@ -656,14 +857,18 @@ export class WorldScene {
       if (mats[1]) (mats[1] as THREE.LineBasicMaterial).opacity = shown * 0.3;
     });
 
-    // Jalons : allumage au passage du fil, bref éclat, puis lueur calme
-    // jusqu’à la fin de la démarche.
-    const approach = 1 - smooth(5.05, 5.5, s);
+    // Jalons de la démarche : chacun se forme au passage du fil, puis reste
+    // discret jusqu’à la fin de la section.
+    const approach = bell(3.45, 3.7, 5.3, 5.7, s);
     for (const m of this.milestones) {
-      const reached = smooth(m.s - 0.3, m.s - 0.05, s);
-      const flash = Math.exp(-Math.pow((s - m.s + 0.05) * 6, 2));
-      m.material.opacity = (reached * 0.3 + flash * 0.35) * approach;
-      m.sprite.scale.setScalar(0.4 + flash * 0.25);
+      m.update({
+        s,
+        time,
+        reached: smooth(m.s - 0.3, m.s - 0.05, s),
+        flash: Math.exp(-Math.pow((s - m.s + 0.05) * 6, 2)),
+        // Un motif à la fois : il apparaît à son étape et s’efface à la suivante.
+        visible: approach * bell(m.s - 0.42, m.s - 0.22, m.s + 0.3, m.s + 0.5, s),
+      });
     }
 
     for (const glow of this.glows) {

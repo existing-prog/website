@@ -174,3 +174,19 @@
     display: none;
   }
 }
+
+/* Avec le fond 3D de l’accueil (classe posée sur <html> quand la scène est prête),
+ * l’ouverture devient transparente : la poussière 3D apparaît derrière le logo
+ * en particules. Le dégradé sombre côté texte reste, pour la lisibilité. */
+.has-world .lh-hero {
+  background: transparent;
+}
+/* Le dégradé partait du bord de la zone des particules (26 % de la largeur) et
+ * dessinait une arête nette sur la 3D : il couvre maintenant toute la largeur,
+ * en partant d’un voile translucide plutôt que d’un fond plein. */
+@media (min-width: 1024px) {
+  .has-world .lh-shade {
+    left: -35.2%; // 26 % de la page, rapportés à la largeur de la zone (74 %)
+    background: linear-gradient(90deg, #0b0f17b8 0%, #0b0f1780 30%, transparent 62%);
+  }
+}

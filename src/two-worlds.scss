@@ -2,6 +2,9 @@
  * réunit d’abord les deux moitiés en une seule carte sombre, puis les sépare. */
 .tw-section {
   position: relative;
+  // Les panneaux s’écartent de ±4 % en fin d’animation : on contient ce débord
+  // pour ne jamais créer de défilement horizontal (même principe que le hero).
+  overflow-x: clip;
 }
 .tw-stage {
   padding-block: 110px 40px;

@@ -44,6 +44,7 @@ import "./readability.scss";
 import "./approach-person.scss";
 import LogoHero from "./LogoHero";
 import TwoWorlds from "./TwoWorlds";
+import WorldBackdrop from "./world/WorldBackdrop";
 
 const SamanthaCaseStudy = lazy(() => import("./SamanthaCaseStudy"));
 const KasaCaseStudy = lazy(() => import("./KasaCaseStudy"));
@@ -532,6 +533,7 @@ function App() {
           </Suspense>
         ) : (
           <>
+            <WorldBackdrop />
             <LogoHero onStart={() => start()} />
             <section className="work-section section" id="work">
               <div className="shell">

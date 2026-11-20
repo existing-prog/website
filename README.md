@@ -93,6 +93,16 @@ Smaller screens use independent inline scenes. Reduced-motion mode uses static v
 
 The Kasa phone preview is optimized from Lucas’s portfolio screenshot at `/projects/kasa-mobile.png`. The three Nina photo thumbnails come from the existing training site at `https://existing-prog.github.io/projet-4/`, retaining its Unsplash images: Aaron Paul (`wnX-fXzB6Cw`), Hannah Busing (`RvF2R_qMpRk`) and Nino van Prattenburg (`-443cl1uR_8`). The Neptune backdrop is a decorative CSS illustration, not a scientific simulation.
 
+## 3D backdrop (“the thread”)
+
+The home page has a WebGL backdrop behind its dark sections, with the same principles as the Dreamscape project: a camera on a Catmull-Rom spline driven by scroll, mouse parallax, slow idle drift, a field of view that widens with scroll speed, and bloom.
+
+- `src/world/WorldBackdrop.tsx` renders a fixed, `aria-hidden`, non-interactive canvas. It loads the scene with a dynamic `import()` once the page is idle, and only when motion is allowed and WebGL is available. Reduced motion, prerendering (which uses reduced motion) and case-study pages never download Three.js.
+- `src/world/worldScene.ts` holds the scene. `ANCHORS` lists the tracked sections (`#top`, `#work`, `#worlds`, `#services`, `#approach`, `#questions`, `#contact`). The middle of the viewport is mapped to a progress value from 0 to 6, and `KEYS` gives one camera position per section. A silver thread draws itself ahead of the camera. It splits into teal and amber strands for the two worlds. Three faint crystals stand for the offers, four rings for the approach steps, and a dawn glow appears at the contact section.
+- Readability rules: the thread fades out close to the camera and in the centre of the screen, where headings sit. Glows stay faint. Nothing is drawn while the light “Selected work” section covers the viewport. The canvas is transparent, so the page colour (`#0b0f17` on `<html>`) shows through it; while the scene is active, `<body>` becomes transparent.
+- Phones and touch devices get a lighter version: fewer particles, pixel ratio 1, no bloom and no pointer parallax. Rendering pauses when the tab is hidden, and `destroy()` releases every GPU resource.
+- Tests: `tests/world-backdrop.spec.ts`.
+
 ## French / English
 
 The site uses i18next and react-i18next, with two bundled catalogs: `src/locales/FR.json` and `src/locales/ENG.json`. Their matching keys are readable English phrases; special export and metadata templates use explicit keys. Preserve the `{{placeholder}}` names when editing translations. No translation API or external translation request is used.

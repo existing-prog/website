@@ -31,7 +31,9 @@ test("home splits into two worlds that lead to the specialised pages", async ({
   await expect
     .poll(() => opacity(page, ".tw-world-restaurants .tw-veil"))
     .toBeLessThan(0.05);
-  await page.getByRole("link", { name: /Websites that make people hungry/ }).click();
+  await page
+    .getByRole("link", { name: /Discover websites for restaurants and shops/ })
+    .click();
   await expect(page).toHaveURL(/\/website\/en\/restaurants-shops\/$/);
 });
 

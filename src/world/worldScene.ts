@@ -9,7 +9,7 @@ import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
  * La caméra suit une spline (une étape par section) au rythme du scroll ; un fil
  * lumineux se dessine devant elle et change de forme selon la section :
  * poussière d’ouverture, deux brins (chercheurs / commerces), trois cristaux
- * (les offres), quatre anneaux (la démarche) et une aube pour le contact.
+ * (les offres), quatre jalons sur le fil (la démarche) et une aube pour le contact.
  *
  * Contrat : ce module n’est chargé qu’à la demande (import dynamique), jamais en
  * mouvement réduit ni pendant le pré-rendu. `destroy()` libère tout le GPU.
@@ -200,7 +200,11 @@ export class WorldScene {
   private threadMat: THREE.ShaderMaterial;
   private strands: { mat: THREE.ShaderMaterial; from: number; to: number }[] = [];
   private crystals: { group: THREE.Group; mats: THREE.Material[]; spin: number }[] = [];
-  private rings: { mesh: THREE.Mesh; mat: THREE.MeshBasicMaterial; t: number }[] = [];
+  private milestones: {
+    sprite: THREE.Sprite;
+    material: THREE.SpriteMaterial;
+    s: number;
+  }[] = [];
   private glows: {
     sprite: THREE.Sprite;
     zone: [number, number, number, number];
@@ -257,7 +261,7 @@ export class WorldScene {
     this.threadMat = this.makeThread();
     this.makeStrands();
     this.makeCrystals();
-    this.makeRings();
+    this.makeMilestones();
     this.makeGlows();
     this.dawnMat = this.makeDawn();
 
@@ -424,24 +428,26 @@ export class WorldScene {
     });
   }
 
-  /** Démarche : quatre anneaux que la caméra traverse, un par étape. */
-  private makeRings() {
-    const tangent = new THREE.Vector3();
-    [3.75, 4.15, 4.55, 4.95].forEach((s) => {
-      const t = s / LAST;
-      const mat = new THREE.MeshBasicMaterial({
+  /**
+   * Démarche : quatre jalons posés sur le fil, un par étape. Chacun s’allume
+   * quand la tête du fil l’atteint, puis reste doucement éclairé (étape franchie).
+   */
+  private makeMilestones() {
+    const texture = this.glowTexture();
+    [3.85, 4.2, 4.55, 4.9].forEach((s) => {
+      const material = new THREE.SpriteMaterial({
+        map: texture,
         color: SILVER,
         transparent: true,
         opacity: 0,
         blending: THREE.AdditiveBlending,
         depthWrite: false,
       });
-      const mesh = new THREE.Mesh(new THREE.TorusGeometry(3.4, 0.022, 8, 160), mat);
-      mesh.position.copy(this.path.getPoint(t));
-      this.path.getTangent(t, tangent);
-      mesh.lookAt(mesh.position.clone().add(tangent));
-      this.scene.add(mesh);
-      this.rings.push({ mesh, mat, t: s });
+      const sprite = new THREE.Sprite(material);
+      sprite.position.copy(this.threadCurve.getPoint(Math.min(1, s / LAST + 0.02)));
+      sprite.scale.setScalar(0.4);
+      this.scene.add(sprite);
+      this.milestones.push({ sprite, material, s });
     });
   }
 
@@ -503,7 +509,7 @@ export class WorldScene {
     // Offres : reflet froid derrière les cristaux.
     add(BLUE, 3, [14, 6, -40], 28, [2.6, 2.95, 3.4, 3.9], 0.08);
     // Questions : une lueur calme dans la colonne vide de gauche.
-    add(SILVER, 5, [-14, 1, -40], 24, [4.5, 4.9, 5.4, 5.9], 0.06);
+    add(SILVER, 5, [-14, 1, -40], 24, [4.5, 4.9, 5.4, 5.9], 0.035);
   }
 
   private makeDawn() {
@@ -650,13 +656,14 @@ export class WorldScene {
       if (mats[1]) (mats[1] as THREE.LineBasicMaterial).opacity = shown * 0.3;
     });
 
-    for (const ring of this.rings) {
-      // Chaque anneau s’allume à l’approche, puis s’éteint une fois traversé.
-      const near = 1 - clamp01(Math.abs(s - ring.t) / 0.45);
-      // … et s’efface juste avant le passage, pour ne pas zébrer les bords de l’écran.
-      const pass = smooth(4, 10, ring.mesh.position.distanceTo(this.camera.position));
-      ring.mat.opacity = near * near * pass * 0.45;
-      ring.mesh.rotation.z += dt * 0.05;
+    // Jalons : allumage au passage du fil, bref éclat, puis lueur calme
+    // jusqu’à la fin de la démarche.
+    const approach = 1 - smooth(5.05, 5.5, s);
+    for (const m of this.milestones) {
+      const reached = smooth(m.s - 0.3, m.s - 0.05, s);
+      const flash = Math.exp(-Math.pow((s - m.s + 0.05) * 6, 2));
+      m.material.opacity = (reached * 0.3 + flash * 0.35) * approach;
+      m.sprite.scale.setScalar(0.4 + flash * 0.25);
     }
 
     for (const glow of this.glows) {

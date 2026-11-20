@@ -77,7 +77,7 @@ export default function TwoWorlds() {
           },
           0.2,
         );
-        // 3. Chaque univers apparaît : nuit et orbites à gauche, rouge tomate à droite.
+        // 3. Chaque univers apparaît : courbe de recherche à gauche, devanture à droite.
         tl.fromTo(
           q(".tw-world-academic .tw-veil"),
           { opacity: 1 },
@@ -96,12 +96,7 @@ export default function TwoWorlds() {
             { y: 0, opacity: 1, stagger: 0.03, duration: 0.12 },
             0.36,
           )
-          .fromTo(
-            q(".tw-pizza"),
-            { rotation: -40, scale: 0.7 },
-            { rotation: 0, scale: 1, duration: 0.5 },
-            0.3,
-          )
+          .fromTo(q(".tw-storefront"), { scale: 1.12 }, { scale: 1, duration: 0.5 }, 0.3)
           .fromTo(
             q(".tw-chart"),
             { rotation: 30, scale: 0.7 },
@@ -169,32 +164,22 @@ export default function TwoWorlds() {
             >
               <span className="tw-art" aria-hidden="true">
                 <img
-                  className="tw-pizza"
-                  src={asset("atelier-pizza-600.webp")}
+                  className="tw-storefront"
+                  src={asset("local-storefront-640.webp")}
                   alt=""
-                  width="560"
-                  height="560"
+                  width="640"
+                  height="427"
                   decoding="async"
-                  loading="lazy"
-                />
-                <img
-                  className="tw-basil tw-basil-1"
-                  src={asset("pizza-burst/basil-leaf.webp")}
-                  alt=""
-                  loading="lazy"
-                />
-                <img
-                  className="tw-basil tw-basil-2"
-                  src={asset("pizza-burst/basil-leaf.webp")}
-                  alt=""
                   loading="lazy"
                 />
               </span>
               <span className="tw-copy">
                 <span className="eyebrow">{tr("FOR RESTAURANTS AND SHOPS")}</span>
-                <strong>{tr("Websites that make people hungry.")}</strong>
+                <strong>
+                  {tr("Give people a reason")} {tr("to walk in.")}
+                </strong>
                 <span className="tw-link">
-                  {tr("Discover the restaurant offer")} <ArrowUpRight size={18} />
+                  {tr("Discover websites for restaurants and shops")}
                 </span>
               </span>
               <span className="tw-veil" aria-hidden="true" />

@@ -48,7 +48,13 @@
   background: radial-gradient(ellipse at 60% 30%, #145055 0%, #0b2a2c 70%);
 }
 .tw-world-restaurants {
-  background: radial-gradient(ellipse at 50% 35%, #a5161a 0%, #6d0c0f 75%);
+  background: #211b17;
+  .tw-art::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 22%, #17130eed 87%);
+  }
 }
 .tw-art {
   position: absolute;
@@ -74,33 +80,17 @@
     stroke-width: 0.6;
   }
 }
-.tw-pizza {
-  width: min(56%, 300px);
-  margin-top: -20%;
-  border-radius: 50%;
-  box-shadow: 0 30px 50px #3a0406cc;
-}
-// Ombre intégrée à l’image de la feuille (marge incluse).
-.tw-basil {
-  position: absolute;
-  width: 88px;
-}
-.tw-basil-1 {
-  top: 12%;
-  left: 14%;
-  rotate: -35deg;
-}
-.tw-basil-2 {
-  top: 38%;
-  right: 12%;
-  rotate: 130deg;
-  scale: -1 1;
+.tw-storefront {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 .tw-copy {
   display: grid;
   gap: 12px;
   .eyebrow {
-    color: #ffd9c9;
+    color: #f1c693;
   }
   strong {
     max-width: 16ch;

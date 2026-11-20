@@ -87,3 +87,24 @@ for (const width of [320, 390]) {
     ).toBeLessThanOrEqual(1);
   });
 }
+
+test("a light sweeps the formed logo and the mouse lights nearby particles", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("en/");
+  await expect(page.locator(".lh-hero")).toHaveAttribute("data-scene", "animated");
+  const lit = () =>
+    page.locator(".lh-canvas").evaluate((c) => Number(c.dataset.lit ?? 0));
+  // Logo dispersé, pointeur hors de la scène : le reflet n’éclaire rien.
+  await page.mouse.move(5, 890);
+  await page.waitForTimeout(5000);
+  expect(await lit()).toBe(0);
+  // Logo formé : le reflet le traverse au moins une fois en 4,5 s.
+  await scrollHero(page, 1);
+  await expect.poll(lit, { timeout: 6000, intervals: [100] }).toBeGreaterThan(100);
+  // La souris au milieu du logo éclaire les particules autour d’elle.
+  const box = (await page.locator(".lh-logo-area").boundingBox())!;
+  await page.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.5);
+  await expect.poll(lit).toBeGreaterThan(50);
+});

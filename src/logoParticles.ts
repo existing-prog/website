@@ -21,6 +21,14 @@ interface Particle {
 
 const INK = "#eef2f8";
 const DOT = "#c6d4e9";
+const LIGHT = "#ffffff";
+/** Halo autour des particules éclairées : bleu froid, additif. */
+const GLOW = "#8fa8ff";
+/** Reflet : une traversée de 1,6 s, puis une pause, toutes les 4,5 s. */
+const SHEEN_PERIOD = 4.5;
+const SHEEN_SWEEP = 1.6;
+/** Rayon d’éclairage du pointeur, en pixels CSS. */
+const LAMP = 190;
 
 const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 /** Pseudo-hasard stable : la même disposition à chaque visite. */
@@ -50,6 +58,8 @@ export class LogoParticles {
   private width = 0;
   private height = 0;
   private resizeObserver: ResizeObserver;
+  /** Cadre du logo dans le canvas : sert de repère au reflet diagonal. */
+  private box = { left: 0, top: 0, width: 1, height: 1 };
   private removePointer?: () => void;
 
   constructor(private options: LogoParticlesOptions) {
@@ -90,6 +100,7 @@ export class LogoParticles {
     const scale = Math.min(boxW / vw, boxH / vh);
     const left = this.width * area.x + (boxW - vw * scale) / 2;
     const top = this.height * area.y + (boxH - vh * scale) / 2;
+    this.box = { left, top, width: vw * scale, height: vh * scale };
     const off = document.createElement("canvas");
     off.width = Math.ceil(vw * scale);
     off.height = Math.ceil(vh * scale);
@@ -163,6 +174,12 @@ export class LogoParticles {
     const time = now / 1000;
     const { x: px, y: py } = this.pointer;
     let formed = 0;
+    let lit = 0;
+    // Position de la bande de reflet le long de la diagonale du logo (−0,4 → 1,5).
+    const cycle = (time % SHEEN_PERIOD) / SHEEN_SWEEP;
+    const sheen = cycle <= 1 ? -0.4 + cycle * 1.9 : 9;
+    const { left: bl, top: bt, width: bw, height: bh } = this.box;
+    const glows: number[] = [];
     for (const p of this.particles) {
       const t = ease(Math.min(1, Math.max(0, (this.progress - p.delay) / 0.45)));
       if (t >= 1) formed++;
@@ -186,11 +203,42 @@ export class LogoParticles {
       p.oy += (fy - p.oy) * 0.12;
       x += p.ox;
       y += p.oy;
-      ctx.globalAlpha = 0.55 + 0.45 * t;
-      ctx.fillStyle = p.dot ? DOT : INK;
+      // Éclairage : le reflet ne touche que les particules arrivées dans le logo,
+      // la lampe du pointeur éclaire tout ce qui passe à sa portée.
+      const u = (x - bl) / bw + ((y - bt) / bh) * 0.35;
+      const band = (u - sheen) / 0.11;
+      const sweep = band * band < 9 ? Math.exp(-band * band) * t : 0;
+      const dist = Math.sqrt(d2);
+      // Les particules s’écartent du pointeur : la lampe porte plus loin que la poussée.
+      const lamp = dist < LAMP ? (1 - dist / LAMP) ** 1.3 : 0;
+      const light = Math.max(sweep, lamp);
+      ctx.globalAlpha = Math.min(1, 0.5 + 0.3 * t + light * 0.5);
+      ctx.fillStyle = light > 0.35 ? LIGHT : p.dot ? DOT : INK;
       ctx.fillRect(x - p.size / 2, y - p.size / 2, p.size, p.size);
+      if (light > 0.08) {
+        lit++;
+        glows.push(x, y, p.size, light);
+      }
+    }
+    // Halos en mode additif : les zones éclairées rayonnent et se mélangent.
+    if (glows.length) {
+      ctx.globalCompositeOperation = "lighter";
+      ctx.fillStyle = GLOW;
+      for (let i = 0; i < glows.length; i += 4) {
+        const [gx, gy, size, light] = [
+          glows[i],
+          glows[i + 1],
+          glows[i + 2],
+          glows[i + 3],
+        ];
+        const halo = size + 8 * light;
+        ctx.globalAlpha = 0.28 * light;
+        ctx.fillRect(gx - halo / 2, gy - halo / 2, halo, halo);
+      }
+      ctx.globalCompositeOperation = "source-over";
     }
     ctx.globalAlpha = 1;
+    this.options.canvas.dataset.lit = String(lit);
     this.options.canvas.dataset.formed = String(
       this.particles.length ? +(formed / this.particles.length).toFixed(2) : 0,
     );

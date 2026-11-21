@@ -7,7 +7,7 @@ A React + TypeScript storefront for independent frontend services, with SCSS, a 
 - Responsive storefront, subtle motion with reduced-motion support, SVG icons, and locally hosted fonts.
 - Three service directions, interactive project previews, project filters, and real portfolio links.
 - Four-step planner for service, scope, options, project brief and contact details.
-- Native validation, review, downloadable text brief, clipboard copy and an email handoff addressed to `lucasberdy@gmail.com`.
+- Native validation, a review step, and **direct sending through Formspree**: the published site posts the brief to `https://formspree.io/f/xbgogapg`, and Lucas receives it by email. If sending fails or times out, the brief is kept and an email to `lucasberdy@gmail.com` is offered as a fallback. A downloadable text brief and clipboard copy are also available.
 - Explicitly saved drafts in localStorage: resume, edit, update and delete. The UI explains that these are local drafts, not submitted orders. Storage failure is reported; a downloadable brief remains available.
 - Browser tests for responsive widths from 320–1920px, navigation, project filtering, draft persistence, export, validation, focus return, corrupted storage and reduced motion.
 
@@ -15,15 +15,16 @@ A React + TypeScript storefront for independent frontend services, with SCSS, a 
 
 Pricing follows **request a quote → approve the scope**, as requested by the owner. Published indicative guides are €600–€1,200 for a focused portfolio, €1,200–€2,400 for a small brochure/business site, and €45/hour for frontend care. These are proposed starter budgets, not fixed prices or market averages for complete projects. Final scope, price, timing, any taxes and external costs are confirmed in a written quote before approval. No checkout, confirmed bookings, testimonials or delivery guarantees are fabricated.
 
-The website has **no backend** at this stage. The project desk is not an authenticated client account; drafts do not sync across devices. Email requests open the visitor's email application and still require the visitor to press Send. The UI never marks a request as received or paid.
+**Project requests are sent directly through Formspree** (see "Activer l’envoi direct des demandes" below). The site only marks a request as received when Formspree confirms it (`ok: true`). The production build gets the form ID from the Pages workflow (`FORMSPREE_FORM_ID`, default `xbgogapg`). Local builds without that ID fall back to opening the visitor's email app.
 
-To accept real on-site orders, the next implementation needs:
+There is still **no backend of our own**. The project desk is not an authenticated client account, drafts stay in the visitor's browser and don't sync across devices, and the site never marks anything as paid or booked.
+
+Going beyond request-a-quote would need:
 
 1. The business's approved services, scope, prices/currency, billing identity and terms.
 2. A backend with authenticated customer accounts, a database, ownership checks and server-side validation.
-3. A transactional email provider and an order/request submission endpoint.
-4. A payment provider with server-created checkout sessions and verified payment webhooks, if direct payments are desired.
-5. An owner dashboard and authenticated client views for real order states, messages and deliverables.
+3. A payment provider with server-created checkout sessions and verified payment webhooks, if direct payments are desired.
+4. An owner dashboard and authenticated client views for real order states, messages and deliverables.
 
 Keep secret keys out of `VITE_*` variables, frontend code and GitHub Pages. GitHub Pages serves static files; server functions must run on a separate supported backend. These integrations are intentionally not simulated by local draft statuses.
 

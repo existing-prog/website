@@ -116,6 +116,30 @@
 .work-section :focus-visible {
   outline-color: #655f9f;
 }
+// Au clavier, le défilement vers l’élément focalisé est immédiat : avec le
+// défilement doux, le focus arrivait sur un élément encore hors de l’écran.
+// La souris (sans :focus-visible) garde le défilement doux des ancres.
+// !important : ScrollTrigger recopie « smooth » en style en ligne sur <html>.
+html:has(:focus-visible) {
+  scroll-behavior: auto !important;
+}
+// Le clavier ne doit jamais attendre une animation : un bloc encore en cours
+// d’apparition (révélation, chapitre lié au défilement) s’affiche dès qu’il
+// reçoit le focus. !important l’emporte sur les styles en ligne de GSAP.
+.reveal.pending:has(:focus-visible),
+.chapter-content:has(:focus-visible)
+  :is(
+    .chapter-number,
+    .project-details > div:first-child,
+    .project-tags,
+    .chapter-outcome,
+    .chapter-cta
+  ) {
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+  transition: none !important;
+}
 @media (prefers-reduced-motion: reduce) {
   .site-header {
     transition: none;
@@ -197,5 +221,30 @@
 @media (prefers-reduced-motion: reduce) {
   .service-card::before {
     transition: none;
+  }
+}
+
+// Téléphone : chaque lien ou contrôle hors du texte courant offre une zone
+// tactile de 44px. Une couche ::before transparente agrandit la zone sans
+// changer l’apparence (soulignement, espacement) ; les filtres grandissent.
+@media (max-width: 767px) {
+  .site-header .brand,
+  .understated-link,
+  .services-note a,
+  .closing-bottom a,
+  .site-footer a {
+    position: relative;
+    &::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: max(100%, 44px);
+      height: max(100%, 44px);
+      transform: translate(-50%, -50%);
+    }
+  }
+  .work-filters button {
+    min-height: 44px;
   }
 }

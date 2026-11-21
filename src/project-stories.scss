@@ -159,8 +159,14 @@
 }
 .scene-kasa {
   background: #ded8cd;
-  .scene-corner {
-    color: #80544d;
+  // Les libellés passent au-dessus du plan et de la capture : un fond plein
+  // les garde lisibles (4.5:1 et plus) quel que soit ce qui défile dessous.
+  .scene-corner,
+  .device-caption {
+    color: #6e423c;
+    background: #f4efe7;
+    padding: 4px 9px;
+    border-radius: 4px;
   }
   .story-browser {
     top: 28%;

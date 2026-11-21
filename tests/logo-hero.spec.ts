@@ -47,7 +47,7 @@ test("particles gather into the lb. logo with the scroll, then scatter back", as
   await expect(page.locator(".hero-actions .button")).toBeHidden();
   await expect(page.locator(".hero-actions a")).toBeHidden();
   await expect(page.locator(".hero-copy h1")).toHaveAccessibleName(
-    "Living websites. That stay in your hands.",
+    "Websites for independents and restaurants.",
   );
   await expect.poll(() => opacity(page, ".lh-end")).toBeGreaterThan(0.95);
   await scrollHero(page, 0);
@@ -67,7 +67,7 @@ test("reduced motion shows the finished logo and no scroll track", async ({ page
   await expect(page.locator(".lh-canvas")).toBeHidden();
   await expect(page.locator(".lh-end")).toBeHidden();
   await expect(page.locator(".hero-copy h1")).toHaveAccessibleName(
-    "Living websites. That stay in your hands.",
+    "Websites for independents and restaurants.",
   );
 });
 

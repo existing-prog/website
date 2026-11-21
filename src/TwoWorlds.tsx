@@ -165,10 +165,15 @@ export default function TwoWorlds() {
               <span className="tw-art" aria-hidden="true">
                 <img
                   className="tw-storefront"
-                  src={asset("local-storefront-640.webp")}
+                  src={asset("local-storefront.webp")}
+                  // L’image (3:2) est recadrée (cover) dans un cadre carré, et
+                  // en portrait sur téléphone : elle s’affiche plus large que le
+                  // cadre, d’où des tailles supérieures à la largeur de l’écran.
+                  srcSet={`${asset("local-storefront-640.webp")} 640w, ${asset("local-storefront.webp")} 1200w`}
+                  sizes="(max-width: 640px) 170vw, 60vw"
                   alt=""
-                  width="640"
-                  height="427"
+                  width="1200"
+                  height="800"
                   decoding="async"
                   loading="lazy"
                 />

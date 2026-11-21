@@ -7,7 +7,7 @@ for (const width of [320, 360, 375, 390, 430, 768, 1024, 1440, 1920]) {
     await page.goto("en/");
     await page.evaluate(() => document.fonts.ready);
     await expect(
-      page.getByRole("heading", { name: /Living websites.*your hands/ }),
+      page.getByRole("heading", { name: /Websites for independents and restaurants/ }),
     ).toBeVisible();
     const dimensions = await page.evaluate(() => ({
       scroll: document.documentElement.scrollWidth,
@@ -208,7 +208,7 @@ for (const width of [390, 1440]) {
     await page.goto("en/");
     await page.evaluate(() => document.fonts.ready);
     await expect(page.locator(".hero-copy > p")).toHaveText(
-      "I design and build websites that stand out from the first scroll, for independent businesses, restaurants and researchers.",
+      "I design and build websites that stand out from the first scroll, for independent businesses, restaurants and researchers. Projects from €600.",
     );
     await expect(page.locator(".hero-actions .button")).toHaveAccessibleName(
       "Start a project",

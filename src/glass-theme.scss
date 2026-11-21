@@ -368,7 +368,8 @@ body {
       }
     }
     small {
-      color: #b7c4d9;
+      // Plus clair pour rester à 4.5:1 au-dessus du halo de la carte.
+      color: #cad5e6;
     }
   }
 }
@@ -415,8 +416,9 @@ body {
 .story-card.project-card.featured .project-details h3 {
   color: #182334;
 }
+// Assez sombre pour rester lisible (4.5:1) pendant le fondu lié au défilement.
 .story-card.project-card .project-details .eyebrow {
-  color: #536176;
+  color: #45526a;
 }
 .story-card.project-card .project-details .project-tags span {
   color: #3e4c62;

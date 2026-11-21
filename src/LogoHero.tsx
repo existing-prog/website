@@ -135,13 +135,13 @@ export default function LogoHero({ onStart }: { onStart: () => void }) {
             </div>
             <div className="hero-grid">
               <div className="hero-copy">
-                <h1 aria-label={tr("Living websites. That stay in your hands.")}>
-                  <span className="hero-line">{tr("Living websites.")}</span>
-                  <span className="hero-line">{tr("That stay")}</span>
+                <h1 aria-label={tr("Websites for independents and restaurants.")}>
+                  <span className="hero-line">{tr("Websites for")}</span>
+                  <span className="hero-line">{tr("independents")}</span>
                   <span className="hero-line">
-                    {tr("in")}{" "}
+                    {tr("and")}{" "}
                     <span className="hero-accent">
-                      {tr("your hands")}
+                      {tr("restaurants")}
                       <svg
                         viewBox="0 0 340 22"
                         preserveAspectRatio="none"
@@ -156,7 +156,8 @@ export default function LogoHero({ onStart }: { onStart: () => void }) {
                 <p>
                   {tr(
                     "I design and build websites that stand out from the first scroll, for independent businesses, restaurants and researchers.",
-                  )}
+                  )}{" "}
+                  <strong>{tr("Projects from €600.")}</strong>
                 </p>
                 <div className="hero-actions">
                   <button className="button primary" onClick={onStart}>
